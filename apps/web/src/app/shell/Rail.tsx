@@ -14,6 +14,8 @@ const RM_VIEW: Module[] = [
 ];
 
 const CUSTOMER_VIEW: Module[] = [
+  { to: '/client', label: 'Client 360', hint: 'Snapshot · alerts · queue' },
+  { to: '/portfolio', label: 'Portfolio deep dive', hint: 'Holdings · exposure · cash flows' },
   { to: '/impact', label: 'Signal impact', hint: 'Stress waterfall' },
   { to: '/rubric', label: 'Risk rubric', hint: 'Capacity · Appetite · Horizon' },
   { to: '/actions', label: 'Risk & actions', hint: 'Matrix and ranked actions' },

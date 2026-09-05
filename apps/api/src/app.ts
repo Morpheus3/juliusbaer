@@ -3,15 +3,18 @@ import sensible from '@fastify/sensible';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { Config } from './config.js';
 import dbPlugin from './plugins/db.js';
+import { ClientDetailRepository } from './repositories/clientDetailRepository.js';
 import { ClientRepository } from './repositories/clientRepository.js';
 import { DataQualityRepository } from './repositories/dataQualityRepository.js';
 import { LoadRunRepository } from './repositories/loadRunRepository.js';
 import { VectorRepository } from './repositories/vectorRepository.js';
+import { clientDetailRoutes } from './routes/clientDetail.js';
 import { clientRoutes } from './routes/clients.js';
 import { dataQualityRoutes } from './routes/dataQuality.js';
 import { healthRoutes } from './routes/health.js';
 import { vectorRoutes } from './routes/vectors.js';
 import { AnalyticsClient } from './services/analyticsClient.js';
+import { ClientDetailService } from './services/clientDetailService.js';
 import { ClientService } from './services/clientService.js';
 import { DataQualityService } from './services/dataQualityService.js';
 import { HealthService } from './services/healthService.js';
@@ -36,11 +39,13 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   const issues = new DataQualityRepository(app.db);
   const clients = new ClientRepository(app.db);
   const vectors = new VectorRepository(app.db);
+  const detail = new ClientDetailRepository(app.db);
 
   const health = new HealthService(loadRuns, API_VERSION, config.DATASET_TODAY);
   const dataQuality = new DataQualityService(loadRuns, issues);
   const clientService = new ClientService(clients, config.DATASET_TODAY);
   const vectorService = new VectorService(vectors, new AnalyticsClient(config.ANALYTICS_URL));
+  const detailService = new ClientDetailService(detail, config.DATASET_TODAY);
 
   await app.register(healthRoutes(health));
   await app.register(
@@ -48,6 +53,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(dataQualityRoutes(dataQuality));
       await v1.register(clientRoutes(clientService));
       await v1.register(vectorRoutes(vectorService));
+      await v1.register(clientDetailRoutes(detailService));
     },
     { prefix: '/api/v1' },
   );

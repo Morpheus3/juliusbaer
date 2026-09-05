@@ -8,6 +8,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgSchema,
   text,
   timestamp,
@@ -113,3 +114,25 @@ export interface PeerRef {
   /** Features where this peer differs most from the subject, with both values. */
   differences: { feature: string; subject: number | null; peer: number | null }[];
 }
+
+/** Reference: what a structured product is exposed to, and which direct holdings share an issuer. */
+export const lookthroughLegs = derived.table(
+  'lookthrough_legs',
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    instrumentId: text().notNull(),
+    leg: text().notNull(),
+    weight: numeric({ precision: 8, scale: 4, mode: 'number' }).notNull(),
+    exposureName: text().notNull(),
+    sector: text().notNull(),
+    region: text().notNull(),
+    matchedInstrumentId: text(),
+    note: text().notNull(),
+  },
+  (t) => [index('lookthrough_instrument_idx').on(t.instrumentId)],
+);
+
+export const issuerGroups = derived.table('issuer_groups', {
+  instrumentId: text().primaryKey(),
+  exposureName: text().notNull(),
+});

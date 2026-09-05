@@ -15,6 +15,13 @@
       "when": 1788596716149,
       "tag": "0001_cultured_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788598537929,
+      "tag": "0002_silly_sauron",
+      "breakpoints": true
     }
   ]
 }

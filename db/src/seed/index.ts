@@ -7,6 +7,7 @@ import { dataQualityIssues, loadRuns } from '../schema/derived.js';
 import { readDataset } from './dataset.js';
 import { loadRaw } from './load.js';
 import { runQualityChecks } from './quality/index.js';
+import { loadReference } from './reference/index.js';
 
 export interface SeedOptions {
   sourceDir?: string | undefined;
@@ -36,6 +37,9 @@ export async function seed(db: Db, opts: SeedOptions = {}): Promise<SeedResult> 
   try {
     const data = await readDataset(sourceDir);
     const rowCounts = await loadRaw(db, data);
+    const ref = await loadReference(db, new Set(data.instruments.map((i) => i.instrument_id)));
+    rowCounts.lookthrough_legs = ref.legs;
+    rowCounts.issuer_groups = ref.issuers;
     const findings = runQualityChecks(data, today);
 
     if (findings.length > 0) {

@@ -13,6 +13,8 @@ export const SnapshotDateSchema = z.enum(SNAPSHOT_DATES);
 
 /** The dataset's notion of "today". */
 export const DATASET_TODAY: SnapshotDate = '2026-08-26';
+export const CURRENT_SNAPSHOT: SnapshotDate = SNAPSHOT_DATES[4];
+export const BASELINE_SNAPSHOT: SnapshotDate = SNAPSHOT_DATES[0];
 
 export const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'expected YYYY-MM-DD');
 

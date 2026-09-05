@@ -3,7 +3,7 @@ project: jb-rm-workbench
 phase: develop
 artifacts:
   intent_and_spec: docs/BLUEPRINT.html
-  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector
+  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector, ADR-004 look-through and attribution
 iterations:
   - id: 0
     name: Foundation
@@ -13,8 +13,11 @@ iterations:
     name: Customer factual data and vector
     status: done
     completed: 2026-09-05
-  - { id: 2, name: Client 360 and portfolio deep dive, status: next }
-  - { id: 3, name: Signals and impact, status: planned }
+  - id: 2
+    name: Client 360 and portfolio deep dive
+    status: done
+    completed: 2026-09-05
+  - { id: 3, name: Signals and impact, status: next }
   - { id: 4, name: Risk rubric and confidence, status: planned }
   - { id: 5, name: Combined risk, actions, trade ideas, status: planned }
   - { id: 6, name: Book cockpit and horizon lanes, status: planned }

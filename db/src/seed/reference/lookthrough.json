@@ -1,0 +1,126 @@
+{
+  "$comment": "Look-through legs for structured products and issuer groups for direct holdings. Worst-of baskets are allocated equally across legs because the worst performer drives the payoff and cannot be known in advance; this is a stated simplification. Weights are economic exposure per unit of note value.",
+  "legs": [
+    {
+      "instrumentId": "SYN-SP-0501",
+      "leg": "Global Energy Majors ADR",
+      "weight": 0.3333,
+      "exposureName": "Global Energy Majors",
+      "sector": "Energy",
+      "region": "Global",
+      "matchedInstrumentId": "SYN-EQ-0008",
+      "note": "Worst-of basket A leg 1 of 3"
+    },
+    {
+      "instrumentId": "SYN-SP-0501",
+      "leg": "Gulf Marine Services",
+      "weight": 0.3333,
+      "exposureName": "Gulf Marine Services",
+      "sector": "Energy",
+      "region": "Middle East",
+      "matchedInstrumentId": null,
+      "note": "Worst-of basket A leg 2 of 3; Gulf offshore services, no direct holding in the universe"
+    },
+    {
+      "instrumentId": "SYN-SP-0501",
+      "leg": "Helios Cloud Systems",
+      "weight": 0.3334,
+      "exposureName": "Helios Cloud Systems",
+      "sector": "Information Technology",
+      "region": "North America",
+      "matchedInstrumentId": "SYN-ST-0103",
+      "note": "Worst-of basket A leg 3 of 3"
+    },
+    {
+      "instrumentId": "SYN-SP-0502",
+      "leg": "Helios Cloud Systems Inc",
+      "weight": 1.0,
+      "exposureName": "Helios Cloud Systems",
+      "sector": "Information Technology",
+      "region": "North America",
+      "matchedInstrumentId": "SYN-ST-0103",
+      "note": "Single underlying equity-linked note"
+    },
+    {
+      "instrumentId": "SYN-SP-0503",
+      "leg": "Golden Harbour Properties Ltd",
+      "weight": 1.0,
+      "exposureName": "Golden Harbour Properties",
+      "sector": "Real Estate",
+      "region": "Hong Kong",
+      "matchedInstrumentId": "SYN-ST-0106",
+      "note": "Accumulator: obliges daily purchases at HKD 17.20, doubles below strike; economic exposure can exceed the note's carrying value"
+    },
+    {
+      "instrumentId": "SYN-SP-0504",
+      "leg": "XAU spot",
+      "weight": 0.7,
+      "exposureName": "Gold",
+      "sector": "Gold",
+      "region": "Global",
+      "matchedInstrumentId": "SYN-CM-0402",
+      "note": "70% participation, 100% capital protection at maturity; remaining 30% is issuer credit"
+    },
+    {
+      "instrumentId": "SYN-SP-0505",
+      "leg": "Pacific Orient Shipping",
+      "weight": 0.3333,
+      "exposureName": "Pacific Orient Shipping",
+      "sector": "Industrials",
+      "region": "Hong Kong",
+      "matchedInstrumentId": "SYN-ST-0104",
+      "note": "Worst-of basket C leg 1 of 3"
+    },
+    {
+      "instrumentId": "SYN-SP-0505",
+      "leg": "Global Energy Majors ADR",
+      "weight": 0.3333,
+      "exposureName": "Global Energy Majors",
+      "sector": "Energy",
+      "region": "Global",
+      "matchedInstrumentId": "SYN-EQ-0008",
+      "note": "Worst-of basket C leg 2 of 3"
+    },
+    {
+      "instrumentId": "SYN-SP-0505",
+      "leg": "Bara Nusantara Energy",
+      "weight": 0.3334,
+      "exposureName": "Bara Nusantara Energy",
+      "sector": "Energy",
+      "region": "Indonesia",
+      "matchedInstrumentId": "SYN-ST-0101",
+      "note": "Worst-of basket C leg 3 of 3"
+    },
+    {
+      "instrumentId": "SYN-SP-0506",
+      "leg": "Asian banking majors basket",
+      "weight": 1.0,
+      "exposureName": "Asian banking majors",
+      "sector": "Financials",
+      "region": "Asia",
+      "matchedInstrumentId": null,
+      "note": "Three-name worst-of; constituents not disclosed in the dataset"
+    }
+  ],
+  "issuers": [
+    { "instrumentId": "SYN-ST-0106", "exposureName": "Golden Harbour Properties" },
+    { "instrumentId": "SYN-FI-0207", "exposureName": "Golden Harbour Properties" },
+    { "instrumentId": "SYN-ST-0103", "exposureName": "Helios Cloud Systems" },
+    { "instrumentId": "SYN-ST-0102", "exposureName": "Meridian Semiconductor" },
+    { "instrumentId": "SYN-ST-0104", "exposureName": "Pacific Orient Shipping" },
+    { "instrumentId": "SYN-ST-0101", "exposureName": "Bara Nusantara Energy" },
+    { "instrumentId": "SYN-ST-0105", "exposureName": "Sunrise Palm Resources" },
+    { "instrumentId": "SYN-ST-0107", "exposureName": "Nordvind Industrial" },
+    { "instrumentId": "SYN-ST-0108", "exposureName": "Kanto Pharma" },
+    { "instrumentId": "SYN-ST-0109", "exposureName": "Verdant Health Group" },
+    { "instrumentId": "SYN-FI-0206", "exposureName": "Pacific Rim Bank" },
+    { "instrumentId": "SYN-EQ-0008", "exposureName": "Global Energy Majors" },
+    { "instrumentId": "SYN-CM-0401", "exposureName": "Gold" },
+    { "instrumentId": "SYN-CM-0402", "exposureName": "Gold" },
+    { "instrumentId": "SYN-AL-0308", "exposureName": "Aranya Technologies" },
+    { "instrumentId": "SYN-AL-0306", "exposureName": "Direct Property - Sentosa Cove" },
+    { "instrumentId": "SYN-AL-0307", "exposureName": "Direct Property - Mid-Levels" },
+    { "instrumentId": "SYN-FI-0201", "exposureName": "US Treasury" },
+    { "instrumentId": "SYN-FI-0202", "exposureName": "US Treasury" }
+  ]
+}
