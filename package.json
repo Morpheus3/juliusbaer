@@ -1,0 +1,50 @@
+{
+  "name": "jb-rm-workbench",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Agentic Relationship Manager workbench for the Julius Baer SingHacks 2026 challenge",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "db",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:generate": "npm run generate -w @jb/db",
+    "db:migrate": "npm run migrate -w @jb/db",
+    "db:seed": "npm run seed -w @jb/db",
+    "db:reset": "npm run migrate -w @jb/db && npm run seed -w @jb/db",
+    "dev": "concurrently -n api,web -c blue,magenta \"npm run dev -w @jb/api\" \"npm run dev -w @jb/web\"",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "prepare": "husky",
+    "py:check": "docker run --rm -v \"$PWD/services/analytics:/w\" -w /w python:3.12-slim sh -c \"pip install -q -e '.[dev]' >/dev/null 2>&1 && ruff check . && mypy app && pytest -q\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^24.0.0",
+    "concurrently": "^9.2.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.0",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0",
+    "prettier": "^3.6.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.69.0",
+    "vitest": "^3.2.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs}": "eslint --fix",
+    "*.{ts,tsx,js,mjs,json,md,yml,yaml,css,html}": "prettier --write"
+  }
+}

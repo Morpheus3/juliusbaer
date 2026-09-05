@@ -1,0 +1,35 @@
+# Trinity SDLC state. Blueprint approved as combined intent + spec on 2026-09-05 (decision D8).
+project: jb-rm-workbench
+phase: develop
+artifacts:
+  intent_and_spec: docs/BLUEPRINT.html
+  adrs: docs/adr/
+iterations:
+  - id: 0
+    name: Foundation
+    status: done
+    completed: 2026-09-05
+  - id: 1
+    name: Customer factual data and vector
+    status: next
+  - { id: 2, name: Client 360 and portfolio deep dive, status: planned }
+  - { id: 3, name: Signals and impact, status: planned }
+  - { id: 4, name: Risk rubric and confidence, status: planned }
+  - { id: 5, name: Combined risk, actions, trade ideas, status: planned }
+  - { id: 6, name: Book cockpit and horizon lanes, status: planned }
+  - { id: 7, name: Workflow and outreach, status: planned }
+  - { id: 8, name: Assistant and polish, status: planned }
+decisions:
+  D1: { where: ~/Desktop/juliusbaer, branch: feat/rm-workbench, status: confirmed }
+  D2: { claude_access: recorded mode until ANTHROPIC_API_KEY provided, status: confirmed }
+  D3: { models: sonnet-5 analysis, haiku-4-5 fast, status: confirmed }
+  D4:
+    {
+      frontend: React + TypeScript + Vite + Tailwind,
+      status: confirmed,
+      note: React 19 used (current stable),
+    }
+  D5: { orm: Drizzle, status: confirmed }
+  D6: { replay_clock: yes, status: confirmed }
+  D7: { anchor_clients: [CL-0002, CL-0003, CL-0004, CL-0014], status: confirmed }
+  D8: { governance: blueprint as intent+spec, ADRs kept, BRD skipped, status: confirmed }

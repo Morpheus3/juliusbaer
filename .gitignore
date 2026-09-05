@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+services/analytics/.venv/
+__pycache__/
+*.pyc
+
+# build
+dist/
+coverage/
+*.tsbuildinfo
+
+# environment
+.env
+.env.*
+!.env.example
+
+# tooling
+.DS_Store
+*.log
+.vite/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# database dumps and local volumes
+pgdata/
+*.egg-info/

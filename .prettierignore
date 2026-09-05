@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+data/
+db/migrations/meta
+services/analytics/.venv
+*.zip
+package-lock.json

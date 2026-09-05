@@ -1,0 +1,2022 @@
+<title>Agentic RM Workbench Blueprint</title>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface-2: #edf1f6;
+    --ink: #16202e;
+    --ink-2: #3c4858;
+    --muted: #66728a;
+    --line: #d9dfe8;
+    --line-2: #c3ccd9;
+    --accent: #1f4e79;
+    --accent-ink: #ffffff;
+    --accent-soft: #e3ecf5;
+    --brass: #8f6f3a;
+    --brass-soft: #f3ebdd;
+    --crit: #b3261e;
+    --crit-soft: #f9e5e3;
+    --warn: #9a6a00;
+    --warn-soft: #fbf0d2;
+    --ok: #1f7a4d;
+    --ok-soft: #dff2e6;
+    --info: #2b5f9e;
+    --l1: #1f4e79;
+    --l2: #3f7cb4;
+    --l3: #8f6f3a;
+    --shadow: 0 1px 2px rgba(22, 32, 46, 0.06), 0 8px 24px -12px rgba(22, 32, 46, 0.18);
+    --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #0f141c;
+      --surface: #161d28;
+      --surface-2: #1d2634;
+      --ink: #e7ebf1;
+      --ink-2: #c4ccd8;
+      --muted: #95a1b4;
+      --line: #273241;
+      --line-2: #344256;
+      --accent: #7fb0e0;
+      --accent-ink: #0f141c;
+      --accent-soft: #1b2c40;
+      --brass: #d2b27c;
+      --brass-soft: #2a2418;
+      --crit: #f28b82;
+      --crit-soft: #3a1f1d;
+      --warn: #e6be5a;
+      --warn-soft: #332a14;
+      --ok: #7ccb9a;
+      --ok-soft: #173224;
+      --info: #8fb6e8;
+      --l1: #7fb0e0;
+      --l2: #a9cbec;
+      --l3: #d2b27c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0f141c;
+    --surface: #161d28;
+    --surface-2: #1d2634;
+    --ink: #e7ebf1;
+    --ink-2: #c4ccd8;
+    --muted: #95a1b4;
+    --line: #273241;
+    --line-2: #344256;
+    --accent: #7fb0e0;
+    --accent-ink: #0f141c;
+    --accent-soft: #1b2c40;
+    --brass: #d2b27c;
+    --brass-soft: #2a2418;
+    --crit: #f28b82;
+    --crit-soft: #3a1f1d;
+    --warn: #e6be5a;
+    --warn-soft: #332a14;
+    --ok: #7ccb9a;
+    --ok-soft: #173224;
+    --info: #8fb6e8;
+    --l1: #7fb0e0;
+    --l2: #a9cbec;
+    --l3: #d2b27c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: var(--accent);
+  }
+  .page {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 40px 32px 96px;
+  }
+  @media (max-width: 960px) {
+    .page {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding: 24px 18px 64px;
+    }
+    .toc {
+      position: static !important;
+    }
+  }
+  .toc {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    font-size: 13px;
+  }
+  .toc .brand {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .toc .sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-left: 1px solid var(--line);
+  }
+  .toc li a {
+    display: block;
+    padding: 5px 0 5px 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+  }
+  .toc li a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  .toc .meta {
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .toc .meta b {
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  main {
+    min-width: 0;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin: 8px 0 14px;
+    text-wrap: balance;
+    max-width: 22ch;
+  }
+  .lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0 0 28px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin: 64px 0 6px;
+    text-wrap: balance;
+  }
+  h2 + p.intro {
+    color: var(--ink-2);
+    margin: 0 0 22px;
+    max-width: 66ch;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 28px 0 8px;
+    letter-spacing: -0.005em;
+  }
+  p {
+    max-width: 68ch;
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: -2px;
+  }
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 26px 0 0;
+  }
+  @media (max-width: 720px) {
+    .principles {
+      grid-template-columns: 1fr;
+    }
+  }
+  .principle {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+  .principle b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .principle span {
+    color: var(--ink-2);
+    font-size: 14px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+  }
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    margin: 14px 0 6px;
+  }
+  th {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tr:last-child td {
+    border-bottom: 0;
+  }
+  td.num,
+  th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  .id {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .pill.crit {
+    background: var(--crit-soft);
+    color: var(--crit);
+  }
+  .pill.warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+  .pill.ok {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+  .pill.info {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .pill.l1 {
+    background: var(--accent-soft);
+    color: var(--l1);
+  }
+  .pill.l2 {
+    background: var(--accent-soft);
+    color: var(--l2);
+  }
+  .pill.l3 {
+    background: var(--brass-soft);
+    color: var(--l3);
+  }
+  .req {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .callout {
+    border-left: 3px solid var(--brass);
+    background: var(--brass-soft);
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 18px 0;
+    max-width: 72ch;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .callout b {
+    color: var(--ink);
+  }
+  .levels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media (max-width: 720px) {
+    .levels {
+      grid-template-columns: 1fr;
+    }
+  }
+  .level {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .level header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .level header .tag {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .level header .tag.l1 {
+    color: var(--l1);
+  }
+  .level header .tag.l2 {
+    color: var(--l2);
+  }
+  .level header .tag.l3 {
+    color: var(--l3);
+  }
+  .level header span {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .level ul {
+    margin: 0;
+    padding: 12px 14px 12px 28px;
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .level li {
+    margin: 3px 0;
+  }
+  .level .q {
+    padding: 0 14px 12px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .screens {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media (max-width: 820px) {
+    .screens {
+      grid-template-columns: 1fr;
+    }
+  }
+  .screen {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px 14px;
+    box-shadow: var(--shadow);
+  }
+  .screen .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .screen .name {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+  }
+  .screen .src {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .screen p {
+    font-size: 13.5px;
+    color: var(--ink-2);
+    margin: 0 0 8px;
+  }
+  .screen ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .screen li {
+    margin: 2px 0;
+  }
+  .screen .foot {
+    margin-top: 10px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .arch {
+    display: grid;
+    gap: 8px;
+    margin: 18px 0;
+  }
+  .tier {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .tier .label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 12px;
+    font-weight: 600;
+  }
+  .tier .boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+  }
+  .box {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 5px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .box b {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .box span {
+    color: var(--muted);
+    font-size: 12px;
+    display: block;
+    margin-top: 2px;
+  }
+  .box.accent {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .box.brass {
+    border-color: var(--brass);
+    background: var(--brass-soft);
+  }
+  .flow {
+    margin-left: 162px;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 2px 0 2px 12px;
+    border-left: 1px dashed var(--line-2);
+  }
+  @media (max-width: 720px) {
+    .tier {
+      grid-template-columns: 1fr;
+    }
+    .flow {
+      margin-left: 0;
+    }
+  }
+  .engines {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .engine {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 720px) {
+    .engine {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+  .engine .k {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.25;
+  }
+  .engine .k small {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 6px;
+  }
+  .engine .v {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .engine .v p {
+    margin: 0 0 6px;
+  }
+  .engine .v ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  .engine .v li {
+    margin: 2px 0;
+  }
+  .formula {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 6px 0;
+  }
+  .tree {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    color: var(--ink-2);
+    white-space: pre;
+  }
+  .tree i {
+    color: var(--muted);
+    font-style: normal;
+  }
+  .iters {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .iter {
+    display: grid;
+    grid-template-columns: 56px 1fr 180px;
+    gap: 14px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+  @media (max-width: 720px) {
+    .iter {
+      grid-template-columns: 56px 1fr;
+    }
+    .iter .out {
+      grid-column: 2;
+    }
+  }
+  .iter .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    padding-top: 3px;
+  }
+  .iter b {
+    display: block;
+    font-weight: 600;
+  }
+  .iter span {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .iter .out {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .iter .out b {
+    font-size: 12px;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .decisions {
+    counter-reset: d;
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+  .decisions li {
+    counter-increment: d;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .decisions li::before {
+    content: 'D' counter(d);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+    font-weight: 500;
+    padding-top: 2px;
+  }
+  .decisions b {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .decisions span {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .decisions .rec {
+    display: block;
+    margin-top: 4px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .decisions .rec strong {
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+    max-width: 72ch;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .screen {
+      transition: transform 0.15s ease;
+    }
+    .screen:hover {
+      transform: translateY(-1px);
+    }
+  }
+</style>
+
+<div class="page">
+  <nav class="toc" aria-label="Contents">
+    <div class="brand">RM Workbench</div>
+    <div class="sub">Product blueprint · v0.1</div>
+    <ol>
+      <li><a href="#vision">1 · Vision &amp; principles</a></li>
+      <li><a href="#book">2 · The RM and her book</a></li>
+      <li><a href="#ia">3 · Information architecture</a></li>
+      <li><a href="#screens">4 · Screen catalogue</a></li>
+      <li><a href="#engines">5 · Intelligence engines</a></li>
+      <li><a href="#confidence">6 · Confidence &amp; explainability</a></li>
+      <li><a href="#arch">7 · Technical architecture</a></li>
+      <li><a href="#data">8 · Data model</a></li>
+      <li><a href="#quality">9 · Engineering standards</a></li>
+      <li><a href="#plan">10 · Build plan</a></li>
+      <li><a href="#decisions">11 · Decisions to confirm</a></li>
+    </ol>
+    <div class="meta">
+      <b>Source repo</b><br />Morpheus3/juliusbaer<br />(fork of Singhacks-2026)<br /><br />
+      <b>Dataset "today"</b><br />26 Aug 2026<br /><br />
+      <b>Wireframes</b><br />8 slides, PB RM Workbench UX
+    </div>
+  </nav>
+
+  <main>
+    <div class="eyebrow">SingHacks 2026 · Julius Baer Wealth Intelligence</div>
+    <h1>Agentic RM Workbench</h1>
+    <p class="lede">
+      A single-page workbench that turns 20 client files, five portfolio snapshots and sixteen world
+      events into a ranked list of what Priscilla Ong should do this morning, this week and this
+      month, with every recommendation traceable to the evidence that produced it and a
+      machine-checked confidence score beside it.
+    </p>
+
+    <div class="callout">
+      <b>How to read this document.</b> It is the full product scope we agreed to discuss before
+      building. Each section ends in something concrete: a screen, a table, an engine, or a
+      decision. Section 10 breaks the scope into build iterations; we review one iteration at a
+      time.
+    </div>
+
+    <!-- 1 -->
+    <h2 id="vision"><span class="section-num">01</span>Vision and non-negotiable principles</h2>
+    <p class="intro">
+      The dataset README states the goal plainly: move the RM from "what does the portfolio look
+      like" to "what should I know and what should I do next". The wireframe deck adds three
+      operating rules. We adopt all of them as product constraints, not aspirations.
+    </p>
+    <div class="principles">
+      <div class="principle">
+        <b>Scan in 30 seconds</b
+        ><span
+          >The RM cockpit shows the KPI strip, the risk banner and the action queue without
+          scrolling. Nothing on L1 needs a click to be understood.</span
+        >
+      </div>
+      <div class="principle">
+        <b>Evidence before recommendation</b
+        ><span
+          >Every signal, score and trade idea carries its source rows, its model, and its confidence
+          before any action button appears.</span
+        >
+      </div>
+      <div class="principle">
+        <b>Human approval for every action</b
+        ><span
+          >No automated trading. The RM reviews, approves or rejects, and every decision is written
+          to an immutable audit log with maker-checker where required.</span
+        >
+      </div>
+    </div>
+    <h3>Two additional rules from the dataset</h3>
+    <p>
+      <b>The event log is the only source of world events.</b> Claude never free-associates about
+      2026 geopolitics. Explanations cite event IDs from the event log and series from the market
+      context table. If the model wants to reference something outside those files, the
+      explainability layer marks it as an unverified claim.
+    </p>
+    <p>
+      <b>Honesty about uncertainty is a feature.</b> Where the data cannot support a conclusion, the
+      workbench says so and lists what the RM would need to check. The judging notes reward this
+      explicitly.
+    </p>
+
+    <!-- 2 -->
+    <h2 id="book"><span class="section-num">02</span>The RM and her book</h2>
+    <p class="intro">
+      One RM, Priscilla Ong on the Asia desk, covers all 20 clients across Singapore and Hong Kong
+      booking centres. Total book about USD 620m across 24 portfolios. Positions exist at five
+      snapshots from 31 Dec 2025 to 26 Aug 2026, which is what makes trend analysis possible.
+    </p>
+    <p>
+      The judging guidance says to go deep on two or three clients rather than shallow on twenty.
+      The workbench will handle all twenty on L1, but the demo narrative and the deepest
+      explainability follow four clients whose files contain a real tension between what the client
+      says and what the portfolio shows.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Profile</th>
+            <th>Why they anchor the demo</th>
+            <th>Trigger on the horizon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Ravi Chandrasekaran</b><br /><span class="id">CL-0002 · USD 46.7m</span></td>
+            <td>41, founder, Growth (8/10), pre-liquidity event</td>
+            <td>
+              Lombard LTV crossed the 75% trigger on 30 Jun after the tech drawdown, now 73.7%. Drew
+              a further USD 1.7m into the volatility. Meridian Semiconductor at 15.2% breaches the
+              15% single-name limit.
+            </td>
+            <td>
+              <span class="pill crit">Now</span> collateral watch; secondary sale Q4 2026; USD 4.2m
+              tax provision 2027
+            </td>
+          </tr>
+          <tr>
+            <td><b>Margarethe Voss-Brenner</b><br /><span class="id">CL-0003 · USD 22.2m</span></td>
+            <td>58, recently widowed, Conservative (2/10)</td>
+            <td>
+              Inherited portfolio is 71.5% equity and 9.1% fixed income against a Conservative
+              mandate of 10–30% and 45–75%. Nordvind at 18.4%. She asked for "something safe and
+              boring".
+            </td>
+            <td>
+              <span class="pill warn">1 month</span> EUR 3.4m inheritance tax due Oct–Dec 2026, tax
+              lots missing
+            </td>
+          </tr>
+          <tr>
+            <td><b>Chalermchai Suphanburi</b><br /><span class="id">CL-0004 · USD 33.5m</span></td>
+            <td>66, retiring Q2 2027, Income (3/10)</td>
+            <td>
+              Needs USD 1.45m a year from a bond portfolio marked down by the yield move from 4.05%
+              to 4.66%. Forwarded an article on 19 Aug asking whether to move everything to
+              deposits. Unanswered.
+            </td>
+            <td>
+              <span class="pill crit">Now</span> unreplied client email; KYC review due 30 Sep 2026
+            </td>
+          </tr>
+          <tr>
+            <td><b>Lau Chi Ming</b><br /><span class="id">CL-0014 · USD 26.5m</span></td>
+            <td>63, HK property developer, Balanced (5/10)</td>
+            <td>
+              Perpetual, shares, accumulator and his own business are one bet on Hong Kong property.
+              LTV 69.4% against a 70% trigger, facility 83% utilised. Needs HKD 60m equity by
+              mid-2027 and was "surprised how little is liquid".
+            </td>
+            <td>
+              <span class="pill crit">Now</span> margin-call proximity;
+              <span class="pill warn">1 month</span> liquidity plan for Nov 2026 start of need
+              window
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size: 13px; color: var(--muted)">
+      Secondary storylines the engines will still surface: Cheung Kwok Wing (71, drawing USD 1.28m a
+      year, will not sell bonds at a loss, longest maturity 2045), Aishah binti Rahman (two excluded
+      instruments inside a Sustainable mandate), Fong Family Office (private equity fund at 35% of a
+      sleeve capped at 25%, private credit gated three quarters, USD 15.8m uncalled), Tan Boon Huat
+      (78, no succession structure, KYC due 31 Aug 2026).
+    </p>
+
+    <!-- 3 -->
+    <h2 id="ia">
+      <span class="section-num">03</span>Information architecture: two views, three levels
+    </h2>
+    <p class="intro">
+      The workbench is one single-page application with two top-level views. Each view is layered so
+      that L1 answers "what needs my attention", L2 answers "why, and how sure are we", and L3
+      exposes the raw evidence and model internals. The same three-level contract applies to every
+      card, chart and recommendation, which is how explainability becomes a habit rather than a
+      feature.
+    </p>
+    <div class="levels">
+      <div class="level">
+        <header><span class="tag l1">L1</span><span>Attention</span></header>
+        <ul>
+          <li>Ranked queues: Now · This week · This month</li>
+          <li>KPI strip and composite risk gauge</li>
+          <li>Severity pills, deltas since last snapshot</li>
+          <li>One-line plain-English insight per item</li>
+        </ul>
+        <div class="q">"Who do I call first, and why in one sentence?"</div>
+      </div>
+      <div class="level">
+        <header><span class="tag l2">L2</span><span>Reasoning</span></header>
+        <ul>
+          <li>Evidence drawer: source rows, event IDs, market series</li>
+          <li>Rubric scores with observed behaviour</li>
+          <li>Impact waterfalls and assumptions</li>
+          <li>Confidence breakdown: rules · LLM · statistical model · data quality</li>
+        </ul>
+        <div class="q">"How was this reached, and could I defend it to the client?"</div>
+      </div>
+      <div class="level">
+        <header><span class="tag l3">L3</span><span>Evidence &amp; audit</span></header>
+        <ul>
+          <li>Raw holdings, transactions, notes behind a claim</li>
+          <li>Model parameters, prompts, validator outputs</li>
+          <li>Snapshot-by-snapshot trajectory tables</li>
+          <li>Immutable decision and override log</li>
+        </ul>
+        <div class="q">"Show me the exact numbers and the exact prompt."</div>
+      </div>
+    </div>
+
+    <h3>RM View versus Customer View</h3>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 90px">Level</th>
+            <th>RM View (whole book)</th>
+            <th>Customer View (one client)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill l1">L1</span></td>
+            <td>
+              Book cockpit: 20 clients ranked by composite urgency, action horizon lanes (Now / 1
+              week / 1 month), live signal ticker, book-level KPIs, meetings in the next fortnight.
+            </td>
+            <td>
+              Client 360: AUM, tier, last contact, next review, active alerts banner, portfolio
+              snapshot donut, rubric summary, action queue for this client.
+            </td>
+          </tr>
+          <tr>
+            <td><span class="pill l2">L2</span></td>
+            <td>
+              Signal-to-book impact: which clients each event touched and by how much; mandate
+              governance grid across all portfolios; collateral trajectory board for the five
+              facilities; trend analysis explaining why an item moved lanes.
+            </td>
+            <td>
+              Portfolio deep dive (holdings, exposure look-through, transactions, cash flows),
+              Signal impact analysis with waterfall, Risk rubric with evidence and RM override,
+              Combined risk matrix and ranked actions, Trade ideas with suitability check.
+            </td>
+          </tr>
+          <tr>
+            <td><span class="pill l3">L3</span></td>
+            <td>
+              Audit trail across the book, model run history, validator reports, data quality
+              register (stale valuations, missing tax lots, entity clients with no age).
+            </td>
+            <td>
+              Customer Vector explorer (feature values, weights, nearest peers), raw rows behind
+              each evidence card, prompt and response transcript for each LLM call, override
+              history.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4 -->
+    <h2 id="screens"><span class="section-num">04</span>Screen catalogue</h2>
+    <p class="intro">
+      Fourteen screens. Eight map directly onto the wireframe slides, six are additions required by
+      the brief (book-level cockpit, horizon lanes, trade ideas, customer vector, chatbot, audit).
+      All live inside one application shell with the client selector, global search and the
+      assistant drawer persistent across routes.
+    </p>
+    <div class="screens">
+      <div class="screen">
+        <div class="top">
+          <span class="name">Application shell</span><span class="src">slide 01</span>
+        </div>
+        <p>
+          Persistent left rail with the five modules plus book view, top bar with client switcher,
+          "as of" clock and stale-data warning, right-hand assistant drawer. Keyboard-first: ⌘K
+          opens client and signal search.
+        </p>
+        <div class="foot"><span class="pill l1">L1</span><span class="req">req 4, 9</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Book cockpit</span><span class="src">new · RM View</span>
+        </div>
+        <p>
+          The Monday-morning screen. Three horizon lanes (Now, next 7 days, next 30 days) populated
+          by the Horizon engine, each card with client, one-line reason, composite score and
+          lane-change arrow showing trend versus the previous snapshot.
+        </p>
+        <ul>
+          <li>Book KPIs: AUM, YTD, clients in breach, facilities near trigger, KYC overdue</li>
+          <li>
+            Filters: severity, booking centre, mandate, theme (energy, duration, tech, HK property)
+          </li>
+        </ul>
+        <div class="foot">
+          <span class="pill l1">L1</span><span class="pill l2">L2</span
+          ><span class="req">req 8, 9</span>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="top"><span class="name">Client 360</span><span class="src">slide 02</span></div>
+        <p>
+          Header with household / entity / account scope, AUM, tier, last contact, next review.
+          Active alerts banner. Three columns: portfolio snapshot with allocation donut and top
+          holdings; live signals filtered to this client's exposures; RM action queue with
+          approve-and-log.
+        </p>
+        <div class="foot"><span class="pill l1">L1</span><span class="req">req 9</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Portfolio deep dive</span><span class="src">slide 03</span>
+        </div>
+        <p>
+          Tabs: Overview, Holdings, Exposure, Transactions, Cash flows. Holdings table with
+          liquidity tier and concentration flag columns. Exposure tab performs structured-product
+          look-through using the underlying reference field and aggregates across all the client's
+          portfolios, including custody.
+        </p>
+        <ul>
+          <li>
+            Liabilities and cash needs panel fed from planned cash needs, commitments and credit
+            facilities
+          </li>
+          <li>Actions: Run stress test, Compare scenarios, Export report</li>
+        </ul>
+        <div class="foot"><span class="pill l2">L2</span><span class="pill l3">L3</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Market signals feed</span><span class="src">slide 04</span>
+        </div>
+        <p>
+          Streaming feed replayed from the event log and market context with a simulation clock.
+          Each signal shows severity, age, source, confidence and affected asset classes, then "why
+          it matters" written for the selected client. Evidence drawer on the right with confidence
+          breakdown and affected holdings.
+        </p>
+        <div class="foot">
+          <span class="pill l1">L1</span><span class="pill l2">L2</span
+          ><span class="req">req 7</span>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Signal impact analysis</span><span class="src">slide 05</span>
+        </div>
+        <p>
+          Select one or more signals, run the Impact engine. Stress waterfall from current AUM to
+          stressed AUM by factor (rates, FX, volatility, credit, energy). Base / mild / severe
+          toggles. Asset class impact, top impacted holdings, and an Assumptions panel stating the
+          models used and the confidence range.
+        </p>
+        <ul>
+          <li>
+            Scenario library: Strait of Hormuz reopens, escalation, Fed hike, tech drawdown repeat
+          </li>
+          <li>Actions: Draft client outreach, Save scenario, Discuss with CIO</li>
+        </ul>
+        <div class="foot"><span class="pill l2">L2</span><span class="req">req 3, 6</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Customer risk rubric</span><span class="src">slide 06</span>
+        </div>
+        <p>
+          Three dimensions scored 1–3: Risk Capacity, Risk Appetite, Investment Horizon. Each shows
+          the three rubric definitions, the selected score, observed evidence from transactions and
+          notes, system confidence, and an RM override control that requires a reason and is written
+          to the audit log.
+        </p>
+        <ul>
+          <li>
+            Mismatch warning when portfolio risk exceeds Appetite or stated profile disagrees with
+            behaviour
+          </li>
+          <li>Save and lock rubric creates a versioned record</li>
+        </ul>
+        <div class="foot">
+          <span class="pill l2">L2</span><span class="pill l3">L3</span
+          ><span class="req">req 1.1</span>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Customer vector explorer</span><span class="src">new · L3</span>
+        </div>
+        <p>
+          The machine view of a client: factual fields on the left, the behavioural feature vector
+          on the right with each feature's value, percentile in the book, and contribution to each
+          rubric score. Nearest-peer panel lists the three most similar clients by vector distance
+          and what differs.
+        </p>
+        <div class="foot"><span class="pill l3">L3</span><span class="req">req 1, 6</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Combined risk and actions</span><span class="src">slide 07</span>
+        </div>
+        <p>
+          Decision matrix of client vulnerability (from the rubric) against signal severity, with
+          the client's current cell highlighted. Composite risk gauge decomposed into signal
+          severity, rubric mismatch and concentration. Ranked actions with suitability status,
+          evidence, benefit and trade-off, and an RM approve-and-log button.
+        </p>
+        <div class="foot">
+          <span class="pill l1">L1</span><span class="pill l2">L2</span
+          ><span class="req">req 7</span>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="top"><span class="name">Trade ideas</span><span class="src">new</span></div>
+        <p>
+          Ideas generated by the Trade Ideas engine from market signals, current holdings and the
+          rubric. Each idea states direction, instrument from the 62-instrument universe, sizing
+          within mandate bands, the signal that motivates it, suitability check result and
+          confidence. Rejected ideas remain visible with the rule that blocked them.
+        </p>
+        <ul>
+          <li>
+            Examples the data supports: reduce duration for CL-0012, hedge SGD/USD mismatch for
+            CL-0006, replace excluded energy fund for CL-0005
+          </li>
+        </ul>
+        <div class="foot"><span class="pill l2">L2</span><span class="req">req 7</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Workflow and approvals</span><span class="src">slide 08</span>
+        </div>
+        <p>
+          The nine-step flow from Select customer to Log decision, shown as a progress rail. Alert
+          triage panel, recommendation review with suitability, compliance pre-clearance,
+          explainability attached, maker-checker status and permission check. Client outreach
+          preview drafted by Claude in the client's reporting language, editable, Send and log.
+        </p>
+        <div class="foot"><span class="pill l1">L1</span><span class="pill l3">L3</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Assistant drawer</span><span class="src">new · chatbot</span>
+        </div>
+        <p>
+          Slide-out chat available on every screen, scoped to the current client or the whole book.
+          Claude answers with tools that query Postgres, run the analytics service and read the
+          event log. Every answer lists the tool calls it made and links to the L3 rows. Suggested
+          prompts change with context.
+        </p>
+        <ul>
+          <li>Analysis modes: Product, Customer, Portfolio, Transactions, Market, Compliance</li>
+        </ul>
+        <div class="foot"><span class="pill l2">L2</span><span class="req">req 10</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Mandate and collateral board</span
+          ><span class="src">new · RM View L2</span>
+        </div>
+        <p>
+          Grid of all 24 portfolios against their bands, colour-coded by breach and by whether the
+          breach is drift, client-directed or waived (waivers detected from RM notes). Collateral
+          panel traces LTV for the five facilities across the five snapshots and shows headroom to
+          trigger.
+        </p>
+        <div class="foot"><span class="pill l2">L2</span><span class="req">req 8</span></div>
+      </div>
+
+      <div class="screen">
+        <div class="top">
+          <span class="name">Audit and data quality</span><span class="src">new · L3</span>
+        </div>
+        <p>
+          Timestamped log of every approval, rejection, override, outreach and model run. Data
+          quality register listing artefacts the pipeline detected: valuation dated 30 Sep 2025 on
+          an illiquid holding, missing tax lots on the transferred-in portfolio, entity client
+          without age, custody accounts excluded from mandate checks.
+        </p>
+        <div class="foot"><span class="pill l3">L3</span><span class="req">req 6</span></div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <h2 id="engines"><span class="section-num">05</span>Intelligence engines</h2>
+    <p class="intro">
+      Seven engines sit between Postgres and the UI. Each is a pure function of database state plus
+      a run timestamp, writes its output back to versioned tables, and exposes an explanation object
+      that the UI renders at L2 and L3. Claude is used where language and judgement are needed;
+      deterministic Python is used wherever a number can be computed.
+    </p>
+    <div class="engines">
+      <div class="engine">
+        <div class="k">Customer Vector<small>customer_vector · nightly + on demand</small></div>
+        <div class="v">
+          <p>
+            Two artefacts per client. <b>Factual data</b> is a normalised record: demographics,
+            domicile versus residence, wealth band, mandate, stated risk profile and score, horizon,
+            liquidity needs, objectives, life stage, KYC status, planned cash needs, facilities,
+            commitments.
+          </p>
+          <p>
+            <b>Behavioural vector</b> is a fixed-order numeric vector computed from holdings and
+            transactions across the five snapshots. Initial feature set:
+          </p>
+          <ul>
+            <li>
+              Cash buffer %, cash buffer trend, withdrawal frequency and unplanned-withdrawal count
+            </li>
+            <li>
+              Portfolio volatility proxy, max drawdown across snapshots, behaviour in drawdown
+              (added, held, sold)
+            </li>
+            <li>Turnover, average holding period, share of tactical versus core positions</li>
+            <li>
+              Concentration: top-1 and top-3 weight with look-through, source-of-wealth overlap flag
+            </li>
+            <li>Liquidity runway: daily-liquid assets divided by 12-month confirmed cash needs</li>
+            <li>Leverage: LTV, utilisation, LTV slope over five snapshots</li>
+            <li>Mandate drift velocity, days to nearest cash need, days to KYC due</li>
+          </ul>
+          <p>
+            An LLM-derived <b>narrative embedding</b> of the RM notes is stored alongside in
+            pgvector for similarity search and chatbot retrieval. The behavioural vector, not the
+            embedding, drives the rubric.
+          </p>
+        </div>
+      </div>
+
+      <div class="engine">
+        <div class="k">Risk Rubric<small>risk_rubric · Capacity · Appetite · Horizon</small></div>
+        <div class="v">
+          <p>
+            Scores each dimension 1–3 exactly as the wireframe defines them. Three independent
+            assessors produce a score with evidence; agreement between them becomes the confidence.
+          </p>
+          <ul>
+            <li>
+              <b>Rules assessor</b> (Python): thresholds on vector features, for example Capacity 1
+              when cash buffer under 5% or two unplanned withdrawals in six months.
+            </li>
+            <li>
+              <b>LLM assessor</b> (Claude): reads the factual record, the vector with feature
+              descriptions, and the RM notes; returns a structured score, cited evidence, and a
+              stated-versus-observed mismatch flag.
+            </li>
+            <li>
+              <b>Statistical assessor</b> (Python): a calibrated classifier over the vector,
+              described in section 6.
+            </li>
+          </ul>
+          <p>
+            Output includes the mismatch warning ("Portfolio risk exceeds Appetite score") and the
+            RM override slot. Scores are versioned; the client's stated risk profile from the client
+            file is shown next to the behavioural score so the tension is visible.
+          </p>
+        </div>
+      </div>
+
+      <div class="engine">
+        <div class="k">
+          Signal Engine<small>signals · replayed from event_log + market_context</small>
+        </div>
+        <div class="v">
+          <p>
+            Converts the 16 events and 23 market series into typed signals with severity,
+            transmission channels and the client exposures they touch. A simulation clock replays
+            signals so the feed feels live during a demo while remaining fully grounded. Each signal
+            maps its transmission channels to instruments through sector, region, sub-asset class
+            and structured-product underlying reference.
+          </p>
+          <p>
+            Confidence is decomposed the way the wireframe shows it: data freshness, source
+            reliability, model confidence. For this dataset "source reliability" is 100% for
+            event-log items and marked lower for any derived signal.
+          </p>
+        </div>
+      </div>
+
+      <div class="engine">
+        <div class="k">Impact Engine<small>impact · deterministic stress models</small></div>
+        <div class="v">
+          <p>
+            Runs the stress waterfall. Models are simple, stated on screen, and computed in Python
+            so they can be validated:
+          </p>
+          <ul>
+            <li>
+              Rates: modified duration × yield change per bond, duration estimated from maturity and
+              coupon
+            </li>
+            <li>
+              FX: notional × spot move for each instrument currency against portfolio base currency
+            </li>
+            <li>
+              Equity: beta-adjusted index move by region and sector, with a technology and energy
+              overlay
+            </li>
+            <li>
+              Structured products: payoff approximation from the underlying reference and barrier
+              terms
+            </li>
+            <li>
+              Collateral: recompute lending value and LTV after the shock, flag trigger breaches
+            </li>
+            <li>
+              Liquidity: post-shock daily-liquid assets against confirmed needs in the next 12
+              months
+            </li>
+          </ul>
+          <p>
+            Base, mild and severe scenarios plus a named library: Strait reopens, escalation, Fed
+            hike, tech drawdown repeat. Claude writes the narrative and the "assumptions" paragraph
+            but never the numbers.
+          </p>
+        </div>
+      </div>
+
+      <div class="engine">
+        <div class="k">Trade Ideas<small>trade_ideas · signal × portfolio × rubric</small></div>
+        <div class="v">
+          <p>
+            Candidate ideas are generated by rules (reduce duration where horizon is short and rates
+            rose; hedge currency mismatch where obligations differ from asset currency; trim single
+            names over the limit; replace excluded holdings in sustainable mandates; raise cash
+            where liquidity runway is under 12 months). Claude then ranks and explains them for the
+            specific client, in the client's framing from the notes.
+          </p>
+          <p>
+            Every idea passes a <b>suitability gate</b>: within mandate bands after the trade,
+            respects single-position limit, respects exclusions, respects liquidity tier versus need
+            date, respects the rubric. Failed ideas are shown with the failing rule rather than
+            hidden, because the RM should see what the system considered.
+          </p>
+        </div>
+      </div>
+
+      <div class="engine">
+        <div class="k">Horizon Engine<small>horizon · Now · 7 days · 30 days</small></div>
+        <div class="v">
+          <p>
+            Assigns each open item to a lane using trend across the five snapshots rather than a
+            static threshold. Examples from the data:
+          </p>
+          <ul>
+            <li>
+              <b>Now:</b> LTV within 1 point of trigger or crossed it in the last two snapshots
+              (Ravi, Lau); client message unanswered more than five days (Chalermchai, 19 Aug); KYC
+              overdue (Tan, 31 Aug).
+            </li>
+            <li>
+              <b>7 days:</b> KYC due within 14 days (Chen, 11 Sep); confirmed cash need starting
+              within 30 days (Nguyen's US fees, Aishah's Australian fees, both Sep 2026); meetings
+              in the fortnight.
+            </li>
+            <li>
+              <b>30 days:</b> cash needs starting within 90 days (Voss-Brenner EUR 3.4m from Oct);
+              capital call windows opening (Fong, Q4 2026); mandate drift whose velocity will breach
+              a band within one snapshot interval.
+            </li>
+          </ul>
+          <p>
+            Each card records why it is in its lane and the lane it would have held one snapshot
+            earlier, so the RM sees momentum, not just state.
+          </p>
+        </div>
+      </div>
+
+      <div class="engine">
+        <div class="k">Assistant<small>chat · Claude with typed tools</small></div>
+        <div class="v">
+          <p>
+            A tool-using agent. Tools are narrow and read-only against Postgres and the analytics
+            service: get client, list holdings with look-through, compare snapshots, list
+            transactions, get mandate status, run impact scenario, search notes, list events. Writes
+            (approve, override, draft outreach) go through the same API the UI uses and still
+            require the RM's click.
+          </p>
+          <p>
+            The system prompt injects the event log as the only permitted world knowledge. Every
+            reply carries the tool trace, which the UI renders as the L3 for that answer.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <h2 id="confidence">
+      <span class="section-num">06</span>Confidence scoring and explainability
+    </h2>
+    <p class="intro">
+      The brief asks for predictive Python code that validates LLM outputs and shows a confidence
+      score. With twenty clients there is no honest way to train a supervised model on real labels,
+      so the design is transparent about what the score means.
+    </p>
+    <h3>What the confidence score is</h3>
+    <p>
+      A weighted agreement measure between independent assessors, penalised for data quality and
+      staleness:
+    </p>
+    <div class="formula">
+      confidence = 0.45·agreement(rules, llm, stat) + 0.25·stat_calibrated_prob + 0.15·data_quality
+      + 0.15·freshness
+    </div>
+    <ul style="font-size: 14px; color: var(--ink-2)">
+      <li>
+        <b>Agreement</b> is 1 when all three assessors return the same rubric score, 0.6 when two
+        agree, 0.2 when all differ. For numeric outputs (impact estimates) it is 1 minus the
+        relative gap between the LLM's stated figure and the Python recomputation.
+      </li>
+      <li>
+        <b>Statistical assessor</b> is a gradient-boosted classifier trained on a disclosed
+        archetype simulation: several thousand synthetic behavioural vectors generated from the
+        rubric definitions themselves, with noise, then isotonic-calibrated. It cannot know things
+        the rules do not encode, and the UI says so. Its value is catching an LLM score that the
+        numbers do not support.
+      </li>
+      <li>
+        <b>Data quality</b> drops for stale valuation dates, missing cost basis, custody accounts
+        mixed into mandate checks, and entity clients without demographic fields.
+      </li>
+      <li>
+        <b>Freshness</b> follows the wireframe rule: full credit under 15 minutes on the simulation
+        clock, decaying afterwards, with the stale-data warning shown above 15 minutes.
+      </li>
+    </ul>
+    <h3>Explainability contract</h3>
+    <p>
+      Every insight object stored in Postgres carries the same shape, and the UI renders it
+      identically at every level:
+    </p>
+    <div class="tree">
+      insight ├── headline <i>L1 · one sentence, plain English</i> ├── severity, lane <i>L1</i> ├──
+      confidence <i>L1 number · L2 breakdown</i> ├── reasoning[]
+      <i>L2 · ordered steps, each citing evidence ids</i> ├── evidence[]
+      <i>L2 · {table, row_ids, fields, values}</i> ├── models[]
+      <i>L2 · {name, version, parameters, output}</i> ├── assessors
+      <i>L2 · rules / llm / stat scores side by side</i> ├── caveats[]
+      <i>L2 · what the data cannot tell us</i> ├── llm_trace
+      <i>L3 · prompt hash, model id, response, tokens</i> └── lineage
+      <i>L3 · run id, snapshot date, inputs hash</i>
+    </div>
+    <p>
+      The stated-versus-observed comparison is a first-class field: the client file says Growth
+      8/10, the behaviour says Appetite 3/3, the note says "agitated about the drop". When they
+      disagree the workbench shows all three rather than picking one.
+    </p>
+
+    <!-- 7 -->
+    <h2 id="arch"><span class="section-num">07</span>Technical architecture</h2>
+    <p class="intro">
+      Node and Postgres as requested, a small Python service for anything numeric, Claude behind a
+      single gateway module so model choice, prompt versions and cost are controlled in one place.
+      Everything runs locally with Docker Compose.
+    </p>
+    <div class="arch">
+      <div class="tier">
+        <div class="label">Client</div>
+        <div class="boxes">
+          <div class="box accent">
+            <b>React 18 + TypeScript SPA</b
+            ><span
+              >Vite · React Router · TanStack Query · Zustand · ECharts · Tailwind with design
+              tokens</span
+            >
+          </div>
+          <div class="box">
+            <b>Server-sent events</b
+            ><span>Signal feed and analysis progress streamed to the UI</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow">
+        REST + SSE over localhost, typed with Zod schemas shared between web and API
+      </div>
+      <div class="tier">
+        <div class="label">API</div>
+        <div class="boxes">
+          <div class="box accent">
+            <b>Node 24 · Fastify · TypeScript</b
+            ><span
+              >Route → service → repository layers. Zod validation at the edge. OpenAPI generated
+              from schemas.</span
+            >
+          </div>
+          <div class="box brass">
+            <b>Claude gateway</b
+            ><span
+              >Anthropic SDK. Sonnet 5 for analysis and chat, Haiku 4.5 for classification and
+              routing. Prompt registry, structured outputs, trace persistence.</span
+            >
+          </div>
+          <div class="box">
+            <b>Engines (TypeScript orchestration)</b
+            ><span>Rubric · Signals · Trade ideas · Horizon · Assistant tools</span>
+          </div>
+          <div class="box">
+            <b>Audit and workflow</b
+            ><span>Approvals, overrides, maker-checker, outreach drafts</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow">
+        HTTP to analytics service; SQL via Drizzle ORM with migrations under version control
+      </div>
+      <div class="tier">
+        <div class="label">Analytics</div>
+        <div class="boxes">
+          <div class="box accent">
+            <b>Python 3.12 · FastAPI</b
+            ><span
+              >pandas · numpy · scikit-learn · pydantic. Runs in Docker because the host Python is
+              3.9.</span
+            >
+          </div>
+          <div class="box">
+            <b>Vector builder</b><span>Behavioural features from holdings and transactions</span>
+          </div>
+          <div class="box">
+            <b>Impact models</b
+            ><span>Duration · FX · beta · structured payoff · collateral · liquidity</span>
+          </div>
+          <div class="box">
+            <b>Validator</b
+            ><span>Calibrated classifier, agreement scoring, confidence assembly</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow">Postgres wire protocol</div>
+      <div class="tier">
+        <div class="label">Data</div>
+        <div class="boxes">
+          <div class="box accent">
+            <b>PostgreSQL 17 + pgvector</b
+            ><span
+              >Docker on host port 5433. Raw schema mirrors the CSVs; derived schema holds vectors,
+              insights, runs, audit.</span
+            >
+          </div>
+          <div class="box">
+            <b>Ingestion</b
+            ><span>Idempotent loader from data/ with data-quality register output</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size: 13px; color: var(--muted)">
+      Docker Desktop is installed and running on this machine with the postgres:17-alpine image
+      already pulled. An unrelated project's Postgres container is bound to 5432 internally, so the
+      workbench uses 5433 to avoid a clash.
+    </p>
+
+    <h3>Repository layout in the fork</h3>
+    <div class="tree">
+      juliusbaer/ ├── apps/ │ ├── web/ <i>React SPA</i> │ └── api/
+      <i>Fastify API, engines, Claude gateway</i> ├── services/ │ └── analytics/
+      <i>FastAPI: vectors, impact models, validator</i> ├── packages/ │ └── contracts/
+      <i>Zod schemas + generated types shared by web and api</i> ├── db/ │ ├── migrations/
+      <i>Drizzle SQL migrations</i> │ └── seed/ <i>CSV loader, data-quality checks</i> ├── data/
+      <i>the SingHacks dataset, unchanged</i> ├── docs/
+      <i>this blueprint, ADRs, demo script, prompt registry</i> ├── docker-compose.yml
+      <i>postgres, analytics, api, web</i> └── README.md
+    </div>
+
+    <!-- 8 -->
+    <h2 id="data"><span class="section-num">08</span>Data model</h2>
+    <p class="intro">
+      Two schemas. The raw schema is a faithful load of the twelve source files so every derived
+      number can be traced to a row. The derived schema is what the engines write and the UI reads.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Schema</th>
+            <th>Table</th>
+            <th>Grain</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="id">raw</td>
+            <td>
+              clients, portfolios, holdings, instruments, mandates, transactions, credit_facilities,
+              commitments, planned_cash_needs, market_context, event_log, rm_notes
+            </td>
+            <td>as in the data dictionary</td>
+            <td>
+              Wide snapshot columns (aum_2025-12-31 …) are unpivoted into long tables on load. Bond
+              quantity convention (units of 100 nominal) is preserved and documented.
+            </td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>client_factual</td>
+            <td>client</td>
+            <td>
+              Normalised factual record including domicile ≠ residence flag, KYC status, entity flag
+            </td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>client_vector</td>
+            <td>client × run</td>
+            <td>
+              Behavioural feature vector as JSONB with a fixed feature manifest; narrative embedding
+              as vector(1024)
+            </td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>rubric_score</td>
+            <td>client × dimension × run</td>
+            <td>
+              Rules, LLM and statistical scores, evidence ids, confidence, RM override with reason
+            </td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>exposure_lookthrough</td>
+            <td>client × snapshot × underlying</td>
+            <td>Aggregated across portfolios with structured products resolved to underlyings</td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>mandate_status</td>
+            <td>portfolio × snapshot × asset class</td>
+            <td>Weight, band, breach flag, breach type (drift / client-directed / waived)</td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>signal</td>
+            <td>signal</td>
+            <td>
+              From event log and market moves; transmission channels, affected instruments,
+              confidence parts
+            </td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>impact_run, impact_line</td>
+            <td>run · run × holding × factor</td>
+            <td>Scenario, parameters, per-holding shock and post-shock LTV and liquidity</td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>insight</td>
+            <td>insight</td>
+            <td>The explainability object from section 6, JSONB with indexed headline fields</td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>action, trade_idea</td>
+            <td>item</td>
+            <td>
+              Lane, urgency score, suitability result, status (proposed / approved / rejected /
+              sent)
+            </td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>audit_event</td>
+            <td>event</td>
+            <td>
+              Append-only. Approvals, overrides, outreach, model runs, with actor and timestamp
+            </td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>llm_trace</td>
+            <td>call</td>
+            <td>Prompt id and hash, model id, input hash, response, usage, latency</td>
+          </tr>
+          <tr>
+            <td class="id">derived</td>
+            <td>data_quality_issue</td>
+            <td>issue</td>
+            <td>
+              Detected on load: stale valuation, missing cost basis, null age on entity, custody
+              excluded from mandate
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9 -->
+    <h2 id="quality"><span class="section-num">09</span>Engineering standards</h2>
+    <p class="intro">
+      The brief asks for stringency on code quality and structure. These are the rules the codebase
+      will be held to from the first commit.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Standard</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Language and types</td>
+            <td>
+              TypeScript strict mode everywhere; no <span class="id">any</span>. Shared Zod
+              contracts generate the types used on both sides. Python typed with pydantic models and
+              mypy in strict mode.
+            </td>
+          </tr>
+          <tr>
+            <td>Structure</td>
+            <td>
+              API in route → service → repository layers; engines are pure modules with explicit
+              inputs and outputs; no SQL in route handlers; no business logic in React components.
+            </td>
+          </tr>
+          <tr>
+            <td>Testing</td>
+            <td>
+              Vitest for TypeScript, pytest for Python. Engines and impact models tested against
+              hand-computed fixtures from the dataset, for example the Ravi LTV path and the
+              Voss-Brenner mandate breach. Contract tests between API and analytics service.
+            </td>
+          </tr>
+          <tr>
+            <td>LLM discipline</td>
+            <td>
+              All prompts live in a registry with versions. Structured outputs validated against
+              schemas; a failed validation is an error, never silently accepted. Every call traced.
+              Numbers in narratives are injected from computed values, not generated.
+            </td>
+          </tr>
+          <tr>
+            <td>Linting and formatting</td>
+            <td>
+              ESLint with typescript-eslint strict, Prettier, Ruff for Python. Pre-commit hooks.
+              Conventional commits.
+            </td>
+          </tr>
+          <tr>
+            <td>Security</td>
+            <td>
+              API key only from environment. No client data in logs. Read-only tools for the
+              assistant. Rate limits on LLM endpoints. Synthetic-data notice retained in the README.
+            </td>
+          </tr>
+          <tr>
+            <td>Documentation</td>
+            <td>
+              Architecture decision records for each major choice, a data lineage note per derived
+              table, a demo script, and a README that runs in three commands.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 10 -->
+    <h2 id="plan">
+      <span class="section-num">10</span>Build plan: nine iterations, one discussion each
+    </h2>
+    <p class="intro">
+      Each iteration ends with something running that we can look at together. Nothing in a later
+      iteration is required to demo an earlier one.
+    </p>
+    <div class="iters">
+      <div class="iter">
+        <div class="n">0</div>
+        <div>
+          <b>Foundation</b
+          ><span
+            >Fork cloned into a project folder, monorepo scaffold, Docker Compose with Postgres 17 +
+            pgvector, Drizzle migrations for the raw schema, idempotent CSV loader, data-quality
+            register, CI lint and test.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> database populated, quality issues listed, empty app shell running.
+        </div>
+      </div>
+      <div class="iter">
+        <div class="n">1</div>
+        <div>
+          <b>Customer factual data and vector</b
+          ><span
+            >Analytics service computes the behavioural vector and factual record for all 20
+            clients. Vector explorer screen at L3.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> the feature manifest and every client's vector with book percentiles.
+        </div>
+      </div>
+      <div class="iter">
+        <div class="n">2</div>
+        <div>
+          <b>Client 360 and portfolio deep dive</b
+          ><span
+            >Slides 02 and 03. Snapshot comparison, look-through exposure, liabilities and cash
+            needs, mandate status.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> the four anchor clients fully navigable.</div>
+      </div>
+      <div class="iter">
+        <div class="n">3</div>
+        <div>
+          <b>Signals and impact</b
+          ><span
+            >Slides 04 and 05. Signal engine with replay clock, evidence drawer, impact waterfall,
+            scenario library, assumptions panel.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> "Strait reopens" run for Al-Mansoori, the scenario he asked for.
+        </div>
+      </div>
+      <div class="iter">
+        <div class="n">4</div>
+        <div>
+          <b>Risk rubric and confidence</b
+          ><span
+            >Slide 06. Three assessors, Claude gateway live, calibrated validator, confidence
+            breakdown, RM override with audit.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> Capacity / Appetite / Horizon with evidence and disagreement surfaced.
+        </div>
+      </div>
+      <div class="iter">
+        <div class="n">5</div>
+        <div>
+          <b>Combined risk, actions, trade ideas</b
+          ><span
+            >Slide 07 plus the trade ideas screen. Decision matrix, composite gauge, suitability
+            gate, ranked actions.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> approve-and-log working end to end.</div>
+      </div>
+      <div class="iter">
+        <div class="n">6</div>
+        <div>
+          <b>Book cockpit and horizon lanes</b
+          ><span
+            >RM View L1 and the mandate and collateral board. Now / 7 days / 30 days with lane
+            momentum.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> the Monday-morning screen for the whole book.</div>
+      </div>
+      <div class="iter">
+        <div class="n">7</div>
+        <div>
+          <b>Workflow and outreach</b
+          ><span
+            >Slide 08. Nine-step rail, maker-checker, compliance pre-clearance, outreach draft in
+            reporting language, audit screen.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> the full loop from alert to logged decision.</div>
+      </div>
+      <div class="iter">
+        <div class="n">8</div>
+        <div>
+          <b>Assistant and polish</b
+          ><span
+            >Tool-using chatbot with trace rendering, empty and error states, keyboard navigation,
+            demo script, README.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> the finished workbench and the demo run-through.</div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <h2 id="decisions">
+      <span class="section-num">11</span>Decisions to confirm before iteration 0
+    </h2>
+    <p class="intro">Each has a recommended default. Confirm, change, or ask for alternatives.</p>
+    <ol class="decisions">
+      <li>
+        <div>
+          <b>Where the code lives</b
+          ><span
+            >The fork currently holds a README and the dataset zip. I propose cloning it to a
+            Desktop folder and committing the monorepo there on a feature branch, with the dataset
+            unzipped under data/.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> ~/Desktop/juliusbaer, branch feat/rm-workbench, push when
+            you say so.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Claude access</b
+          ><span
+            >No ANTHROPIC_API_KEY is set in this environment. The Claude gateway needs one. Until it
+            is available, the gateway runs in a recorded mode that replays saved responses so the UI
+            can be built and tested.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> you add the key to a local .env when convenient; nothing
+            else changes.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Model choice</b
+          ><span
+            >Sonnet 5 for analysis, explanation and chat; Haiku 4.5 for classification, routing and
+            note embedding. Opus 5 reserved for nothing by default.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> as stated, configurable per prompt in the registry.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Frontend stack</b
+          ><span
+            >React 18 with TypeScript and Vite, ECharts for the waterfall, gauge, donut and
+            trajectory charts, Tailwind constrained by a token file that follows the wireframe's
+            visual language.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> as stated. Alternative if you prefer: Next.js, at the
+            cost of a heavier single-page story.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>ORM and migrations</b
+          ><span
+            >Drizzle ORM with SQL migrations checked in, versus Prisma or raw SQL with Kysely.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> Drizzle, for readable SQL and a small runtime.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Simulation clock for "live" signals</b
+          ><span
+            >The dataset is static. A replay clock starting at 26 Aug 2026 09:00 SGT emits signals
+            from the event log and market moves on a compressed timeline so the feed, the freshness
+            score and the stale-data warning behave as designed.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> yes, with a pause and scrub control for the demo.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Anchor clients for the deep narrative</b
+          ><span
+            >Ravi Chandrasekaran, Margarethe Voss-Brenner, Chalermchai Suphanburi, Lau Chi Ming. All
+            twenty are still processed.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> these four; swap any for Cheung Kwok Wing or Fong Family
+            Office if you prefer their stories.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Trinity / AI-DLC governance</b
+          ><span
+            >Your other projects run under the Trinity SDLC with phase artefacts. This can either
+            follow the same phases (intent, BRD, spec, stories) or treat this blueprint as the
+            combined intent and spec and go straight to build.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> treat this document as intent plus spec, keep ADRs and
+            the state file, skip the BRD for a hackathon build.</span
+          >
+        </div>
+      </li>
+    </ol>
+
+    <footer>
+      All client, portfolio and instrument data referenced here is the synthetic SingHacks 2026
+      dataset. Market levels and the event log are calibrated to 2026 history as supplied. Nothing
+      here is investment advice. Prepared 5 Sep 2026 for the Morpheus3 team.
+    </footer>
+  </main>
+</div>

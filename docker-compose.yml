@@ -1,0 +1,36 @@
+name: rm-workbench
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: rmw-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-rmw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rmw_local_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-rm_workbench}
+    ports:
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-rmw} -d ${POSTGRES_DB:-rm_workbench}']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  analytics:
+    build: ./services/analytics
+    container_name: rmw-analytics
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-rmw}:${POSTGRES_PASSWORD:-rmw_local_dev}@postgres:5432/${POSTGRES_DB:-rm_workbench}
+      DATASET_TODAY: ${DATASET_TODAY:-2026-08-26}
+    ports:
+      - '8000:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ['analytics']
+
+volumes:
+  pgdata:
