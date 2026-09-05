@@ -6,7 +6,7 @@ import { TopBar } from './TopBar';
 /** Persistent frame: navy module rail, top bar with the dataset clock, scrolling work area. */
 export function AppShell(): JSX.Element {
   return (
-    <div className="grid h-full grid-cols-[232px_minmax(0,1fr)]">
+    <div className="grid h-screen grid-cols-[232px_minmax(0,1fr)] grid-rows-[minmax(0,1fr)] overflow-hidden">
       <Rail />
       <div className="flex min-w-0 flex-col">
         <TopBar />
