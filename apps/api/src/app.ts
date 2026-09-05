@@ -21,6 +21,7 @@ import { metaRoutes } from './routes/meta.js';
 import { bookRoutes } from './routes/book.js';
 import { riskRoutes } from './routes/risk.js';
 import { rubricRoutes } from './routes/rubric.js';
+import { settingsRoutes } from './routes/settings.js';
 import { signalRoutes } from './routes/signals.js';
 import { vectorRoutes } from './routes/vectors.js';
 import { workflowRoutes } from './routes/workflow.js';
@@ -33,6 +34,7 @@ import { HealthService } from './services/healthService.js';
 import { BookService } from './services/bookService.js';
 import { RiskService } from './services/riskService.js';
 import { RubricService } from './services/rubricService.js';
+import { SettingsService } from './services/settingsService.js';
 import { SignalService } from './services/signalService.js';
 import { VectorService } from './services/vectorService.js';
 import { WorkflowService } from './services/workflowService.js';
@@ -44,6 +46,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   const app = Fastify({
     logger: {
       level: config.LOG_LEVEL,
+      redact: ['req.headers.authorization', 'req.body.apiKey'],
       ...(process.env.NODE_ENV !== 'production' ? { transport: { target: 'pino-pretty' } } : {}),
     },
   });
@@ -72,6 +75,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     app.db,
   );
   app.log.info({ mode: gateway.mode, model: config.CLAUDE_ANALYSIS_MODEL }, 'claude gateway');
+  const settingsService = new SettingsService(gateway);
 
   const health = new HealthService(loadRuns, API_VERSION, ctx);
   const dataQuality = new DataQualityService(loadRuns, issues);
@@ -119,6 +123,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(clientRoutes(clientService));
       await v1.register(vectorRoutes(vectorService));
       await v1.register(metaRoutes(ctx));
+      await v1.register(settingsRoutes(settingsService));
       await v1.register(clientDetailRoutes(detailService, ctx));
       await v1.register(signalRoutes(signalService));
       await v1.register(rubricRoutes(rubricService));

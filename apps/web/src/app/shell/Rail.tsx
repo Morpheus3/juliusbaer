@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useMeta } from '@/lib/meta';
+import { ClaudeKeyPanel } from './ClaudeKeyPanel';
 
 interface Module {
   to: string;
@@ -75,7 +76,10 @@ export function Rail(): JSX.Element {
       </div>
       <Group title="RM view" items={RM_VIEW} />
       <Group title="Customer view" items={CUSTOMER_VIEW} />
-      <div className="mt-auto px-5 py-4 text-[11px] leading-relaxed text-rail-muted">
+      <div className="mt-auto">
+        <ClaudeKeyPanel />
+      </div>
+      <div className="px-5 py-4 text-[11px] leading-relaxed text-rail-muted">
         {meta.data?.datasetName ?? 'No dataset loaded'}
         <br />
         No automated trading. RM approval required.

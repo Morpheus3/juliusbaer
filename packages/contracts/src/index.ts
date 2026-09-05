@@ -11,3 +11,4 @@ export * from './api/meta.js';
 export * from './api/risk.js';
 export * from './api/book.js';
 export * from './api/workflow.js';
+export * from './api/settings.js';

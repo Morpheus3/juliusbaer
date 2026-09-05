@@ -44,6 +44,9 @@ machine.
   `zodOutputFormat` and adaptive thinking, cached system prompt, trace persistence to
   `derived.llm_traces` (prompt id/version/hash, input hash, model, mode, response, usage, latency,
   error).
+- **Runtime key.** The key can come from `ANTHROPIC_API_KEY` or be entered in the app's Claude panel;
+  the API validates it against the Models API, holds it in process memory (never in the browser or
+  the database), optionally writes it to the local `.env`, and redacts it from request logs.
 - **Recorded mode.** Without a key the gateway replays saved responses keyed by prompt and input
   hash from `apps/api/recordings`. If none matches, the assessor reports `unavailable` and the
   rubric proceeds on two assessors with the penalty above and a visible notice. With a key and

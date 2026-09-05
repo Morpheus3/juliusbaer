@@ -19,7 +19,7 @@ Prerequisites: Node 24+, Docker Desktop. Python 3.12 only if you want to run the
 service outside Docker.
 
 ```bash
-cp .env.example .env         # add ANTHROPIC_API_KEY when you have one; without it the Claude gateway runs in recorded mode
+cp .env.example .env         # ANTHROPIC_API_KEY is optional here: you can also paste it into the Claude panel in the app's left rail
 npm install
 npm run db:up                # Postgres 17 + pgvector on localhost:5433
 npm run db:migrate
@@ -34,7 +34,7 @@ docker compose --profile analytics up -d --build
 npm run vectors:build
 ```
 
-Open <http://localhost:5173>. The customer vector explorer is under Customer view.
+Open <http://localhost:5173>. To enable the language model, paste an Anthropic API key into the **Claude** panel at the bottom of the left rail; the API validates it against the models endpoint, keeps it in process memory (optionally saving it to the local `.env`), and the rubric's LLM assessor and outreach drafts switch to live immediately.
 
 ## Repository layout
 

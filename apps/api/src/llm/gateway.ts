@@ -35,20 +35,92 @@ export type StructuredResult<T> =
   | { status: 'unavailable'; traceId: string | null; note: string }
   | { status: 'invalid'; traceId: string; note: string };
 
+export interface GatewayStatus {
+  mode: GatewayMode;
+  analysisModel: string;
+  fastModel: string;
+  keyHint: string | null;
+  source: 'environment' | 'runtime' | 'none';
+  validatedAt: string | null;
+  recordingsEnabled: boolean;
+}
+
+export class KeyValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'KeyValidationError';
+  }
+}
+
 export class ClaudeGateway {
-  private readonly client: Anthropic | null;
-  readonly mode: GatewayMode;
+  private client: Anthropic | null;
+  private apiKey: string | undefined;
+  private source: GatewayStatus['source'];
+  private validatedAt: string | null = null;
   private readonly recordingsDir: string;
 
   constructor(
     private readonly cfg: GatewayConfig,
     private readonly db: Db,
   ) {
+    this.apiKey = cfg.apiKey;
     this.client = cfg.apiKey ? new Anthropic({ apiKey: cfg.apiKey }) : null;
-    this.mode = this.client ? 'live' : 'recorded';
+    this.source = cfg.apiKey ? 'environment' : 'none';
     this.recordingsDir =
       cfg.recordingsDir ??
       path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'recordings');
+  }
+
+  get mode(): GatewayMode {
+    return this.client ? 'live' : 'recorded';
+  }
+
+  status(): GatewayStatus {
+    return {
+      mode: this.mode,
+      analysisModel: this.cfg.analysisModel,
+      fastModel: this.cfg.fastModel,
+      keyHint: this.apiKey ? `…${this.apiKey.slice(-4)}` : null,
+      source: this.source,
+      validatedAt: this.validatedAt,
+      recordingsEnabled: this.cfg.record ?? false,
+    };
+  }
+
+  /** Validates a key against the Models API and, if it works, switches the gateway to live mode. */
+  async configure(apiKey: string): Promise<GatewayStatus> {
+    const candidate = new Anthropic({ apiKey });
+    try {
+      await candidate.models.retrieve(this.cfg.analysisModel);
+    } catch (err) {
+      if (err instanceof Anthropic.AuthenticationError) {
+        throw new KeyValidationError('Anthropic rejected the key (authentication error).');
+      }
+      if (err instanceof Anthropic.NotFoundError) {
+        throw new KeyValidationError(
+          `The key works but the model ${this.cfg.analysisModel} is not available to it; change CLAUDE_ANALYSIS_MODEL.`,
+        );
+      }
+      if (err instanceof Anthropic.APIError) {
+        throw new KeyValidationError(
+          `Anthropic returned ${err.status ?? ''} ${err.name}: ${err.message}`,
+        );
+      }
+      throw new KeyValidationError(err instanceof Error ? err.message : String(err));
+    }
+    this.client = candidate;
+    this.apiKey = apiKey;
+    this.source = 'runtime';
+    this.validatedAt = new Date().toISOString();
+    return this.status();
+  }
+
+  clear(): GatewayStatus {
+    this.client = null;
+    this.apiKey = undefined;
+    this.source = 'none';
+    this.validatedAt = null;
+    return this.status();
   }
 
   private recordingPath(key: string): string {
