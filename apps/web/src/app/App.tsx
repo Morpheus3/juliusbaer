@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { BoardPage } from '@/features/book/BoardPage';
 import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
 import { Client360Page } from '@/features/client360/Client360Page';
@@ -25,6 +26,7 @@ export function App(): JSX.Element {
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/book" replace />} />
         <Route path="/book" element={<BookPage />} />
+        <Route path="/board" element={<BoardPage />} />
         <Route path="/signals" element={<SignalsPage />} />
         <Route
           path="/impact"

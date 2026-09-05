@@ -1,118 +1,367 @@
-import type { JSX, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ClientListResponse } from '@jb/contracts';
+import { BookResponse, type HorizonItem, type Theme, type Urgency } from '@jb/contracts';
+import { useMemo, useState, type JSX } from 'react';
 import { Link } from 'react-router-dom';
+import { Kpi } from '@/components/Kpi';
+import { PageHeader } from '@/components/PageHeader';
+import { Panel } from '@/components/Panel';
+import { Pill } from '@/components/Pill';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
+import { useClockDate } from '@/state/clock';
 
-/**
- * Iteration 0 stand-in for the book cockpit: the twenty clients as loaded. The horizon
- * lanes and urgency ranking arrive in iteration 6.
- */
+const LANES: { key: Urgency; title: string; sub: string }[] = [
+  { key: 'now', title: 'Act now', sub: 'today' },
+  { key: 'week', title: 'Next 7 days', sub: 'this week' },
+  { key: 'month', title: 'Next 30 days', sub: 'this month' },
+];
+const THEME_LABEL: Record<Theme, string> = {
+  collateral: 'Collateral',
+  mandate: 'Mandate',
+  concentration: 'Concentration',
+  liquidity: 'Liquidity',
+  compliance: 'Compliance',
+  contact: 'Contact',
+  valuation: 'Valuation',
+  signal: 'Signal',
+};
+
+/** The Monday-morning screen: who to call first, and why, across the whole book. Wireframe slide 01 shell. */
 export function BookPage(): JSX.Element {
+  const clock = useClockDate();
   const q = useQuery({
-    queryKey: ['clients'],
-    queryFn: () => getJson('/api/v1/clients', ClientListResponse),
+    queryKey: ['book', clock],
+    queryFn: () => getJson(`/api/v1/book?clock=${clock}`, BookResponse),
+    enabled: clock !== '',
+    placeholderData: (p) => p,
   });
+  const [centre, setCentre] = useState('all');
+  const [theme, setTheme] = useState<Theme | 'all'>('all');
+  const [severity, setSeverity] = useState<'all' | 'high'>('all');
+  const [client, setClient] = useState<string | null>(null);
+  const d = q.data;
 
-  if (q.isPending) {
-    return <p className="text-muted">Loading the book…</p>;
-  }
-  if (q.isError) {
-    return (
-      <div className="rounded border border-crit/30 bg-crit-soft px-4 py-3 text-crit">
-        Could not load clients: {q.error.message}
-      </div>
-    );
-  }
-
-  const { clients, asOf } = q.data;
-  const totalAum = clients.reduce((s, c) => s + c.totalAumUsd, 0);
+  const centres = useMemo(
+    () => [...new Set((d?.clients ?? []).map((c) => c.bookingCentre))].sort(),
+    [d],
+  );
+  const centreClients = useMemo(
+    () =>
+      new Set(
+        (d?.clients ?? [])
+          .filter((c) => centre === 'all' || c.bookingCentre === centre)
+          .map((c) => c.clientId),
+      ),
+    [d, centre],
+  );
+  const shown = (d?.items ?? []).filter(
+    (i) =>
+      centreClients.has(i.clientId) &&
+      (theme === 'all' || i.theme === theme) &&
+      (severity === 'all' || i.severity === 'high') &&
+      (client === null || i.clientId === client),
+  );
 
   return (
-    <div className="max-w-6xl">
-      <div className="mb-5 flex items-baseline justify-between">
-        <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brass">
-            RM view · L1
-          </div>
-          <h1 className="font-serif text-[26px] font-semibold text-ink">Book cockpit</h1>
+    <div className="max-w-[1600px]">
+      <PageHeader
+        eyebrow="RM view · L1"
+        title="Book cockpit"
+        right={
+          d && (
+            <span className="text-[12.5px] text-muted">
+              clock {fmtDate(d.clock)} · positions {fmtDate(d.snapshotDate)}
+              {d.previousSnapshotDate ? ` · momentum vs ${fmtDate(d.previousSnapshotDate)}` : ''}
+            </span>
+          )
+        }
+      >
+        {d && (
+          <p className="mb-0 mt-1 text-[12.5px] text-muted">
+            {d.kpis.items.now} to act on now, {d.kpis.items.week} this week, {d.kpis.items.month}{' '}
+            this month across {d.kpis.clients} clients.
+          </p>
+        )}
+      </PageHeader>
+
+      {q.isPending && <p className="text-muted">Ranking the book…</p>}
+      {q.isError && (
+        <div className="rounded border border-crit/30 bg-crit-soft px-4 py-3 text-crit">
+          {q.error.message}
         </div>
-        <div className="text-[12.5px] text-muted">As of {fmtDate(asOf)}</div>
-      </div>
+      )}
+      {d && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-6 gap-3">
+            <Kpi
+              label="Book AUM"
+              value={fmtUsdCompact(d.kpis.aumUsd)}
+              sub={`${d.kpis.ytdChangePct > 0 ? '+' : ''}${d.kpis.ytdChangePct.toFixed(1)}% since baseline`}
+              tone={d.kpis.ytdChangePct < 0 ? 'crit' : 'ok'}
+            />
+            <Kpi
+              label="Act now"
+              value={String(d.kpis.items.now)}
+              tone={d.kpis.items.now > 0 ? 'crit' : 'ok'}
+              sub="items"
+            />
+            <Kpi
+              label="Clients in breach"
+              value={String(d.kpis.clientsInBreach)}
+              tone={d.kpis.clientsInBreach > 0 ? 'warn' : 'ok'}
+              sub="mandate bands"
+            />
+            <Kpi
+              label="Facilities near trigger"
+              value={String(d.kpis.facilitiesNearTrigger)}
+              tone={d.kpis.facilitiesNearTrigger > 0 ? 'crit' : 'ok'}
+              sub="< 5 points headroom"
+            />
+            <Kpi
+              label="KYC"
+              value={`${d.kpis.kycOverdue} / ${d.kpis.kycDueSoon}`}
+              tone={d.kpis.kycOverdue > 0 ? 'crit' : d.kpis.kycDueSoon > 0 ? 'warn' : 'ok'}
+              sub="overdue / due in 45 days"
+            />
+            <Kpi
+              label="Rubric assessed"
+              value={`${d.kpis.rubricAssessed}/${d.kpis.clients}`}
+              sub="clients scored"
+              tone={d.kpis.rubricAssessed < d.kpis.clients ? 'warn' : 'ok'}
+            />
+          </div>
 
-      <div className="mb-6 grid grid-cols-4 gap-3">
-        <Kpi label="Clients" value={String(clients.length)} />
-        <Kpi label="Book AUM" value={fmtUsdCompact(totalAum)} />
-        <Kpi label="Portfolios" value={String(clients.reduce((s, c) => s + c.portfolioCount, 0))} />
-        <Kpi label="UHNW" value={String(clients.filter((c) => c.wealthBand === 'UHNW').length)} />
-      </div>
+          <div className="flex flex-wrap items-center gap-2 text-[12px]">
+            <select
+              value={centre}
+              onChange={(e) => {
+                setCentre(e.target.value);
+              }}
+              className="rounded border border-line bg-surface px-2 py-1"
+            >
+              <option value="all">All booking centres</option>
+              {centres.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <select
+              value={theme}
+              onChange={(e) => {
+                setTheme(e.target.value as Theme | 'all');
+              }}
+              className="rounded border border-line bg-surface px-2 py-1"
+            >
+              <option value="all">All themes</option>
+              {(Object.keys(THEME_LABEL) as Theme[]).map((t) => (
+                <option key={t} value={t}>
+                  {THEME_LABEL[t]}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => {
+                setSeverity((s) => (s === 'all' ? 'high' : 'all'));
+              }}
+              className={`rounded-full border px-2.5 py-0.5 ${severity === 'high' ? 'border-transparent bg-ink text-white' : 'border-line bg-surface text-ink-2'}`}
+            >
+              High severity only
+            </button>
+            {client && (
+              <button
+                type="button"
+                onClick={() => {
+                  setClient(null);
+                }}
+                className="rounded-full border border-brass bg-brass-soft px-2.5 py-0.5 text-brass"
+              >
+                {d.clients.find((c) => c.clientId === client)?.name ?? client} × clear
+              </button>
+            )}
+            <span className="ml-auto text-muted">{shown.length} items shown</span>
+          </div>
 
-      <div className="overflow-x-auto rounded-md border border-line bg-surface">
-        <table className="w-full text-[13px]">
-          <thead className="bg-surface-2 text-[11px] uppercase tracking-[0.08em] text-muted">
-            <tr>
-              <Th>Client</Th>
-              <Th>Centre</Th>
-              <Th>Profile</Th>
-              <Th className="text-right">Score</Th>
-              <Th className="text-right">Horizon</Th>
-              <Th>Liquidity</Th>
-              <Th className="text-right">AUM (USD)</Th>
-              <Th>KYC due</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {clients.map((c) => (
-              <tr key={c.clientId} className="border-t border-line hover:bg-surface-2/60">
-                <td className="px-3 py-2">
-                  <Link
-                    to={`/clients/${c.clientId}`}
-                    className="font-medium text-ink no-underline hover:text-accent"
+          <div className="grid grid-cols-3 gap-4">
+            {LANES.map((lane) => {
+              const items = shown.filter((i) => i.lane === lane.key);
+              return (
+                <section key={lane.key} className="rounded-md border border-line bg-surface">
+                  <header
+                    className={`flex items-baseline justify-between border-b border-line px-4 py-2 ${lane.key === 'now' ? 'bg-crit-soft/50' : lane.key === 'week' ? 'bg-warn-soft/40' : 'bg-surface-2'}`}
                   >
-                    {c.name}
-                  </Link>
-                  <div className="font-mono text-[11px] text-muted">
-                    {c.clientId} · {c.isEntity ? 'Entity' : `${c.age ?? '—'} yrs`} · {c.lifeStage}
-                  </div>
-                </td>
-                <td className="px-3 py-2 text-ink-2">{c.bookingCentre}</td>
-                <td className="px-3 py-2 text-ink-2">{c.riskProfile}</td>
-                <td className="tnum px-3 py-2 text-right font-mono text-[12px]">
-                  {c.riskToleranceScore}/10
-                </td>
-                <td className="tnum px-3 py-2 text-right font-mono text-[12px]">
-                  {c.investmentHorizonYears}y
-                </td>
-                <td className="px-3 py-2 text-ink-2">{c.liquidityNeeds}</td>
-                <td className="tnum px-3 py-2 text-right font-mono text-[12px]">
-                  {fmtUsdCompact(c.totalAumUsd)}
-                </td>
-                <td className="px-3 py-2 text-ink-2">{fmtDate(c.kycReviewDue)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <span className="text-[13px] font-semibold text-ink">{lane.title}</span>
+                    <span className="text-[11.5px] text-muted">
+                      {items.length} · {lane.sub}
+                    </span>
+                  </header>
+                  <ul className="m-0 max-h-[60vh] list-none divide-y divide-line overflow-y-auto p-0">
+                    {items.map((i) => (
+                      <ItemCard
+                        key={i.id}
+                        i={i}
+                        onClient={() => {
+                          setClient(i.clientId);
+                        }}
+                      />
+                    ))}
+                    {items.length === 0 && (
+                      <li className="px-4 py-6 text-center text-[12px] text-muted">
+                        Nothing in this lane.
+                      </li>
+                    )}
+                  </ul>
+                </section>
+              );
+            })}
+          </div>
+
+          <Panel
+            title="Who to call first"
+            right="ranked by urgency score · click a row to filter the lanes"
+          >
+            <table className="w-full text-[12.5px]">
+              <thead className="text-[10.5px] uppercase tracking-[0.08em] text-muted">
+                <tr>
+                  <th className="py-1 text-left font-semibold">#</th>
+                  <th className="py-1 text-left font-semibold">Client</th>
+                  <th className="py-1 text-right font-semibold">Urgency</th>
+                  <th className="py-1 text-center font-semibold">Now / 7d / 30d</th>
+                  <th className="py-1 text-left font-semibold">Rubric</th>
+                  <th className="py-1 text-left font-semibold">Themes</th>
+                  <th className="py-1 text-left font-semibold">Top item</th>
+                  <th className="py-1 text-right font-semibold">AUM</th>
+                </tr>
+              </thead>
+              <tbody>
+                {d.clients
+                  .filter((c) => centre === 'all' || c.bookingCentre === centre)
+                  .map((c, i) => (
+                    <tr
+                      key={c.clientId}
+                      onClick={() => {
+                        setClient(c.clientId === client ? null : c.clientId);
+                      }}
+                      className={`cursor-pointer border-t border-line hover:bg-surface-2/60 ${client === c.clientId ? 'bg-accent-soft/60' : ''}`}
+                    >
+                      <td className="py-1.5 font-mono text-muted">{i + 1}</td>
+                      <td className="py-1.5">
+                        <Link
+                          to={`/clients/${c.clientId}`}
+                          className="font-medium text-ink no-underline hover:text-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          {c.name}
+                        </Link>
+                        <div className="font-mono text-[10.5px] text-muted">
+                          {c.clientId} · {c.bookingCentre} · {c.riskProfile}
+                        </div>
+                      </td>
+                      <td className="tnum py-1.5 text-right font-mono font-semibold text-ink">
+                        {c.urgencyScore}
+                      </td>
+                      <td className="tnum py-1.5 text-center font-mono">
+                        <span className={c.counts.now ? 'text-crit' : 'text-muted'}>
+                          {c.counts.now}
+                        </span>{' '}
+                        /{' '}
+                        <span className={c.counts.week ? 'text-warn' : 'text-muted'}>
+                          {c.counts.week}
+                        </span>{' '}
+                        / <span className="text-ink-2">{c.counts.month}</span>
+                      </td>
+                      <td className="py-1.5">
+                        {c.rubric ? (
+                          <span
+                            className="font-mono text-[11.5px] text-ink-2"
+                            title={c.rubric.status}
+                          >
+                            C{c.rubric.capacity} A{c.rubric.appetite} H{c.rubric.horizon}
+                          </span>
+                        ) : (
+                          <Link to={`/clients/${c.clientId}/rubric`} className="text-[11.5px]">
+                            assess
+                          </Link>
+                        )}
+                      </td>
+                      <td className="py-1.5">
+                        <div className="flex flex-wrap gap-1">
+                          {c.themes.map((t) => (
+                            <Pill key={t} tone="neutral">
+                              {THEME_LABEL[t]}
+                            </Pill>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="py-1.5 text-ink-2">{c.topItem ?? '—'}</td>
+                      <td className="tnum py-1.5 text-right font-mono">
+                        {fmtUsdCompact(c.aumUsd)}{' '}
+                        <span
+                          className={`text-[10.5px] ${c.ytdChangePct < 0 ? 'text-crit' : 'text-ok'}`}
+                        >
+                          {c.ytdChangePct > 0 ? '+' : ''}
+                          {c.ytdChangePct.toFixed(1)}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </Panel>
+
+          <details className="text-[12px] text-muted">
+            <summary className="cursor-pointer">How the lanes are built</summary>
+            <ul className="m-0 mt-1 list-disc pl-5">
+              {d.method.map((m) => (
+                <li key={m}>{m}</li>
+              ))}
+            </ul>
+          </details>
+        </div>
+      )}
     </div>
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }): JSX.Element {
+function ItemCard({ i, onClient }: { i: HorizonItem; onClient: () => void }): JSX.Element {
+  const mom =
+    i.momentum === 'escalated'
+      ? { t: '↑ escalated', c: 'text-crit' }
+      : i.momentum === 'new'
+        ? { t: '● new', c: 'text-brass' }
+        : i.momentum === 'eased'
+          ? { t: '↓ eased', c: 'text-ok' }
+          : { t: '→ unchanged', c: 'text-muted' };
   return (
-    <div className="rounded-md border border-line bg-surface px-4 py-3">
-      <div className="text-[11px] uppercase tracking-[0.08em] text-muted">{label}</div>
-      <div className="tnum mt-1 font-serif text-[24px] font-semibold text-ink">{value}</div>
-    </div>
+    <li className="px-4 py-2.5 text-[12.5px]">
+      <div className="flex items-start justify-between gap-2">
+        <button
+          type="button"
+          onClick={onClient}
+          className="m-0 border-0 bg-transparent p-0 text-left font-semibold text-ink hover:text-accent"
+        >
+          {i.clientName}
+        </button>
+        <span className="flex items-center gap-1">
+          <Pill
+            tone={i.severity === 'high' ? 'crit' : i.severity === 'medium' ? 'warn' : 'neutral'}
+          >
+            {THEME_LABEL[i.theme]}
+          </Pill>
+        </span>
+      </div>
+      <Link to={i.link} className="mt-0.5 block text-ink-2 no-underline hover:text-accent">
+        {i.title}
+      </Link>
+      <div className="mt-0.5 text-[11px] text-muted">{i.laneReason}</div>
+      <div className={`mt-0.5 text-[10.5px] ${mom.c}`}>
+        {mom.t}
+        {i.previousLane && i.previousLane !== i.lane ? ` from ${i.previousLane}` : ''}
+        {i.dueDate ? ` · due ${fmtDate(i.dueDate)}` : ''}
+      </div>
+    </li>
   );
-}
-
-function Th({
-  children,
-  className = '',
-}: {
-  children: ReactNode;
-  className?: string;
-}): JSX.Element {
-  return <th className={`px-3 py-2 text-left font-semibold ${className}`}>{children}</th>;
 }

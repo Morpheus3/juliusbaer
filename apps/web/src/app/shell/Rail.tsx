@@ -10,6 +10,7 @@ interface Module {
 
 const RM_VIEW: Module[] = [
   { to: '/book', label: 'Book cockpit', hint: 'Now · 7 days · 30 days' },
+  { to: '/board', label: 'Mandate & collateral', hint: 'Bands · LTV across the book' },
   { to: '/signals', label: 'Market signals', hint: 'Event log replay' },
   { to: '/audit', label: 'Audit & data quality', hint: 'Register and log' },
 ];

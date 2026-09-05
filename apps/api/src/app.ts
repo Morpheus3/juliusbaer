@@ -17,6 +17,7 @@ import { clientRoutes } from './routes/clients.js';
 import { dataQualityRoutes } from './routes/dataQuality.js';
 import { healthRoutes } from './routes/health.js';
 import { metaRoutes } from './routes/meta.js';
+import { bookRoutes } from './routes/book.js';
 import { riskRoutes } from './routes/risk.js';
 import { rubricRoutes } from './routes/rubric.js';
 import { signalRoutes } from './routes/signals.js';
@@ -27,6 +28,7 @@ import { DatasetContext } from './services/datasetContext.js';
 import { ClientService } from './services/clientService.js';
 import { DataQualityService } from './services/dataQualityService.js';
 import { HealthService } from './services/healthService.js';
+import { BookService } from './services/bookService.js';
 import { RiskService } from './services/riskService.js';
 import { RubricService } from './services/rubricService.js';
 import { SignalService } from './services/signalService.js';
@@ -91,6 +93,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     signalService,
     ctx,
   );
+  const bookService = new BookService(clients, detail, signals, rubric, ctx);
 
   await app.register(healthRoutes(health));
   await app.register(
@@ -103,6 +106,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(signalRoutes(signalService));
       await v1.register(rubricRoutes(rubricService));
       await v1.register(riskRoutes(riskService));
+      await v1.register(bookRoutes(bookService));
     },
     { prefix: '/api/v1' },
   );
