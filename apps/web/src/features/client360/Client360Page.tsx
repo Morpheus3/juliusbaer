@@ -1,5 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClientOverviewResponse, SignalsResponse, type ClientAlert } from '@jb/contracts';
+import {
+  ClientOverviewResponse,
+  RubricAssessmentResponse,
+  SignalsResponse,
+  type ClientAlert,
+} from '@jb/contracts';
 import type { JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ClientPicker } from '@/components/ClientPicker';
@@ -8,7 +13,7 @@ import { Kpi } from '@/components/Kpi';
 import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
-import { getJson } from '@/lib/api';
+import { ApiError, getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
 import { useClock } from '@/state/clock';
 import { SEVERITY_SHORT, SEVERITY_TONE, ageLabel } from '../signals/signalFormat';
@@ -269,12 +274,7 @@ function Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
               risk engine. Until then the alerts above are the queue.
             </p>
           </Panel>
-          <Panel title="Risk rubric" right="iteration 4">
-            <p className="m-0 text-[12.5px] text-muted">
-              Capacity, Appetite and Horizon scores are computed from the{' '}
-              <Link to={`/clients/${d.client.clientId}/vector`}>customer vector</Link>.
-            </p>
-          </Panel>
+          <RubricPanel clientId={d.client.clientId} />
         </div>
       </div>
     </div>
@@ -362,6 +362,70 @@ function SignalsPanel({ clientId }: { clientId: string }): JSX.Element {
           </li>
         ))}
       </ul>
+    </Panel>
+  );
+}
+
+function RubricPanel({ clientId }: { clientId: string }): JSX.Element {
+  const q = useQuery({
+    queryKey: ['rubric', clientId],
+    queryFn: async () => {
+      try {
+        return await getJson(`/api/v1/clients/${clientId}/rubric`, RubricAssessmentResponse);
+      } catch (e) {
+        if (e instanceof ApiError && e.status === 404) {
+          return null;
+        }
+        throw e;
+      }
+    },
+  });
+  const r = q.data;
+  return (
+    <Panel
+      title="Risk rubric"
+      right={<Link to={`/clients/${clientId}/rubric`}>{r ? 'Open rubric →' : 'Assess →'}</Link>}
+    >
+      {q.isPending && <p className="m-0 text-[12.5px] text-muted">Loading…</p>}
+      {r === null && (
+        <p className="m-0 text-[12.5px] text-muted">
+          Not yet scored. Capacity, Appetite and Horizon are computed from the customer vector by
+          three assessors.
+        </p>
+      )}
+      {r && (
+        <div className="space-y-2 text-[12.5px]">
+          <div className="grid grid-cols-3 gap-2">
+            {r.dimensions.map((dim) => (
+              <div
+                key={dim.dimension}
+                className="rounded border border-line px-2 py-1.5 text-center"
+              >
+                <div className="text-[10.5px] uppercase tracking-[0.08em] text-muted">
+                  {dim.dimension}
+                </div>
+                <div className="tnum font-serif text-[22px] font-semibold text-ink">
+                  {dim.effectiveScore}
+                  <span className="text-[12px] text-muted">/3</span>
+                </div>
+                <div className="text-[10.5px] text-muted">
+                  {Math.round(dim.confidence.overall * 100)}% conf
+                </div>
+              </div>
+            ))}
+          </div>
+          {r.mismatches.map((m) => (
+            <div key={m.kind} className="flex items-start gap-2">
+              <Pill tone={m.severity === 'critical' ? 'crit' : 'warn'}>Mismatch</Pill>
+              <span className="text-ink-2">{m.message}</span>
+            </div>
+          ))}
+          <div className="text-[11px] text-muted">
+            {r.status === 'locked' ? 'Locked' : 'Draft'} · LLM assessor {r.llmMode} · scored{' '}
+            {new Date(r.createdAt).toLocaleDateString('en-GB')}
+          </div>
+        </div>
+      )}
     </Panel>
   );
 }

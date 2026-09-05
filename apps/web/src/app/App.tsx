@@ -4,6 +4,7 @@ import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
 import { Client360Page } from '@/features/client360/Client360Page';
 import { ImpactPage } from '@/features/impact/ImpactPage';
+import { RubricPage } from '@/features/rubric/RubricPage';
 import { SignalsPage } from '@/features/signals/SignalsPage';
 import { CashflowsTab } from '@/features/portfolio/CashflowsTab';
 import { ExposureTab } from '@/features/portfolio/ExposureTab';
@@ -27,10 +28,8 @@ export function App(): JSX.Element {
           element={<Navigate to="/clients/CL-0019/impact?scenario=hormuz-reopens" replace />}
         />
         <Route path="/clients/:clientId/impact" element={<ImpactPage />} />
-        <Route
-          path="/rubric"
-          element={<PlaceholderPage title="Customer risk rubric" iteration={4} />}
-        />
+        <Route path="/rubric" element={<Navigate to="/clients/CL-0003/rubric" replace />} />
+        <Route path="/clients/:clientId/rubric" element={<RubricPage />} />
         <Route
           path="/actions"
           element={<PlaceholderPage title="Combined risk and actions" iteration={5} />}

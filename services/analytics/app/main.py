@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from app import db
-from app.routers import impact, vectors
+from app.routers import impact, rubric, vectors
 from app.settings import settings
 
 app = FastAPI(
@@ -12,6 +12,7 @@ app = FastAPI(
 )
 app.include_router(vectors.router)
 app.include_router(impact.router)
+app.include_router(rubric.router)
 
 
 class Health(BaseModel):

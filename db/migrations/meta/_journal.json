@@ -29,6 +29,13 @@
       "when": 1788600059027,
       "tag": "0003_nifty_namor",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788602729733,
+      "tag": "0004_dark_ser_duncan",
+      "breakpoints": true
     }
   ]
 }

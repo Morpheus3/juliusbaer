@@ -30,6 +30,8 @@ ignore = ["ANN401", "S101"]
 "app/features/manifest.py" = ["E501"]
 "app/impact/scenarios.py" = ["E501"]
 "app/impact/engine.py" = ["E501"]
+"app/rubric/definitions.py" = ["E501"]
+"app/rubric/statistical.py" = ["E501"]
 
 [tool.mypy]
 strict = true

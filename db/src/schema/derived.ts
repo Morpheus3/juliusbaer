@@ -165,3 +165,81 @@ export const impactRuns = derived.table(
   },
   (t) => [index('impact_runs_client_idx').on(t.clientId, t.createdAt)],
 );
+
+/** One rubric assessment per client per run: three dimensions, three assessors, the combined result. */
+export const rubricAssessments = derived.table(
+  'rubric_assessments',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    clientId: text().notNull(),
+    vectorRunId: uuid().references(() => vectorRuns.id, { onDelete: 'set null' }),
+    clock: text().notNull(),
+    status: text().notNull().default('draft'),
+    result: jsonb().$type<Record<string, unknown>>().notNull(),
+    engineVersions: jsonb().$type<Record<string, string>>().notNull(),
+    lockedAt: timestamp({ withTimezone: true }),
+    lockedBy: text(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('rubric_client_idx').on(t.clientId, t.createdAt)],
+);
+
+export const rubricOverrides = derived.table(
+  'rubric_overrides',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    assessmentId: uuid()
+      .notNull()
+      .references(() => rubricAssessments.id, { onDelete: 'cascade' }),
+    clientId: text().notNull(),
+    dimension: text().notNull(),
+    systemScore: integer().notNull(),
+    overrideScore: integer().notNull(),
+    reason: text().notNull(),
+    rmId: text().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('rubric_overrides_client_idx').on(t.clientId)],
+);
+
+/** Every Claude call: prompt id and hash, model, inputs hash, response, usage, latency. */
+export const llmTraces = derived.table(
+  'llm_traces',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    promptId: text().notNull(),
+    promptVersion: text().notNull(),
+    promptHash: text().notNull(),
+    model: text().notNull(),
+    mode: text().notNull(),
+    inputHash: text().notNull(),
+    clientId: text(),
+    request: jsonb().$type<Record<string, unknown>>().notNull(),
+    response: jsonb().$type<Record<string, unknown>>(),
+    usage: jsonb().$type<Record<string, unknown>>(),
+    latencyMs: integer(),
+    error: text(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('llm_traces_client_idx').on(t.clientId, t.createdAt)],
+);
+
+/** Append-only log of RM decisions and system actions. */
+export const auditEvents = derived.table(
+  'audit_events',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    kind: text().notNull(),
+    actor: text().notNull(),
+    clientId: text(),
+    entityType: text(),
+    entityId: text(),
+    summary: text().notNull(),
+    payload: jsonb().$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('audit_client_idx').on(t.clientId, t.createdAt),
+    index('audit_kind_idx').on(t.kind),
+  ],
+);

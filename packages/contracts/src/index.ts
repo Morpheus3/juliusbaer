@@ -6,3 +6,4 @@ export * from './api/clients.js';
 export * from './api/vectors.js';
 export * from './api/clientDetail.js';
 export * from './api/signals.js';
+export * from './api/rubric.js';

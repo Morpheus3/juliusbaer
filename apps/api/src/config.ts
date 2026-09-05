@@ -14,7 +14,11 @@ const ConfigSchema = z.object({
     .default('2026-08-26'),
   ANTHROPIC_API_KEY: z.string().optional(),
   CLAUDE_ANALYSIS_MODEL: z.string().default('claude-sonnet-5'),
-  CLAUDE_FAST_MODEL: z.string().default('claude-haiku-4-5-20251001'),
+  CLAUDE_FAST_MODEL: z.string().default('claude-haiku-4-5'),
+  CLAUDE_RECORD: z
+    .string()
+    .optional()
+    .transform((v) => v === 'true' || v === '1'),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

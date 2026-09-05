@@ -18,7 +18,7 @@ Prerequisites: Node 24+, Docker Desktop. Python 3.12 only if you want to run the
 service outside Docker.
 
 ```bash
-cp .env.example .env         # add ANTHROPIC_API_KEY when you have one
+cp .env.example .env         # add ANTHROPIC_API_KEY when you have one; without it the Claude gateway runs in recorded mode
 npm install
 npm run db:up                # Postgres 17 + pgvector on localhost:5433
 npm run db:migrate
