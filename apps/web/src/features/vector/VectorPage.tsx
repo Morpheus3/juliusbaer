@@ -19,7 +19,7 @@ import { RUBRIC_LABEL, RUBRIC_TONE, fmtFeature, groupBy } from './format';
  * Right: the behavioural vector with book percentiles, evidence on demand, and nearest peers.
  */
 export function VectorPage(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
+  const { clientId = '' } = useParams();
   const q = useQuery({
     queryKey: ['vector', clientId],
     queryFn: () => getJson(`/api/v1/clients/${clientId}/vector`, ClientVectorResponse),

@@ -15,12 +15,14 @@ const inst = {
   concentrationLimitApplies: true,
 };
 
+const SNAPS = ['2025-12-31', '2026-02-27', '2026-03-31', '2026-06-30', '2026-08-26'];
+
 describe('snapshotForClock', () => {
   it('picks the latest snapshot on or before the clock', () => {
-    expect(snapshotForClock('2026-03-15')).toBe('2026-02-27');
-    expect(snapshotForClock('2026-03-31')).toBe('2026-03-31');
-    expect(snapshotForClock('2025-01-01')).toBe('2025-12-31');
-    expect(snapshotForClock('2026-08-26')).toBe('2026-08-26');
+    expect(snapshotForClock(SNAPS, '2026-03-15')).toBe('2026-02-27');
+    expect(snapshotForClock(SNAPS, '2026-03-31')).toBe('2026-03-31');
+    expect(snapshotForClock(SNAPS, '2025-01-01')).toBe('2025-12-31');
+    expect(snapshotForClock(SNAPS, '2026-08-26')).toBe('2026-08-26');
   });
 });
 

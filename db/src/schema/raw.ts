@@ -1,6 +1,6 @@
 /**
  * Raw schema: a faithful load of the twelve source files. Wide snapshot columns
- * (aum_2026-02-27, price_..., drawn_...) are unpivoted into long tables so that
+ * (aum_<date>, price_<date>, drawn_<date>, ...) are unpivoted into long tables so that
  * every derived figure can cite a single row.
  */
 import { relations } from 'drizzle-orm';

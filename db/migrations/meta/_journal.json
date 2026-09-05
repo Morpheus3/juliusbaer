@@ -36,6 +36,20 @@
       "when": 1788602729733,
       "tag": "0004_dark_ser_duncan",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788604085369,
+      "tag": "0005_eminent_lilandra",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788604085756,
+      "tag": "0006_zippy_bedlam",
+      "breakpoints": true
     }
   ]
 }

@@ -3,7 +3,6 @@ import {
   ChangeResponse,
   ClientOverviewResponse,
   MandateStatusResponse,
-  SNAPSHOT_DATES,
   type SnapshotDate,
 } from '@jb/contracts';
 import type { JSX } from 'react';
@@ -13,16 +12,18 @@ import { Kpi } from '@/components/Kpi';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { getJson } from '@/lib/api';
+import { useMeta } from '@/lib/meta';
 import { fmtUsdCompact } from '@/lib/format';
 
 export function OverviewTab(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
+  const { clientId = '' } = useParams();
   const [sp, setSp] = useSearchParams();
-  const from = (
-    (SNAPSHOT_DATES as readonly string[]).includes(sp.get('from') ?? '')
-      ? sp.get('from')
-      : SNAPSHOT_DATES[0]
-  ) as SnapshotDate;
+  const meta = useMeta();
+  const dates = meta.data?.snapshots.map((x) => x.date) ?? [];
+  const current = meta.data?.current ?? '';
+  const rawFrom = sp.get('from');
+  const from: SnapshotDate =
+    rawFrom && dates.includes(rawFrom) ? rawFrom : (meta.data?.baseline ?? '');
   const overview = useQuery({
     queryKey: ['overview', clientId],
     queryFn: () => getJson(`/api/v1/clients/${clientId}/overview`, ClientOverviewResponse),
@@ -32,12 +33,10 @@ export function OverviewTab(): JSX.Element {
     queryFn: () => getJson(`/api/v1/clients/${clientId}/mandate`, MandateStatusResponse),
   });
   const change = useQuery({
-    queryKey: ['change', clientId, from],
+    queryKey: ['change', clientId, from, current],
+    enabled: from !== '' && current !== '',
     queryFn: () =>
-      getJson(
-        `/api/v1/clients/${clientId}/change?from=${from}&to=${SNAPSHOT_DATES[4]}`,
-        ChangeResponse,
-      ),
+      getJson(`/api/v1/clients/${clientId}/change?from=${from}&to=${current}`, ChangeResponse),
   });
 
   if (overview.isPending || mandate.isPending || change.isPending) {
@@ -102,13 +101,13 @@ export function OverviewTab(): JSX.Element {
                   setSp(next, { replace: true });
                 }}
               >
-                {SNAPSHOT_DATES.slice(0, 4).map((s) => (
+                {dates.slice(0, -1).map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
                 ))}
               </select>
-              to {SNAPSHOT_DATES[4]}
+              to {current}
             </label>
           }
         >

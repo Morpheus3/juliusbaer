@@ -1,13 +1,18 @@
+/**
+ * Dataset-specific reference data lives next to the dataset in `<data dir>/reference/` and is
+ * optional: a missing file loads an empty table and the features that depend on it degrade
+ * gracefully (no look-through, events without transmission rules, no named scenarios).
+ */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import type { Db } from '../../client.js';
 import {
   issuerGroups,
   lookthroughLegs,
+  scenarios,
   signalRules,
-  signalThresholds,
+  signalSeriesRules,
 } from '../../schema/derived.js';
 
 const Leg = z.object({
@@ -21,26 +26,77 @@ const Leg = z.object({
   note: z.string(),
 });
 const Issuer = z.object({ instrumentId: z.string(), exposureName: z.string() });
-const File = z.object({
+const LookthroughFile = z.object({
   $comment: z.string().optional(),
   legs: z.array(Leg),
   issuers: z.array(Issuer),
 });
-
 export type LookthroughLeg = z.infer<typeof Leg>;
 
-export async function readLookthrough(): Promise<z.infer<typeof File>> {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  const text = await readFile(path.join(here, 'lookthrough.json'), 'utf8');
-  return File.parse(JSON.parse(text));
+const MatchRule = z.record(z.string(), z.union([z.string(), z.boolean()]));
+const EventRule = z.object({
+  eventId: z.string().regex(/^EV-\d{3}$/),
+  match: z.array(MatchRule).min(1),
+  shock: z.record(z.string(), z.unknown()),
+  note: z.string(),
+});
+const SeriesRule = z.object({
+  seriesId: z.string(),
+  unit: z.enum(['pct', 'abs']),
+  threshold: z.number().positive(),
+  match: z.array(MatchRule).min(1),
+  shock: z.array(z.object({ path: z.string(), factor: z.number() })),
+});
+const SignalFile = z.object({
+  $comment: z.string().optional(),
+  events: z.array(EventRule),
+  derived: z.object({ $comment: z.string().optional(), series: z.array(SeriesRule) }),
+});
+
+const ScenarioFile = z.object({
+  $comment: z.string().optional(),
+  scenarios: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      description: z.string(),
+      shock: z.record(z.string(), z.unknown()),
+      horizonDays: z.number().int().positive(),
+      probabilityNote: z.string(),
+    }),
+  ),
+});
+
+async function readOptional<T>(dir: string, file: string, schema: z.ZodType<T>): Promise<T | null> {
+  let text: string;
+  try {
+    text = await readFile(path.join(dir, file), 'utf8');
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      return null;
+    }
+    throw err;
+  }
+  return schema.parse(JSON.parse(text));
 }
 
-/** Replaces the reference tables. Validates that every structured product's legs sum to at most 1. */
 export async function loadReference(
   db: Db,
+  referenceDir: string,
   knownInstrumentIds: ReadonlySet<string>,
 ): Promise<{ legs: number; issuers: number }> {
-  const ref = await readLookthrough();
+  const ref = await readOptional(referenceDir, 'lookthrough.json', LookthroughFile);
+  await db.transaction(async (tx) => {
+    await tx.delete(lookthroughLegs);
+    await tx.delete(issuerGroups);
+    if (ref) {
+      await tx.insert(lookthroughLegs).values(ref.legs);
+      await tx.insert(issuerGroups).values(ref.issuers);
+    }
+  });
+  if (!ref) {
+    return { legs: 0, issuers: 0 };
+  }
   const sums = new Map<string, number>();
   for (const l of ref.legs) {
     if (!knownInstrumentIds.has(l.instrumentId)) {
@@ -56,63 +112,43 @@ export async function loadReference(
       throw new Error(`lookthrough legs for ${id} sum to ${sum}, above 1`);
     }
   }
-  await db.transaction(async (tx) => {
-    await tx.delete(lookthroughLegs);
-    await tx.delete(issuerGroups);
-    await tx.insert(lookthroughLegs).values(ref.legs);
-    await tx.insert(issuerGroups).values(ref.issuers);
-  });
   return { legs: ref.legs.length, issuers: ref.issuers.length };
 }
 
-const SignalRule = z.object({
-  eventId: z.string().regex(/^EV-\d{3}$/),
-  match: z.array(z.record(z.string(), z.union([z.string(), z.boolean()]))).min(1),
-  shock: z.record(z.string(), z.unknown()),
-  note: z.string(),
-});
-const SignalFile = z.object({
-  $comment: z.string().optional(),
-  events: z.array(SignalRule),
-  derived: z.object({
-    $comment: z.string().optional(),
-    thresholds: z.record(z.string(), z.number().positive()),
-  }),
-});
-
-export async function readSignalRules(): Promise<z.infer<typeof SignalFile>> {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  const text = await readFile(path.join(here, 'signal_rules.json'), 'utf8');
-  return SignalFile.parse(JSON.parse(text));
-}
-
-/** Replaces the signal reference tables. Every event in the log must have exactly one rule. */
+/** Event rules must point at events that exist; events without a rule are allowed and become unmapped signals. */
 export async function loadSignalRules(
   db: Db,
+  referenceDir: string,
   eventIds: ReadonlySet<string>,
-): Promise<{ rules: number; thresholds: number }> {
-  const ref = await readSignalRules();
-  const ruleIds = new Set(ref.events.map((e) => e.eventId));
-  for (const id of eventIds) {
-    if (!ruleIds.has(id)) {
-      throw new Error(`signal_rules.json has no rule for ${id}`);
-    }
-  }
-  for (const id of ruleIds) {
-    if (!eventIds.has(id)) {
-      throw new Error(`signal_rules.json rule ${id} does not match any event`);
+): Promise<{ rules: number; series: number }> {
+  const ref = await readOptional(referenceDir, 'signal_rules.json', SignalFile);
+  if (ref) {
+    for (const r of ref.events) {
+      if (!eventIds.has(r.eventId)) {
+        throw new Error(`signal_rules.json rule ${r.eventId} does not match any event`);
+      }
     }
   }
   await db.transaction(async (tx) => {
     await tx.delete(signalRules);
-    await tx.delete(signalThresholds);
-    await tx.insert(signalRules).values(ref.events);
-    await tx.insert(signalThresholds).values(
-      Object.entries(ref.derived.thresholds).map(([seriesId, threshold]) => ({
-        seriesId,
-        threshold,
-      })),
-    );
+    await tx.delete(signalSeriesRules);
+    if (ref) {
+      await tx.insert(signalRules).values(ref.events);
+      if (ref.derived.series.length) {
+        await tx.insert(signalSeriesRules).values(ref.derived.series);
+      }
+    }
   });
-  return { rules: ref.events.length, thresholds: Object.keys(ref.derived.thresholds).length };
+  return { rules: ref?.events.length ?? 0, series: ref?.derived.series.length ?? 0 };
+}
+
+export async function loadScenarios(db: Db, referenceDir: string): Promise<number> {
+  const ref = await readOptional(referenceDir, 'scenarios.json', ScenarioFile);
+  await db.transaction(async (tx) => {
+    await tx.delete(scenarios);
+    if (ref?.scenarios.length) {
+      await tx.insert(scenarios).values(ref.scenarios.map((s, i) => ({ ...s, ordinal: i })));
+    }
+  });
+  return ref?.scenarios.length ?? 0;
 }

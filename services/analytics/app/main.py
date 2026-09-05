@@ -18,7 +18,7 @@ app.include_router(rubric.router)
 class Health(BaseModel):
     status: str
     version: str
-    dataset_today: str
+    dataset_today: str | None
     database_reachable: bool
 
 

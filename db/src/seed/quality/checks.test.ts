@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { DATASET_TODAY } from '@jb/contracts';
 import { repoRoot } from '../../env.js';
 import { readDataset } from '../dataset.js';
 import { runQualityChecks } from './index.js';
@@ -11,13 +10,22 @@ import { runQualityChecks } from './index.js';
  */
 describe('quality checks on the shipped dataset', async () => {
   const data = await readDataset(path.join(repoRoot(), 'data'));
-  const findings = runQualityChecks(data, DATASET_TODAY);
+  const today = data.snapshots[data.snapshots.length - 1]?.date ?? '';
+  const findings = runQualityChecks(data, today);
   const byCode = (code: string) => findings.filter((f) => f.code === code);
 
   it('validates every source file', () => {
     expect(data.clients).toHaveLength(20);
     expect(data.holdings).toHaveLength(1015);
     expect(data.eventLog).toHaveLength(16);
+    expect(data.snapshots.map((x) => x.date)).toEqual([
+      '2025-12-31',
+      '2026-02-27',
+      '2026-03-31',
+      '2026-06-30',
+      '2026-08-26',
+    ]);
+    expect(data.snapshots[2]?.label).toBe('Post-Hormuz closure');
   });
 
   it('finds the stale Aranya valuation in the founder custody account', () => {

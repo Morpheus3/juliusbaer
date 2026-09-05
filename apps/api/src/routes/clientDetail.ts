@@ -1,14 +1,12 @@
 import type { FastifyPluginCallback } from 'fastify';
 import { z } from 'zod';
-import { BASELINE_SNAPSHOT, CURRENT_SNAPSHOT, SnapshotDateSchema } from '@jb/contracts';
+import { SnapshotDateSchema } from '@jb/contracts';
 import type { ClientDetailService } from '../services/clientDetailService.js';
+import type { DatasetContext } from '../services/datasetContext.js';
 import { ClientNotFoundError } from '../services/vectorService.js';
 
-const CURRENT = CURRENT_SNAPSHOT;
-const BASELINE = BASELINE_SNAPSHOT;
-
 const Params = z.object({ clientId: z.string().regex(/^CL-\d{4}$/) });
-const SnapshotQuery = z.object({ snapshot: SnapshotDateSchema.default(CURRENT) });
+const SnapshotQuery = z.object({ snapshot: SnapshotDateSchema.optional() });
 const HoldingsQuery = SnapshotQuery.extend({
   portfolio: z
     .string()
@@ -16,8 +14,8 @@ const HoldingsQuery = SnapshotQuery.extend({
     .optional(),
 });
 const ChangeQuery = z.object({
-  from: SnapshotDateSchema.default(BASELINE),
-  to: SnapshotDateSchema.default(CURRENT),
+  from: SnapshotDateSchema.optional(),
+  to: SnapshotDateSchema.optional(),
 });
 const TxQuery = z.object({
   portfolio: z
@@ -28,7 +26,7 @@ const TxQuery = z.object({
 });
 
 export const clientDetailRoutes =
-  (service: ClientDetailService): FastifyPluginCallback =>
+  (service: ClientDetailService, ctx: DatasetContext): FastifyPluginCallback =>
   (app, _opts, done) => {
     const handle =
       <Q>(querySchema: z.ZodType<Q>, run: (clientId: string, q: Q) => Promise<unknown>) =>
@@ -62,19 +60,28 @@ export const clientDetailRoutes =
     );
     app.get(
       '/clients/:clientId/holdings',
-      handle(HoldingsQuery, (id, q) => service.holdings(id, q.snapshot, q.portfolio)),
+      handle(HoldingsQuery, async (id, q) =>
+        service.holdings(id, q.snapshot ?? (await ctx.meta()).current, q.portfolio),
+      ),
     );
     app.get(
       '/clients/:clientId/exposure',
-      handle(SnapshotQuery, (id, q) => service.exposure(id, q.snapshot)),
+      handle(SnapshotQuery, async (id, q) =>
+        service.exposure(id, q.snapshot ?? (await ctx.meta()).current),
+      ),
     );
     app.get(
       '/clients/:clientId/mandate',
-      handle(SnapshotQuery, (id, q) => service.mandate(id, q.snapshot)),
+      handle(SnapshotQuery, async (id, q) =>
+        service.mandate(id, q.snapshot ?? (await ctx.meta()).current),
+      ),
     );
     app.get(
       '/clients/:clientId/change',
-      handle(ChangeQuery, (id, q) => service.change(id, q.from, q.to)),
+      handle(ChangeQuery, async (id, q) => {
+        const m = await ctx.meta();
+        return service.change(id, q.from ?? m.baseline, q.to ?? m.current);
+      }),
     );
     app.get(
       '/clients/:clientId/cashflows',

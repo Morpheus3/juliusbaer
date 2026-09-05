@@ -14,6 +14,7 @@ import { PortfolioPage } from '@/features/portfolio/PortfolioPage';
 import { TransactionsTab } from '@/features/portfolio/TransactionsTab';
 import { VectorPage } from '@/features/vector/VectorPage';
 import { AppShell } from './shell/AppShell';
+import { DefaultClientRedirect } from './shell/DefaultClientRedirect';
 import { PlaceholderPage } from './shell/PlaceholderPage';
 
 export function App(): JSX.Element {
@@ -25,10 +26,13 @@ export function App(): JSX.Element {
         <Route path="/signals" element={<SignalsPage />} />
         <Route
           path="/impact"
-          element={<Navigate to="/clients/CL-0019/impact?scenario=hormuz-reopens" replace />}
+          element={<DefaultClientRedirect to={(id) => `/clients/${id}/impact`} />}
         />
         <Route path="/clients/:clientId/impact" element={<ImpactPage />} />
-        <Route path="/rubric" element={<Navigate to="/clients/CL-0003/rubric" replace />} />
+        <Route
+          path="/rubric"
+          element={<DefaultClientRedirect to={(id) => `/clients/${id}/rubric`} />}
+        />
         <Route path="/clients/:clientId/rubric" element={<RubricPage />} />
         <Route
           path="/actions"
@@ -42,10 +46,16 @@ export function App(): JSX.Element {
           <Route path="transactions" element={<TransactionsTab />} />
           <Route path="cashflows" element={<CashflowsTab />} />
         </Route>
-        <Route path="/client" element={<Navigate to="/clients/CL-0002" replace />} />
-        <Route path="/portfolio" element={<Navigate to="/clients/CL-0002/portfolio" replace />} />
+        <Route path="/client" element={<DefaultClientRedirect to={(id) => `/clients/${id}`} />} />
+        <Route
+          path="/portfolio"
+          element={<DefaultClientRedirect to={(id) => `/clients/${id}/portfolio`} />}
+        />
         <Route path="/clients/:clientId/vector" element={<VectorPage />} />
-        <Route path="/vector" element={<Navigate to="/clients/CL-0002/vector" replace />} />
+        <Route
+          path="/vector"
+          element={<DefaultClientRedirect to={(id) => `/clients/${id}/vector`} />}
+        />
         <Route path="/audit" element={<DataQualityPage />} />
         <Route path="*" element={<PlaceholderPage title="Not found" />} />
       </Route>

@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useMeta } from '@/lib/meta';
 
 interface Module {
   to: string;
@@ -53,6 +54,7 @@ function Group({ title, items }: { title: string; items: Module[] }): JSX.Elemen
 }
 
 export function Rail(): JSX.Element {
+  const meta = useMeta();
   return (
     <nav aria-label="Modules" className="flex h-full flex-col bg-rail text-rail-ink">
       <div className="flex items-center gap-3 px-5 pb-3 pt-5">
@@ -63,13 +65,15 @@ export function Rail(): JSX.Element {
           <div className="font-serif text-[15px] font-semibold leading-tight text-white">
             RM Workbench
           </div>
-          <div className="text-[11px] text-rail-muted">Private Banking · Asia desk</div>
+          <div className="text-[11px] text-rail-muted">
+            {meta.data?.rm.desk ?? 'Private Banking'}
+          </div>
         </div>
       </div>
       <Group title="RM view" items={RM_VIEW} />
       <Group title="Customer view" items={CUSTOMER_VIEW} />
       <div className="mt-auto px-5 py-4 text-[11px] leading-relaxed text-rail-muted">
-        Synthetic SingHacks 2026 data.
+        {meta.data?.datasetName ?? 'No dataset loaded'}
         <br />
         No automated trading. RM approval required.
       </div>

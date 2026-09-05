@@ -27,9 +27,8 @@ import type { AssessmentRow, RubricRepository } from '../repositories/rubricRepo
 import type { SignalRepository } from '../repositories/signalRepository.js';
 import type { VectorRepository } from '../repositories/vectorRepository.js';
 import { AnalyticsUnavailableError } from './analyticsClient.js';
+import type { DatasetContext } from './datasetContext.js';
 import { ClientNotFoundError, NoVectorRunError } from './vectorService.js';
-
-const RM_ID = 'RM-SG-014';
 
 /** Shape returned by the analytics service's /rubric/assess. */
 const PyAssess = z.object({
@@ -119,12 +118,13 @@ export class RubricService {
     private readonly signals: SignalRepository,
     private readonly gateway: ClaudeGateway,
     private readonly analyticsUrl: string,
-    private readonly today: string,
+    private readonly ctx: DatasetContext,
     private readonly fetchImpl: typeof fetch = fetch,
   ) {}
 
   async assess(clientId: string, clock: string | undefined): Promise<RubricAssessmentResponse> {
-    const at = clock && clock < this.today ? clock : this.today;
+    const meta = await this.ctx.meta();
+    const at = clock && clock < meta.today ? clock : meta.today;
     const [bundle, run, facts, vector, quality] = await Promise.all([
       this.clients.bundle(clientId),
       this.vectors.latestRun(),
@@ -180,7 +180,10 @@ export class RubricService {
       clientId,
     });
 
-    const snapshot = snapshotForClock(at);
+    const snapshot = snapshotForClock(
+      meta.snapshots.map((x) => x.date),
+      at,
+    );
     const freshness = Math.max(0.5, 1 - daysBetween(snapshot, at) / 180);
     const dataQuality = Math.max(0.4, 1 - quality.errors * 0.15 - quality.warnings * 0.05);
 
@@ -303,11 +306,11 @@ export class RubricService {
       systemScore: dim.systemScore,
       overrideScore: req.score,
       reason: req.reason,
-      rmId: RM_ID,
+      rmId: await this.ctx.rmId(),
     });
     await this.repo.audit({
       kind: 'RUBRIC_OVERRIDE',
-      actor: RM_ID,
+      actor: await this.ctx.rmId(),
       clientId,
       entityType: 'rubric_override',
       entityId: o.id,
@@ -328,10 +331,10 @@ export class RubricService {
     if (!row) {
       throw new NoAssessmentError(clientId);
     }
-    const locked = (await this.repo.lock(row.id, RM_ID)) ?? row;
+    const locked = (await this.repo.lock(row.id, await this.ctx.rmId())) ?? row;
     await this.repo.audit({
       kind: 'RUBRIC_LOCKED',
-      actor: RM_ID,
+      actor: await this.ctx.rmId(),
       clientId,
       entityType: 'rubric_assessment',
       entityId: row.id,

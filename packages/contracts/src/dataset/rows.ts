@@ -10,17 +10,17 @@ import {
   NumCell,
   OptionalNumCell,
   OptionalStrCell,
-  SNAPSHOT_DATES,
   ServiceModelSchema,
   SeveritySchema,
   YesNoCell,
 } from './common.js';
 
-const snapshotColumns = <P extends string>(prefix: P) =>
-  Object.fromEntries(SNAPSHOT_DATES.map((d) => [`${prefix}_${d}`, NumCell])) as Record<
-    `${P}_${(typeof SNAPSHOT_DATES)[number]}`,
-    typeof NumCell
-  >;
+/**
+ * Wide per-snapshot columns (aum_YYYY-MM-DD, price_YYYY-MM-DD, drawn_YYYY-MM-DD, ...) are not
+ * enumerated here: the loader discovers the snapshot dates from the data and unpivots whatever
+ * columns match `<prefix>_<date>`. Rows therefore allow extra string cells.
+ */
+export const SNAPSHOT_COLUMN = /^([a-z_]+)_(\d{4}-\d{2}-\d{2})$/;
 
 export const ClientRow = z.object({
   client_id: z.string().regex(/^CL-\d{4}$/),
@@ -51,23 +51,24 @@ export const ClientRow = z.object({
 });
 export type ClientRow = z.infer<typeof ClientRow>;
 
-export const PortfolioRow = z.object({
-  portfolio_id: z.string().regex(/^PF-\d{4}$/),
-  client_id: z.string(),
-  portfolio_name: z.string(),
-  mandate_code: z.string(),
-  mandate_name: z.string(),
-  service_model: ServiceModelSchema,
-  base_currency: z.string().length(3),
-  inception_date: IsoDate,
-  benchmark: z.string(),
-  aum_usd_current: NumCell,
-  ...snapshotColumns('aum'),
-});
+export const PortfolioRow = z
+  .object({
+    portfolio_id: z.string().regex(/^PF-\d{4}$/),
+    client_id: z.string(),
+    portfolio_name: z.string(),
+    mandate_code: z.string(),
+    mandate_name: z.string(),
+    service_model: ServiceModelSchema,
+    base_currency: z.string().length(3),
+    inception_date: IsoDate,
+    benchmark: z.string(),
+    aum_usd_current: NumCell,
+  })
+  .catchall(z.string());
 export type PortfolioRow = z.infer<typeof PortfolioRow>;
 
 export const HoldingRow = z.object({
-  snapshot_date: z.enum(SNAPSHOT_DATES),
+  snapshot_date: IsoDate,
   portfolio_id: z.string(),
   client_id: z.string(),
   instrument_id: z.string(),
@@ -96,20 +97,21 @@ export const HoldingRow = z.object({
 });
 export type HoldingRow = z.infer<typeof HoldingRow>;
 
-export const InstrumentRow = z.object({
-  instrument_id: z.string(),
-  instrument_name: z.string(),
-  asset_class: AssetClassSchema,
-  sub_asset_class: z.string(),
-  sector: OptionalStrCell,
-  region: z.string(),
-  currency: z.string().length(3),
-  liquidity_tier: LiquidityTierSchema,
-  underlying_reference: OptionalStrCell,
-  sustainability_excluded: YesNoCell,
-  concentration_limit_applies: YesNoCell,
-  ...snapshotColumns('price'),
-});
+export const InstrumentRow = z
+  .object({
+    instrument_id: z.string(),
+    instrument_name: z.string(),
+    asset_class: AssetClassSchema,
+    sub_asset_class: z.string(),
+    sector: OptionalStrCell,
+    region: z.string(),
+    currency: z.string().length(3),
+    liquidity_tier: LiquidityTierSchema,
+    underlying_reference: OptionalStrCell,
+    sustainability_excluded: YesNoCell,
+    concentration_limit_applies: YesNoCell,
+  })
+  .catchall(z.string());
 export type InstrumentRow = z.infer<typeof InstrumentRow>;
 
 export const MandateRow = z.object({
@@ -141,22 +143,19 @@ export const TransactionRow = z.object({
 });
 export type TransactionRow = z.infer<typeof TransactionRow>;
 
-export const CreditFacilityRow = z.object({
-  facility_id: z.string(),
-  client_id: z.string(),
-  collateral_portfolio_id: z.string(),
-  facility_type: z.string(),
-  facility_ccy: z.string().length(3),
-  credit_limit: NumCell,
-  interest_rate_pct: NumCell,
-  margin_call_ltv_pct: NumCell,
-  utilisation_pct_current: NumCell,
-  ...snapshotColumns('drawn'),
-  ...snapshotColumns('collateral_market_value'),
-  ...snapshotColumns('lending_value'),
-  ...snapshotColumns('ltv_pct'),
-  ...snapshotColumns('headroom'),
-});
+export const CreditFacilityRow = z
+  .object({
+    facility_id: z.string(),
+    client_id: z.string(),
+    collateral_portfolio_id: z.string(),
+    facility_type: z.string(),
+    facility_ccy: z.string().length(3),
+    credit_limit: NumCell,
+    interest_rate_pct: NumCell,
+    margin_call_ltv_pct: NumCell,
+    utilisation_pct_current: NumCell,
+  })
+  .catchall(z.string());
 export type CreditFacilityRow = z.infer<typeof CreditFacilityRow>;
 
 export const CommitmentRow = z.object({
@@ -186,13 +185,13 @@ export const PlannedCashNeedRow = z.object({
 export type PlannedCashNeedRow = z.infer<typeof PlannedCashNeedRow>;
 
 export const MarketContextRow = z.object({
-  snapshot_date: z.enum(SNAPSHOT_DATES),
+  snapshot_date: IsoDate,
   series_id: z.string(),
   series_name: z.string(),
   category: z.string(),
   unit: z.string(),
   value: NumCell,
-  snapshot_label: z.string(),
+  snapshot_label: z.string().optional(),
 });
 export type MarketContextRow = z.infer<typeof MarketContextRow>;
 

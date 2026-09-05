@@ -1,13 +1,12 @@
 import path from 'node:path';
 import { eq } from 'drizzle-orm';
-import { DATASET_TODAY } from '@jb/contracts';
 import type { Db } from '../client.js';
 import { repoRoot } from '../env.js';
 import { dataQualityIssues, loadRuns } from '../schema/derived.js';
 import { readDataset } from './dataset.js';
 import { loadRaw } from './load.js';
 import { runQualityChecks } from './quality/index.js';
-import { loadReference, loadSignalRules } from './reference/index.js';
+import { loadReference, loadScenarios, loadSignalRules } from './reference/index.js';
 
 export interface SeedOptions {
   sourceDir?: string | undefined;
@@ -23,12 +22,11 @@ export interface SeedResult {
 
 /** Validates the dataset, loads it into raw.*, runs quality checks and records the run. */
 export async function seed(db: Db, opts: SeedOptions = {}): Promise<SeedResult> {
-  const sourceDir = opts.sourceDir ?? path.join(repoRoot(), 'data');
-  const today = opts.today ?? DATASET_TODAY;
+  const sourceDir = opts.sourceDir ?? process.env.DATA_DIR ?? path.join(repoRoot(), 'data');
 
   const [run] = await db
     .insert(loadRuns)
-    .values({ datasetToday: today, sourceDir })
+    .values({ datasetToday: opts.today ?? 'latest snapshot', sourceDir })
     .returning({ id: loadRuns.id });
   if (!run) {
     throw new Error('failed to create load run');
@@ -36,16 +34,24 @@ export async function seed(db: Db, opts: SeedOptions = {}): Promise<SeedResult> 
 
   try {
     const data = await readDataset(sourceDir);
+    const today = opts.today ?? data.snapshots[data.snapshots.length - 1]?.date ?? '';
     const rowCounts = await loadRaw(db, data);
-    const ref = await loadReference(db, new Set(data.instruments.map((i) => i.instrument_id)));
+    const referenceDir = path.join(sourceDir, 'reference');
+    const ref = await loadReference(
+      db,
+      referenceDir,
+      new Set(data.instruments.map((i) => i.instrument_id)),
+    );
     rowCounts.lookthrough_legs = ref.legs;
     rowCounts.issuer_groups = ref.issuers;
     const sig = await loadSignalRules(
       db,
+      referenceDir,
       new Set(data.eventLog.map((_e, i) => `EV-${String(i + 1).padStart(3, '0')}`)),
     );
+    rowCounts.scenarios = await loadScenarios(db, referenceDir);
     rowCounts.signal_rules = sig.rules;
-    rowCounts.signal_thresholds = sig.thresholds;
+    rowCounts.signal_series_rules = sig.series;
     const findings = runQualityChecks(data, today);
 
     if (findings.length > 0) {
@@ -56,7 +62,13 @@ export async function seed(db: Db, opts: SeedOptions = {}): Promise<SeedResult> 
 
     await db
       .update(loadRuns)
-      .set({ status: 'succeeded', finishedAt: new Date(), rowCounts, issueCount: findings.length })
+      .set({
+        status: 'succeeded',
+        finishedAt: new Date(),
+        rowCounts,
+        issueCount: findings.length,
+        datasetToday: today,
+      })
       .where(eq(loadRuns.id, run.id));
 
     const issuesByCode: Record<string, number> = {};

@@ -15,7 +15,7 @@ import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
 import { fmtDateTime } from '@/lib/format';
-import { useClock } from '@/state/clock';
+import { useClockDate } from '@/state/clock';
 
 async function post<T>(url: string, body: unknown, parse: (v: unknown) => T): Promise<T> {
   const init: RequestInit = { method: 'POST', headers: { 'content-type': 'application/json' } };
@@ -39,8 +39,8 @@ async function post<T>(url: string, body: unknown, parse: (v: unknown) => T): Pr
 
 /** Customer risk rubric (L2/L3). Wireframe slide 06. */
 export function RubricPage(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
-  const clock = useClock((s) => s.clock);
+  const { clientId = '' } = useParams();
+  const clock = useClockDate();
   const qc = useQueryClient();
   const q = useQuery({
     queryKey: ['rubric', clientId],

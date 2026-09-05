@@ -7,16 +7,18 @@ import { PageHeader } from '@/components/PageHeader';
 import { Pill } from '@/components/Pill';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
-import { useClock } from '@/state/clock';
+import { useMeta } from '@/lib/meta';
+import { useClockDate } from '@/state/clock';
 import { SEVERITY_SHORT, SEVERITY_TONE, ageLabel } from './signalFormat';
 
 type SeverityFilter = 'all' | 'high' | 'medium';
 
 /** Market signals feed (RM view L1) with the evidence drawer (L2). Wireframe slide 04. */
 export function SignalsPage(): JSX.Element {
-  const clock = useClock((s) => s.clock);
+  const clock = useClockDate();
+  const meta = useMeta();
   const [sp, setSp] = useSearchParams();
-  const clientId = sp.get('client') ?? 'CL-0002';
+  const clientId = sp.get('client') ?? meta.data?.defaultClientId ?? '';
   const [selected, setSelected] = useState<string | null>(null);
   const [severity, setSeverity] = useState<SeverityFilter>('all');
   const [kind, setKind] = useState<'all' | 'event' | 'derived'>('all');
@@ -26,6 +28,7 @@ export function SignalsPage(): JSX.Element {
   const q = useQuery({
     queryKey: ['signals', clock, clientId],
     queryFn: () => getJson(`/api/v1/signals?clock=${clock}&clientId=${clientId}`, SignalsResponse),
+    enabled: clock !== '' && clientId !== '',
     placeholderData: (prev) => prev,
   });
 

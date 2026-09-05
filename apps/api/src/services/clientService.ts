@@ -1,5 +1,6 @@
 import type { ClientListResponse, ClientSummary } from '@jb/contracts';
 import type { ClientRepository, ClientRow } from '../repositories/clientRepository.js';
+import type { DatasetContext } from './datasetContext.js';
 
 export function toClientSummary(row: ClientRow): ClientSummary {
   return {
@@ -24,11 +25,11 @@ export function toClientSummary(row: ClientRow): ClientSummary {
 export class ClientService {
   constructor(
     private readonly clients: ClientRepository,
-    private readonly datasetToday: string,
+    private readonly ctx: DatasetContext,
   ) {}
 
   async list(): Promise<ClientListResponse> {
-    const rows = await this.clients.listAll();
-    return { asOf: this.datasetToday, clients: rows.map(toClientSummary) };
+    const [rows, today] = await Promise.all([this.clients.listAll(), this.ctx.today()]);
+    return { asOf: today, clients: rows.map(toClientSummary) };
   }
 }

@@ -21,7 +21,15 @@ import {
   TransactionRow,
 } from '@jb/contracts';
 
+export interface Snapshot {
+  date: string;
+  ordinal: number;
+  label: string;
+}
+
 export interface Dataset {
+  /** Discovered from holdings; labels from market_context.snapshot_label when present. */
+  snapshots: Snapshot[];
   clients: ClientRow[];
   portfolios: PortfolioRow[];
   holdings: HoldingRow[];
@@ -124,7 +132,9 @@ export async function readDataset(dir: string): Promise<Dataset> {
     readCsv(dir, 'event_log.csv', EventLogRow),
     readJson(dir, 'rm_notes.json', RmNoteRow),
   ]);
+  const snapshots = discoverSnapshots(holdings, marketContext);
   return {
+    snapshots,
     clients,
     portfolios,
     holdings,
@@ -138,4 +148,51 @@ export async function readDataset(dir: string): Promise<Dataset> {
     eventLog,
     rmNotes,
   };
+}
+
+function discoverSnapshots(holdings: HoldingRow[], market: MarketContextRow[]): Snapshot[] {
+  const dates = [...new Set(holdings.map((h) => h.snapshot_date))].sort();
+  if (dates.length === 0) {
+    throw new DatasetValidationError('holdings.csv', ['no snapshot dates found']);
+  }
+  const labels = new Map<string, string>();
+  for (const m of market) {
+    if (m.snapshot_label && !labels.has(m.snapshot_date)) {
+      labels.set(m.snapshot_date, m.snapshot_label);
+    }
+  }
+  return dates.map((date, ordinal) => ({
+    date,
+    ordinal,
+    label:
+      labels.get(date) ??
+      (ordinal === 0
+        ? 'Baseline'
+        : ordinal === dates.length - 1
+          ? 'Current'
+          : `Snapshot ${ordinal + 1}`),
+  }));
+}
+
+/** Reads `<prefix>_<date>` wide cells from a row as numbers, for the given snapshot dates. */
+export function wideSeries(
+  row: Record<string, unknown>,
+  prefix: string,
+  dates: readonly string[],
+  file: string,
+  id: string,
+): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const d of dates) {
+    const raw = row[`${prefix}_${d}`];
+    if (raw === undefined || raw === '') {
+      throw new DatasetValidationError(file, [`${id}: missing column ${prefix}_${d}`]);
+    }
+    const n = Number(raw);
+    if (Number.isNaN(n)) {
+      throw new DatasetValidationError(file, [`${id}: ${prefix}_${d} is not a number`]);
+    }
+    out.set(d, n);
+  }
+  return out;
 }

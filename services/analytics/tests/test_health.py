@@ -9,4 +9,4 @@ def test_health_shape(monkeypatch) -> None:  # noqa: ANN001
     body = client.get("/health").json()
     assert body["status"] == "degraded"
     assert body["database_reachable"] is False
-    assert body["dataset_today"] == "2026-08-26"
+    assert "dataset_today" in body

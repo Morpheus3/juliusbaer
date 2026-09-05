@@ -15,7 +15,7 @@ import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
-import { useClock } from '@/state/clock';
+import { useClockDate } from '@/state/clock';
 import { SEVERITY_SHORT, SEVERITY_TONE, ageLabel } from '../signals/signalFormat';
 
 const ALERT_KIND_LABEL: Record<ClientAlert['kind'], string> = {
@@ -33,7 +33,7 @@ const ALERT_KIND_LABEL: Record<ClientAlert['kind'], string> = {
 
 /** Client 360 (L1): scan the client in thirty seconds. Wireframe slide 02. */
 export function Client360Page(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
+  const { clientId = '' } = useParams();
   const q = useQuery({
     queryKey: ['overview', clientId],
     queryFn: () => getJson(`/api/v1/clients/${clientId}/overview`, ClientOverviewResponse),
@@ -322,10 +322,11 @@ function AlertsBanner({
 }
 
 function SignalsPanel({ clientId }: { clientId: string }): JSX.Element {
-  const clock = useClock((s) => s.clock);
+  const clock = useClockDate();
   const q = useQuery({
     queryKey: ['signals', clock, clientId],
     queryFn: () => getJson(`/api/v1/signals?clock=${clock}&clientId=${clientId}`, SignalsResponse),
+    enabled: clock !== '',
   });
   const relevant = (q.data?.signals ?? [])
     .filter((s) => (s.client?.exposedPct ?? 0) > 0)

@@ -17,7 +17,7 @@ import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
-import { useClock } from '@/state/clock';
+import { useClockDate } from '@/state/clock';
 import { SEVERITY_SHORT, SEVERITY_TONE } from '../signals/signalFormat';
 
 async function postJson<T>(url: string, body: unknown, parse: (v: unknown) => T): Promise<T> {
@@ -42,8 +42,8 @@ async function postJson<T>(url: string, body: unknown, parse: (v: unknown) => T)
 
 /** Signal impact analysis (Customer view L2). Wireframe slide 05. */
 export function ImpactPage(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
-  const clock = useClock((s) => s.clock);
+  const { clientId = '' } = useParams();
+  const clock = useClockDate();
   const [sp, setSp] = useSearchParams();
   const initial = useMemo(() => (sp.get('signals') ?? '').split(',').filter(Boolean), [sp]);
   const [signalIds, setSignalIds] = useState<string[]>(initial);

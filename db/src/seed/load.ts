@@ -4,18 +4,9 @@
  * what happened. Snapshot-wide columns are unpivoted here.
  */
 import { sql } from 'drizzle-orm';
-import { SNAPSHOT_DATES } from '@jb/contracts';
 import type { Db } from '../client.js';
 import * as s from '../schema/index.js';
-import type { Dataset } from './dataset.js';
-
-const SNAPSHOT_LABELS: Record<(typeof SNAPSHOT_DATES)[number], string> = {
-  '2025-12-31': 'Year-end 2025 baseline',
-  '2026-02-27': 'Pre-conflict',
-  '2026-03-31': 'Post-Hormuz closure',
-  '2026-06-30': 'Half-year 2026',
-  '2026-08-26': 'Current',
-};
+import { wideSeries, type Dataset } from './dataset.js';
 
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 
@@ -31,6 +22,7 @@ async function insertChunked(
 }
 
 export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, number>> {
+  const dates = data.snapshots.map((x) => x.date);
   return db.transaction(async (tx) => {
     await tx.execute(sql`
       TRUNCATE TABLE
@@ -44,7 +36,7 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
     await insertChunked(
       tx,
       s.snapshots,
-      SNAPSHOT_DATES.map((d, i) => ({ snapshotDate: d, ordinal: i, label: SNAPSHOT_LABELS[d] })),
+      data.snapshots.map((x) => ({ snapshotDate: x.date, ordinal: x.ordinal, label: x.label })),
     );
 
     await insertChunked(
@@ -114,10 +106,10 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
       tx,
       s.portfolioAum,
       data.portfolios.flatMap((p) =>
-        SNAPSHOT_DATES.map((d) => ({
+        [...wideSeries(p, 'aum', dates, 'portfolios.csv', p.portfolio_id)].map(([d, v]) => ({
           portfolioId: p.portfolio_id,
           snapshotDate: d,
-          aumBase: p[`aum_${d}`],
+          aumBase: v,
         })),
       ),
     );
@@ -143,10 +135,10 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
       tx,
       s.instrumentPrices,
       data.instruments.flatMap((i) =>
-        SNAPSHOT_DATES.map((d) => ({
+        [...wideSeries(i, 'price', dates, 'instruments.csv', i.instrument_id)].map(([d, v]) => ({
           instrumentId: i.instrument_id,
           snapshotDate: d,
-          priceLocal: i[`price_${d}`],
+          priceLocal: v,
         })),
       ),
     );
@@ -222,17 +214,23 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
     await insertChunked(
       tx,
       s.creditFacilitySnapshots,
-      data.creditFacilities.flatMap((f) =>
-        SNAPSHOT_DATES.map((d) => ({
+      data.creditFacilities.flatMap((f) => {
+        const file = 'credit_facilities.csv';
+        const drawn = wideSeries(f, 'drawn', dates, file, f.facility_id);
+        const cmv = wideSeries(f, 'collateral_market_value', dates, file, f.facility_id);
+        const lv = wideSeries(f, 'lending_value', dates, file, f.facility_id);
+        const ltv = wideSeries(f, 'ltv_pct', dates, file, f.facility_id);
+        const head = wideSeries(f, 'headroom', dates, file, f.facility_id);
+        return dates.map((d) => ({
           facilityId: f.facility_id,
           snapshotDate: d,
-          drawn: f[`drawn_${d}`],
-          collateralMarketValue: f[`collateral_market_value_${d}`],
-          lendingValue: f[`lending_value_${d}`],
-          ltvPct: f[`ltv_pct_${d}`],
-          headroom: f[`headroom_${d}`],
-        })),
-      ),
+          drawn: drawn.get(d) ?? 0,
+          collateralMarketValue: cmv.get(d) ?? 0,
+          lendingValue: lv.get(d) ?? 0,
+          ltvPct: ltv.get(d) ?? 0,
+          headroom: head.get(d) ?? 0,
+        }));
+      }),
     );
 
     await insertChunked(
@@ -277,7 +275,7 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
         category: m.category,
         unit: m.unit,
         value: m.value,
-        snapshotLabel: m.snapshot_label,
+        snapshotLabel: m.snapshot_label ?? '',
       })),
     );
 
@@ -313,14 +311,14 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
     return {
       clients: data.clients.length,
       portfolios: data.portfolios.length,
-      portfolio_aum: data.portfolios.length * SNAPSHOT_DATES.length,
+      portfolio_aum: data.portfolios.length * dates.length,
       instruments: data.instruments.length,
-      instrument_prices: data.instruments.length * SNAPSHOT_DATES.length,
+      instrument_prices: data.instruments.length * dates.length,
       holdings: data.holdings.length,
       mandates: data.mandates.length,
       transactions: data.transactions.length,
       credit_facilities: data.creditFacilities.length,
-      credit_facility_snapshots: data.creditFacilities.length * SNAPSHOT_DATES.length,
+      credit_facility_snapshots: data.creditFacilities.length * dates.length,
       commitments: data.commitments.length,
       planned_cash_needs: data.plannedCashNeeds.length,
       market_context: data.marketContext.length,

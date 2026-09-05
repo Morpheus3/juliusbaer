@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 from app import db
 from app.data.frames import from_postgres
+from app.data.today import resolve_today
 from app.features.build import build, persist
 from app.features.manifest import ENGINE_VERSION, MANIFEST, Feature
-from app.settings import settings
 
 router = APIRouter(prefix="/vectors", tags=["vectors"])
 
@@ -38,8 +38,9 @@ def build_vectors() -> BuildResponse:
                 raise HTTPException(
                     status_code=409, detail="raw.clients is empty; seed the database first"
                 )
-            result = build(frames, settings.dataset_today)
-            run_id = persist(conn, result, settings.dataset_today)
+            today = resolve_today(conn)
+            result = build(frames, today)
+            run_id = persist(conn, result, today)
     except psycopg.Error as e:  # pragma: no cover - surfaced to the API caller
         raise HTTPException(status_code=503, detail=f"database error: {e}") from e
     return BuildResponse(

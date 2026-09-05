@@ -16,8 +16,8 @@ const LIQ_TONE: Record<string, 'ok' | 'warn' | 'crit' | 'neutral'> = {
 };
 
 export function HoldingsTab(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
-  const [snapshot, setSnapshot] = useSnapshotParam();
+  const { clientId = '' } = useParams();
+  const [snapshot, setSnapshot, snapshotOptions] = useSnapshotParam();
   const [portfolio, setPortfolio] = useState<string>('all');
   const q = useQuery({
     queryKey: ['holdings', clientId, snapshot],
@@ -38,7 +38,7 @@ export function HoldingsTab(): JSX.Element {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-4 text-[12.5px] text-muted">
-        <SnapshotSelect value={snapshot} onChange={setSnapshot} />
+        <SnapshotSelect value={snapshot} onChange={setSnapshot} options={snapshotOptions} />
         <label className="flex items-center gap-2">
           Portfolio
           <select

@@ -24,7 +24,7 @@ const TONE: Record<string, 'ok' | 'warn' | 'crit' | 'info' | 'neutral' | 'brass'
 };
 
 export function TransactionsTab(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
+  const { clientId = '' } = useParams();
   const [type, setType] = useState('all');
   const q = useQuery({
     queryKey: ['transactions', clientId],

@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClientOverviewResponse, SNAPSHOT_DATES, type SnapshotDate } from '@jb/contracts';
+import { ClientOverviewResponse, type SnapshotDate } from '@jb/contracts';
 import type { JSX } from 'react';
 import { Link, NavLink, Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { ClientPicker } from '@/components/ClientPicker';
 import { PageHeader } from '@/components/PageHeader';
 import { getJson } from '@/lib/api';
+import { useMeta } from '@/lib/meta';
 
 const TABS = [
   { to: '', label: 'Overview' },
@@ -14,12 +15,12 @@ const TABS = [
   { to: 'cashflows', label: 'Cash flows' },
 ] as const;
 
-export function useSnapshotParam(): [SnapshotDate, (d: SnapshotDate) => void] {
+export function useSnapshotParam(): [SnapshotDate, (d: SnapshotDate) => void, string[]] {
+  const meta = useMeta();
+  const dates = meta.data?.snapshots.map((x) => x.date) ?? [];
   const [sp, setSp] = useSearchParams();
   const raw = sp.get('snapshot');
-  const snap = (SNAPSHOT_DATES as readonly string[]).includes(raw ?? '')
-    ? (raw as SnapshotDate)
-    : SNAPSHOT_DATES[4];
+  const snap = raw && dates.includes(raw) ? raw : (meta.data?.current ?? '');
   return [
     snap,
     (d) => {
@@ -27,15 +28,18 @@ export function useSnapshotParam(): [SnapshotDate, (d: SnapshotDate) => void] {
       next.set('snapshot', d);
       setSp(next, { replace: true });
     },
+    dates,
   ];
 }
 
 export function SnapshotSelect({
   value,
   onChange,
+  options,
 }: {
   value: SnapshotDate;
   onChange: (d: SnapshotDate) => void;
+  options: string[];
 }): JSX.Element {
   return (
     <label className="flex items-center gap-2 text-[12.5px] text-muted">
@@ -44,10 +48,10 @@ export function SnapshotSelect({
         className="rounded border border-line bg-surface px-2 py-1 font-mono text-[12.5px] text-ink"
         value={value}
         onChange={(e) => {
-          onChange(e.target.value as SnapshotDate);
+          onChange(e.target.value);
         }}
       >
-        {SNAPSHOT_DATES.map((d) => (
+        {options.map((d) => (
           <option key={d} value={d}>
             {d}
           </option>
@@ -59,7 +63,7 @@ export function SnapshotSelect({
 
 /** Portfolio deep dive (L2/L3) shell with tabs. Wireframe slide 03. */
 export function PortfolioPage(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
+  const { clientId = '' } = useParams();
   const q = useQuery({
     queryKey: ['overview', clientId],
     queryFn: () => getJson(`/api/v1/clients/${clientId}/overview`, ClientOverviewResponse),

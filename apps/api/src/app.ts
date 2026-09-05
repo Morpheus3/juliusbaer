@@ -15,11 +15,13 @@ import { clientDetailRoutes } from './routes/clientDetail.js';
 import { clientRoutes } from './routes/clients.js';
 import { dataQualityRoutes } from './routes/dataQuality.js';
 import { healthRoutes } from './routes/health.js';
+import { metaRoutes } from './routes/meta.js';
 import { rubricRoutes } from './routes/rubric.js';
 import { signalRoutes } from './routes/signals.js';
 import { vectorRoutes } from './routes/vectors.js';
 import { AnalyticsClient } from './services/analyticsClient.js';
 import { ClientDetailService } from './services/clientDetailService.js';
+import { DatasetContext } from './services/datasetContext.js';
 import { ClientService } from './services/clientService.js';
 import { DataQualityService } from './services/dataQualityService.js';
 import { HealthService } from './services/healthService.js';
@@ -42,6 +44,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   await app.register(cors, { origin: config.CORS_ORIGIN });
   await app.register(dbPlugin, { connectionString: config.DATABASE_URL });
 
+  const ctx = new DatasetContext(app.db, config.DATASET_TODAY, config.DATASET_NAME);
   const loadRuns = new LoadRunRepository(app.db);
   const issues = new DataQualityRepository(app.db);
   const clients = new ClientRepository(app.db);
@@ -60,17 +63,12 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   );
   app.log.info({ mode: gateway.mode, model: config.CLAUDE_ANALYSIS_MODEL }, 'claude gateway');
 
-  const health = new HealthService(loadRuns, API_VERSION, config.DATASET_TODAY);
+  const health = new HealthService(loadRuns, API_VERSION, ctx);
   const dataQuality = new DataQualityService(loadRuns, issues);
-  const clientService = new ClientService(clients, config.DATASET_TODAY);
+  const clientService = new ClientService(clients, ctx);
   const vectorService = new VectorService(vectors, new AnalyticsClient(config.ANALYTICS_URL));
-  const detailService = new ClientDetailService(detail, config.DATASET_TODAY);
-  const signalService = new SignalService(
-    signals,
-    detail,
-    config.ANALYTICS_URL,
-    config.DATASET_TODAY,
-  );
+  const detailService = new ClientDetailService(detail, ctx);
+  const signalService = new SignalService(signals, detail, config.ANALYTICS_URL, ctx);
   const rubricService = new RubricService(
     rubric,
     vectors,
@@ -78,7 +76,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     signals,
     gateway,
     config.ANALYTICS_URL,
-    config.DATASET_TODAY,
+    ctx,
   );
 
   await app.register(healthRoutes(health));
@@ -87,7 +85,8 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(dataQualityRoutes(dataQuality));
       await v1.register(clientRoutes(clientService));
       await v1.register(vectorRoutes(vectorService));
-      await v1.register(clientDetailRoutes(detailService));
+      await v1.register(metaRoutes(ctx));
+      await v1.register(clientDetailRoutes(detailService, ctx));
       await v1.register(signalRoutes(signalService));
       await v1.register(rubricRoutes(rubricService));
     },

@@ -10,7 +10,7 @@ import { getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
 
 export function CashflowsTab(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
+  const { clientId = '' } = useParams();
   const q = useQuery({
     queryKey: ['cashflows', clientId],
     queryFn: () => getJson(`/api/v1/clients/${clientId}/cashflows`, CashflowsResponse),

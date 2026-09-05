@@ -1,20 +1,8 @@
 import { z } from 'zod';
 
-/** The five dated snapshots at which positions are supplied. Order matters. */
-export const SNAPSHOT_DATES = [
-  '2025-12-31',
-  '2026-02-27',
-  '2026-03-31',
-  '2026-06-30',
-  '2026-08-26',
-] as const;
-export type SnapshotDate = (typeof SNAPSHOT_DATES)[number];
-export const SnapshotDateSchema = z.enum(SNAPSHOT_DATES);
-
-/** The dataset's notion of "today". */
-export const DATASET_TODAY: SnapshotDate = '2026-08-26';
-export const CURRENT_SNAPSHOT: SnapshotDate = SNAPSHOT_DATES[4];
-export const BASELINE_SNAPSHOT: SnapshotDate = SNAPSHOT_DATES[0];
+/** Snapshot dates are discovered from the data at load time; they are plain ISO dates everywhere. */
+export type SnapshotDate = string;
+export const SnapshotDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'expected YYYY-MM-DD');
 
 export const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'expected YYYY-MM-DD');
 

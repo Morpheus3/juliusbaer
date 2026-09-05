@@ -1,7 +1,10 @@
+import json
+from pathlib import Path
+
 import pytest
 
 from app.impact.models import bond_duration, price_instrument
-from app.impact.scenarios import SCENARIO_BY_ID
+from app.impact.scenarios import Scenario
 from app.impact.shock import Shock
 
 
@@ -100,12 +103,23 @@ def test_private_marks_are_not_revalued() -> None:
     assert p.equity_pct == 0.0 and p.model.startswith("private mark")
 
 
-def test_scenarios_combine_and_scale() -> None:
-    s = SCENARIO_BY_ID["hormuz-reopens"].shock
-    doubled = s.scaled(2)
-    assert doubled.brent_pct == 2 * s.brent_pct
-    both = Shock.combine([s, SCENARIO_BY_ID["fed-hike"].shock])
-    assert (
-        both.rates_bps["USD"]
-        == s.rates_bps["USD"] + SCENARIO_BY_ID["fed-hike"].shock.rates_bps["USD"]
-    )
+def test_reference_scenarios_parse_combine_and_scale() -> None:
+    ref_path = Path(__file__).resolve().parents[3] / "data" / "reference" / "scenarios.json"
+    ref = json.loads(ref_path.read_text())
+    scenarios = [
+        Scenario(
+            id=s["id"],
+            name=s["name"],
+            description=s["description"],
+            shock=Shock.model_validate(s["shock"]),
+            horizon_days=s["horizonDays"],
+            probability_note=s["probabilityNote"],
+        )
+        for s in ref["scenarios"]
+    ]
+    assert len(scenarios) >= 1
+    first = scenarios[0].shock
+    assert first.scaled(2).brent_pct == 2 * first.brent_pct
+    both = Shock.combine([first, first])
+    for k, v in first.rates_bps.items():
+        assert both.rates_bps[k] == 2 * v

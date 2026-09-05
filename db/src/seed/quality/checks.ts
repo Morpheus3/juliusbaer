@@ -4,7 +4,6 @@
  * goal is to name them, attach them to the client they affect, and let the UI show
  * them next to any figure they touch.
  */
-import { SNAPSHOT_DATES } from '@jb/contracts';
 import type { Check, Finding } from './types.js';
 
 const DAY_MS = 86_400_000;
@@ -123,7 +122,7 @@ export const missingSector: Check = ({ data }) =>
 
 /** Private markets marks are reported quarterly and lag by design. Flag them so the UI can caveat. */
 export const privateMarketMarkLag: Check = ({ data }) => {
-  const current = SNAPSHOT_DATES[SNAPSHOT_DATES.length - 1];
+  const current = data.snapshots[data.snapshots.length - 1]?.date;
   return data.holdings
     .filter(
       (h) =>
@@ -172,9 +171,9 @@ export const aumReconciliation: Check = ({ data }) => {
     holdingsSum.set(k, (holdingsSum.get(k) ?? 0) + h.market_value_base);
   }
   for (const p of data.portfolios) {
-    for (const d of SNAPSHOT_DATES) {
+    for (const d of data.snapshots.map((x) => x.date)) {
       const sum = holdingsSum.get(`${p.portfolio_id}|${d}`) ?? 0;
-      const aum = p[`aum_${d}`];
+      const aum = Number(p[`aum_${d}`]);
       if (!near(sum, aum, 1, 0.001)) {
         findings.push({
           code: 'AUM_RECONCILIATION',
@@ -217,10 +216,10 @@ export const weightSum: Check = ({ data }) => {
 
 export const ltvRecompute: Check = ({ data }) =>
   data.creditFacilities.flatMap((f) =>
-    SNAPSHOT_DATES.flatMap((d): Finding[] => {
-      const lending = f[`lending_value_${d}`];
-      const drawn = f[`drawn_${d}`];
-      const stated = f[`ltv_pct_${d}`];
+    data.snapshots.flatMap(({ date: d }): Finding[] => {
+      const lending = Number(f[`lending_value_${d}`]);
+      const drawn = Number(f[`drawn_${d}`]);
+      const stated = Number(f[`ltv_pct_${d}`]);
       const computed = lending === 0 ? 0 : (drawn / lending) * 100;
       if (near(computed, stated, 0.05)) {
         return [];
@@ -305,7 +304,7 @@ export const orphanReferences: Check = ({ data }) => {
 
 /** Sustainable mandates hold instruments the mandate excludes. Not a data error, but a governance fact worth registering at load. */
 export const sustainabilityExclusionHeld: Check = ({ data }) => {
-  const current = SNAPSHOT_DATES[SNAPSHOT_DATES.length - 1];
+  const current = data.snapshots[data.snapshots.length - 1]?.date;
   const excluded = new Set(
     data.instruments.filter((i) => i.sustainability_excluded).map((i) => i.instrument_id),
   );
@@ -325,7 +324,7 @@ export const sustainabilityExclusionHeld: Check = ({ data }) => {
       entityType: 'holding',
       entityId: `${h.portfolio_id}/${h.snapshot_date}/${h.instrument_id}`,
       clientId: h.client_id,
-      message: `${h.instrument_name} (${h.weight_pct.toFixed(1)}% of ${h.portfolio_id}) falls within the Sustainable Balanced mandate's binding exclusions.`,
+      message: `${h.instrument_name} (${h.weight_pct.toFixed(1)}% of ${h.portfolio_id}) falls within the mandate's binding exclusions.`,
       detail: {
         portfolioId: h.portfolio_id,
         instrumentId: h.instrument_id,
@@ -349,3 +348,14 @@ export const ALL_CHECKS: readonly Check[] = [
   orphanReferences,
   sustainabilityExclusionHeld,
 ];
+
+/** Mandates whose notes declare binding exclusions. Detected from text so no mandate code is assumed. */
+export function exclusionBoundMandates(
+  mandates: readonly { mandate_code: string; mandate_notes: string }[],
+): string[] {
+  return [
+    ...new Set(
+      mandates.filter((m) => /exclusion/i.test(m.mandate_notes)).map((m) => m.mandate_code),
+    ),
+  ];
+}

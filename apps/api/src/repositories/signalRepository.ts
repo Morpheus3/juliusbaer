@@ -7,7 +7,8 @@ import {
   lookthroughLegs,
   marketContext,
   signalRules,
-  signalThresholds,
+  signalSeriesRules,
+  snapshots,
   type Db,
 } from '@jb/db';
 import type { SignalInputs } from '../domain/signals/build.js';
@@ -26,20 +27,22 @@ export class SignalRepository {
   constructor(private readonly db: Db) {}
 
   async inputs(): Promise<SignalInputs> {
-    const [events, rules, thresholds, market, inst, issuers, legs] = await Promise.all([
+    const [events, rules, seriesRules, market, inst, issuers, legs, snaps] = await Promise.all([
       this.db.select().from(eventLog).orderBy(asc(eventLog.ordinal)),
       this.db.select().from(signalRules),
-      this.db.select().from(signalThresholds),
+      this.db.select().from(signalSeriesRules),
       this.db.select().from(marketContext),
       this.db.select().from(instruments),
       this.db.select().from(issuerGroups),
       this.db.select().from(lookthroughLegs),
+      this.db.select().from(snapshots).orderBy(asc(snapshots.ordinal)),
     ]);
     return {
       events,
       rules,
-      thresholds,
+      seriesRules,
       market,
+      snapshots: snaps.map((x) => x.snapshotDate),
       instruments: new Map(inst.map((i) => [i.instrumentId, i])),
       issuers: new Map(issuers.map((i) => [i.instrumentId, i.exposureName])),
       lookthrough: legs.map((l) => ({

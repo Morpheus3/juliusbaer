@@ -1,0 +1,144 @@
+{
+  "$comment": "Named stress scenarios for this dataset's world. Each is a stated view, not a forecast. Severity multipliers are applied by the impact engine (mild 0.5, base 1, severe 2).",
+  "scenarios": [
+    {
+      "id": "hormuz-reopens",
+      "name": "Strait of Hormuz reopens",
+      "description": "Ceasefire holds, tanker traffic normalises, energy risk premium unwinds. Energy and shipping give back gains; risk assets and Asian currencies recover; gold and duration lose their safe-haven bid.",
+      "shock": {
+        "brent_pct": -25,
+        "equity_pct": {
+          "global": 3,
+          "asia_ex_japan": 4,
+          "greater_china": 3
+        },
+        "sector_overlay_pct": {
+          "Energy": -15,
+          "Industrials": -8,
+          "Information Technology": 2
+        },
+        "gold_pct": -5,
+        "rates_bps": {
+          "USD": -20,
+          "EUR": -15
+        },
+        "fx_pct_vs_usd": {
+          "SGD": 1.5,
+          "IDR": 2.5,
+          "INR": 1.5,
+          "THB": 2,
+          "HKD": 0
+        },
+        "vix_points": -8
+      },
+      "horizonDays": 60,
+      "probabilityNote": "Unresolved as of the dataset's today; the blockade was reimposed on 5 Aug 2026. Treat as a plausible, not central, case."
+    },
+    {
+      "id": "escalation",
+      "name": "Middle East escalation",
+      "description": "Renewed attacks on shipping, sustained closure. Energy and shipping rally further, risk assets fall, dollar and gold bid, rates rise on inflation.",
+      "shock": {
+        "brent_pct": 30,
+        "equity_pct": {
+          "global": -8,
+          "asia_ex_japan": -7,
+          "greater_china": -6,
+          "north_america": -6,
+          "europe": -9
+        },
+        "sector_overlay_pct": {
+          "Energy": 15,
+          "Industrials": 6,
+          "Information Technology": -4
+        },
+        "gold_pct": 8,
+        "rates_bps": {
+          "USD": 15,
+          "EUR": 20
+        },
+        "credit_spread_bps": {
+          "hy": 80,
+          "em": 60,
+          "ig": 25
+        },
+        "fx_pct_vs_usd": {
+          "SGD": -2,
+          "IDR": -4,
+          "INR": -2.5,
+          "THB": -3,
+          "EUR": -2,
+          "JPY": 1
+        },
+        "vix_points": 14
+      },
+      "horizonDays": 30,
+      "probabilityNote": "The 5 Aug 2026 blockade makes this the path of least surprise; magnitude is the uncertainty."
+    },
+    {
+      "id": "fed-hike",
+      "name": "Fed hikes 25bp",
+      "description": "Market pricing shifts from holds to a hike. Duration sells off, growth valuations compress, dollar strengthens.",
+      "shock": {
+        "rates_bps": {
+          "USD": 25
+        },
+        "equity_pct": {
+          "north_america": -5,
+          "global": -3
+        },
+        "sector_overlay_pct": {
+          "Information Technology": -5
+        },
+        "fx_pct_vs_usd": {
+          "SGD": -1,
+          "EUR": -1.5,
+          "JPY": -2,
+          "HKD": 0
+        },
+        "credit_spread_bps": {
+          "ig": 10,
+          "hy": 30
+        }
+      },
+      "horizonDays": 45,
+      "probabilityNote": "Two holds with dissents (17 Jun, 29 Jul 2026); the 10-year is already at 4.66%."
+    },
+    {
+      "id": "tech-drawdown",
+      "name": "Technology drawdown repeats",
+      "description": "A second AI-capex scare of the 5 June 2026 kind: megacap technology falls hard, concentrated single names fall harder, tech-backed collateral shrinks.",
+      "shock": {
+        "equity_pct": {
+          "north_america": -6,
+          "global": -3
+        },
+        "sector_overlay_pct": {
+          "Information Technology": -18
+        },
+        "vix_points": 12
+      },
+      "horizonDays": 20,
+      "probabilityNote": "Narrow, technology-led leadership at the half-year close makes a repeat plausible."
+    },
+    {
+      "id": "hk-property-down",
+      "name": "Hong Kong property leg down",
+      "description": "Hong Kong residential and commercial prices fall a further leg; developers, their perpetuals and accumulators referencing them fall together.",
+      "shock": {
+        "equity_pct": {
+          "greater_china": -6
+        },
+        "sector_overlay_pct": {
+          "Real Estate": -15,
+          "Financials": -5
+        },
+        "credit_spread_bps": {
+          "hy": 60
+        }
+      },
+      "horizonDays": 90,
+      "probabilityNote": "The accumulator is already settling against the client; this is the concentration risk in one move."
+    }
+  ]
+}

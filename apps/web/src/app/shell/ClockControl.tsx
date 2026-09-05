@@ -1,16 +1,27 @@
-import type { JSX } from 'react';
-import { CLOCK_END, CLOCK_START, useClock } from '@/state/clock';
+import { useEffect, type JSX } from 'react';
 import { fmtDate } from '@/lib/format';
+import { useMeta } from '@/lib/meta';
+import { useClock } from '@/state/clock';
 
 const DAY_MS = 86_400_000;
-const totalDays =
-  (Date.parse(`${CLOCK_END}T00:00:00Z`) - Date.parse(`${CLOCK_START}T00:00:00Z`)) / DAY_MS;
 
-/** Replay control: scrub through the dataset's 2026, play it back, or jump to today. */
-export function ClockControl(): JSX.Element {
-  const { clock, playing, speed, toggle, set, setSpeed, jumpToToday } = useClock();
-  const pos = (Date.parse(`${clock}T00:00:00Z`) - Date.parse(`${CLOCK_START}T00:00:00Z`)) / DAY_MS;
-  const isToday = clock === CLOCK_END;
+/** Replay control: scrub through the dataset's history, play it back, or jump to today. */
+export function ClockControl(): JSX.Element | null {
+  const meta = useMeta();
+  const { clock, start, end, playing, speed, toggle, set, setSpeed, jumpToToday, configure } =
+    useClock();
+  useEffect(() => {
+    if (meta.data) {
+      configure(meta.data.clockStart, meta.data.clockEnd);
+    }
+  }, [meta.data, configure]);
+  if (!clock || !start || !end) {
+    return null;
+  }
+  const startMs = Date.parse(`${start}T00:00:00Z`);
+  const totalDays = (Date.parse(`${end}T00:00:00Z`) - startMs) / DAY_MS;
+  const pos = (Date.parse(`${clock}T00:00:00Z`) - startMs) / DAY_MS;
+  const isToday = clock === end;
   return (
     <div className="flex items-center gap-2 rounded-md border border-line bg-surface-2 px-2 py-1 text-[12px]">
       <button
@@ -24,15 +35,11 @@ export function ClockControl(): JSX.Element {
       <input
         type="range"
         min={0}
-        max={totalDays}
+        max={Math.max(totalDays, 1)}
         value={pos}
         aria-label="Dataset date"
         onChange={(e) => {
-          set(
-            new Date(Date.parse(`${CLOCK_START}T00:00:00Z`) + Number(e.target.value) * DAY_MS)
-              .toISOString()
-              .slice(0, 10),
-          );
+          set(new Date(startMs + Number(e.target.value) * DAY_MS).toISOString().slice(0, 10));
         }}
         className="w-32 accent-[#1f4e79]"
       />

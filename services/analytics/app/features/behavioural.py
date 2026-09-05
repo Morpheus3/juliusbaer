@@ -11,13 +11,13 @@ from itertools import pairwise
 import numpy as np
 import pandas as pd
 
-from app.data.frames import BASELINE, CURRENT, SNAPSHOT_DATES, Frames
+from app.data.frames import Frames
 from app.features.fx import Fx
 from app.features.manifest import FEATURE_NAMES
+from app.features.stress import stress_windows
 
 RISK_ASSET_CLASSES = {"Equity", "Structured Products", "Commodities", "Alternatives"}
 CASH = "Cash and Equivalents"
-STRESS_WINDOWS = [("2026-02-27", "2026-03-31"), ("2026-03-31", "2026-06-30")]
 INCOME_TYPES = {"Dividend", "Coupon", "Interest", "Distribution"}
 NEED_CERTAINTIES = {"Confirmed", "Likely"}
 
@@ -60,11 +60,14 @@ def _days(from_iso: str, to_iso: str) -> int:
 
 def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) -> ClientVector:
     """Compute every feature in the manifest for one client."""
+    snapshots = frames.snapshots
+    current, baseline = frames.current, frames.baseline
+    windows, windows_method = stress_windows(frames.market_context, frames.event_log, snapshots)
     client = frames.clients.loc[frames.clients.client_id == client_id].iloc[0]
     portfolios = frames.portfolios.loc[frames.portfolios.client_id == client_id]
     pids = set(portfolios.portfolio_id)
     h_all = frames.holdings.loc[frames.holdings.client_id == client_id].copy()
-    h_now = h_all.loc[h_all.snapshot_date == CURRENT]
+    h_now = h_all.loc[h_all.snapshot_date == current]
     aum_usd = float(h_now.market_value_usd.sum())
     f: dict[str, float | None] = {}
     ev: dict[str, dict[str, object]] = {}
@@ -75,16 +78,16 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     # --- Liquidity and cash flow -------------------------------------------------------
     cash_pct = pct_of_aum(h_now.asset_class == CASH)
     f["cash_pct"] = cash_pct
-    h_base = h_all.loc[h_all.snapshot_date == BASELINE]
+    h_base = h_all.loc[h_all.snapshot_date == baseline]
     base_aum = float(h_base.market_value_usd.sum())
     base_cash = float(h_base.loc[h_base.asset_class == CASH, "market_value_usd"].sum())
     f["cash_pct_change_ytd"] = cash_pct - (base_cash / base_aum * 100 if base_aum else 0.0)
     ev["cash_pct"] = {
         "sources": ["raw.holdings"],
-        "snapshot": CURRENT,
+        "snapshot": current,
         "portfolio_ids": sorted(pids),
     }
-    ev["cash_pct_change_ytd"] = {"sources": ["raw.holdings"], "snapshots": [BASELINE, CURRENT]}
+    ev["cash_pct_change_ytd"] = {"sources": ["raw.holdings"], "snapshots": [baseline, current]}
 
     needs = frames.planned_cash_needs.loc[frames.planned_cash_needs.client_id == client_id]
     horizon_end = (pd.Timestamp(today) + pd.DateOffset(months=12)).date().isoformat()
@@ -92,7 +95,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     for n in needs.itertuples(index=False):
         if n.certainty not in NEED_CERTAINTIES or n.due_from > horizon_end:
             continue
-        amount_usd = fx.to_usd(float(n.amount), n.currency, CURRENT)
+        amount_usd = fx.to_usd(float(n.amount), n.currency, current)
         recurrence = str(n.recurrence).lower()
         if "annual" in recurrence:
             needs_12m_usd += amount_usd
@@ -132,7 +135,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     withdrawals = tx.loc[tx.transaction_type == "Withdrawal"]
     f["withdrawal_count_ytd"] = float(len(withdrawals))
     w_usd = sum(
-        fx.to_usd(abs(float(t.amount)), t.currency, CURRENT) for t in withdrawals.itertuples()
+        fx.to_usd(abs(float(t.amount)), t.currency, current) for t in withdrawals.itertuples()
     )
     f["withdrawal_pct_aum_ytd"] = w_usd / aum_usd * 100 if aum_usd else 0.0
     ev["withdrawal_count_ytd"] = {
@@ -141,8 +144,9 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     }
     ev["withdrawal_pct_aum_ytd"] = ev["withdrawal_count_ytd"]
     income = tx.loc[tx.transaction_type.isin(INCOME_TYPES)]
-    income_usd = sum(fx.to_usd(float(t.amount), t.currency, CURRENT) for t in income.itertuples())
-    months_elapsed = max(_days("2026-01-01", today) / 30.4375, 1.0)
+    income_usd = sum(fx.to_usd(float(t.amount), t.currency, current) for t in income.itertuples())
+    first_tx = str(frames.transactions.trade_date.min()) if len(frames.transactions) else today
+    months_elapsed = max(_days(first_tx, today) / 30.4375, 1.0)
     f["income_yield_pct"] = income_usd * (12 / months_elapsed) / aum_usd * 100 if aum_usd else 0.0
     ev["income_yield_pct"] = {
         "sources": ["raw.transactions"],
@@ -156,23 +160,24 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
         snaps = frames.credit_facility_snapshots.loc[
             frames.credit_facility_snapshots.facility_id.isin(facs.facility_id)
         ]
-        now = snaps.loc[snaps.snapshot_date == CURRENT].merge(facs, on="facility_id")
+        now = snaps.loc[snaps.snapshot_date == current].merge(facs, on="facility_id")
         now = now.assign(headroom_pts=now.margin_call_ltv_pct - now.ltv_pct)
         tight = now.sort_values("headroom_pts").iloc[0]
-        march = snaps.loc[
-            (snaps.snapshot_date == "2026-03-31") & (snaps.facility_id == tight.facility_id)
+        two_back = snapshots[max(0, len(snapshots) - 3)]
+        earlier = snaps.loc[
+            (snaps.snapshot_date == two_back) & (snaps.facility_id == tight.facility_id)
         ].iloc[0]
         f["ltv_pct"] = float(tight.ltv_pct)
         f["ltv_headroom_pts"] = float(tight.headroom_pts)
-        f["ltv_change_since_march_pts"] = float(tight.ltv_pct - march.ltv_pct)
+        f["ltv_change_2_snapshots_pts"] = float(tight.ltv_pct - earlier.ltv_pct)
         f["facility_utilisation_pct"] = float(facs.utilisation_pct_current.max())
         ev["ltv_pct"] = {
             "sources": ["raw.credit_facility_snapshots"],
             "facility_id": tight.facility_id,
-            "snapshot": CURRENT,
+            "snapshot": current,
         }
         ev["ltv_headroom_pts"] = ev["ltv_pct"]
-        ev["ltv_change_since_march_pts"] = {**ev["ltv_pct"], "snapshots": ["2026-03-31", CURRENT]}
+        ev["ltv_change_2_snapshots_pts"] = {**ev["ltv_pct"], "snapshots": [two_back, current]}
         ev["facility_utilisation_pct"] = {
             "sources": ["raw.credit_facilities"],
             "facility_ids": sorted(facs.facility_id),
@@ -181,7 +186,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
         for k in [
             "ltv_pct",
             "ltv_headroom_pts",
-            "ltv_change_since_march_pts",
+            "ltv_change_2_snapshots_pts",
             "facility_utilisation_pct",
         ]:
             f[k] = None
@@ -190,7 +195,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     # --- Behaviour under stress (implied trades from position changes) ------------------
     added = reduced = turnover = 0.0
     changed_ids: list[str] = []
-    for prev_d, next_d in pairwise(SNAPSHOT_DATES):
+    for prev_d, next_d in pairwise(snapshots):
         prev = h_all.loc[h_all.snapshot_date == prev_d].set_index(["portfolio_id", "instrument_id"])
         nxt = h_all.loc[h_all.snapshot_date == next_d].set_index(["portfolio_id", "instrument_id"])
         keys = prev.index.union(nxt.index)
@@ -205,7 +210,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
             )
             turnover += abs(delta_usd)
             changed_ids.append(f"{key[0]}/{next_d}/{key[1]}")
-            if (prev_d, next_d) in STRESS_WINDOWS and row.asset_class in RISK_ASSET_CLASSES:
+            if (prev_d, next_d) in windows and row.asset_class in RISK_ASSET_CLASSES:
                 if delta_usd > 0:
                     added += delta_usd
                 else:
@@ -219,7 +224,8 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     stress_ev: dict[str, object] = {
         "sources": ["raw.holdings"],
         "method": "quantity change between snapshots x price x FX",
-        "windows": STRESS_WINDOWS,
+        "windows": windows,
+        "windows_method": windows_method,
         "changed_positions": changed_ids,
     }
     for k in [
@@ -237,7 +243,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     }
 
     values = [
-        float(h_all.loc[h_all.snapshot_date == d, "market_value_usd"].sum()) for d in SNAPSHOT_DATES
+        float(h_all.loc[h_all.snapshot_date == d, "market_value_usd"].sum()) for d in snapshots
     ]
     peak, max_dd = values[0], 0.0
     for v in values[1:]:
@@ -249,7 +255,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     f["ytd_return_pct"] = (values[-1] / values[0] - 1) * 100 if values[0] else 0.0
     ts_ev = {
         "sources": ["raw.holdings"],
-        "snapshots": SNAPSHOT_DATES,
+        "snapshots": snapshots,
         "household_value_usd": values,
     }
     ev["max_drawdown_pct"] = ev["value_volatility_pct"] = ev["ytd_return_pct"] = ts_ev
@@ -342,7 +348,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     total_needs_usd = 0.0
     mismatched_usd = 0.0
     for n in needs.itertuples(index=False):
-        amt = fx.to_usd(float(n.amount), n.currency, CURRENT)
+        amt = fx.to_usd(float(n.amount), n.currency, current)
         total_needs_usd += amt
         if float(ccy_share.get(n.currency, 0.0)) < 20.0:
             mismatched_usd += amt

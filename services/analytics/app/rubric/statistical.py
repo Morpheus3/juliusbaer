@@ -34,7 +34,7 @@ FEATURES: dict[Dimension, list[str]] = {
         "top1_single_line_pct",
         "structured_product_pct",
         "max_drawdown_pct",
-        "ltv_change_since_march_pts",
+        "ltv_change_2_snapshots_pts",
         "source_of_wealth_overlap_pct",
     ],
     "horizon": [
@@ -87,7 +87,7 @@ ARCHETYPES: dict[Dimension, dict[int, dict[str, tuple[float, float]]]] = {
             "top1_single_line_pct": (0, 8),
             "structured_product_pct": (0, 3),
             "max_drawdown_pct": (0, 6),
-            "ltv_change_since_march_pts": (-5, 2),
+            "ltv_change_2_snapshots_pts": (-5, 2),
             "source_of_wealth_overlap_pct": (0, 10),
         },
         2: {
@@ -96,7 +96,7 @@ ARCHETYPES: dict[Dimension, dict[int, dict[str, tuple[float, float]]]] = {
             "top1_single_line_pct": (0, 14),
             "structured_product_pct": (0, 10),
             "max_drawdown_pct": (3, 12),
-            "ltv_change_since_march_pts": (-5, 5),
+            "ltv_change_2_snapshots_pts": (-5, 5),
             "source_of_wealth_overlap_pct": (0, 25),
         },
         3: {
@@ -105,7 +105,7 @@ ARCHETYPES: dict[Dimension, dict[int, dict[str, tuple[float, float]]]] = {
             "top1_single_line_pct": (12, 70),
             "structured_product_pct": (5, 30),
             "max_drawdown_pct": (8, 30),
-            "ltv_change_since_march_pts": (0, 15),
+            "ltv_change_2_snapshots_pts": (0, 15),
             "source_of_wealth_overlap_pct": (15, 90),
         },
     },
@@ -142,7 +142,7 @@ ARCHETYPES: dict[Dimension, dict[int, dict[str, tuple[float, float]]]] = {
 
 NEUTRAL_FILL: dict[str, float] = {
     "ltv_headroom_pts": 30.0,
-    "ltv_change_since_march_pts": 0.0,
+    "ltv_change_2_snapshots_pts": 0.0,
     "days_to_next_cash_need": 730.0,
     "age": 50.0,
     "liquidity_runway_months": 120.0,

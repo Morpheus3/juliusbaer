@@ -145,9 +145,24 @@ export const signalRules = derived.table('signal_rules', {
   note: text().notNull(),
 });
 
-export const signalThresholds = derived.table('signal_thresholds', {
+/** Reference: market-context series that become derived signals, with match rules and a shock template. */
+export const signalSeriesRules = derived.table('signal_series_rules', {
   seriesId: text().primaryKey(),
+  unit: text().notNull(),
   threshold: numeric({ precision: 12, scale: 4, mode: 'number' }).notNull(),
+  match: jsonb().$type<Record<string, unknown>[]>().notNull(),
+  shock: jsonb().$type<{ path: string; factor: number }[]>().notNull(),
+});
+
+/** Reference: named stress scenarios for this dataset's world. */
+export const scenarios = derived.table('scenarios', {
+  id: text().primaryKey(),
+  ordinal: integer().notNull(),
+  name: text().notNull(),
+  description: text().notNull(),
+  shock: jsonb().$type<Record<string, unknown>>().notNull(),
+  horizonDays: integer().notNull(),
+  probabilityNote: text().notNull(),
 });
 
 /** Saved impact runs: the request that produced them and the full result, for audit and replay. */

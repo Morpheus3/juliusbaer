@@ -1,0 +1,700 @@
+{
+  "$comment": "Dataset-specific transmission rules: how each event in event_log.csv reaches portfolios, and which market-context series become derived signals. Match rules select instruments by attribute (sector, subAssetClass, assetClass, region, currency, exposureName, liquidityTier, hasFacility). Every rule is a stated judgement and is shown in the evidence drawer. Events without a rule still appear as signals with no mapped holdings.",
+  "events": [
+    {
+      "eventId": "EV-001",
+      "match": [
+        {
+          "sector": "Gold"
+        }
+      ],
+      "shock": {
+        "gold_pct": 8
+      },
+      "note": "Gold's 2025 rally; positions already marked, shock represents continuation."
+    },
+    {
+      "eventId": "EV-002",
+      "match": [
+        {
+          "sector": "Gold"
+        }
+      ],
+      "shock": {
+        "gold_pct": 5
+      },
+      "note": "Spot gold through USD 5,000."
+    },
+    {
+      "eventId": "EV-003",
+      "match": [
+        {
+          "sector": "Gold"
+        }
+      ],
+      "shock": {
+        "gold_pct": -6
+      },
+      "note": "Intraday high then consolidation: downside for gold-heavy books."
+    },
+    {
+      "eventId": "EV-004",
+      "match": [
+        {
+          "sector": "Energy"
+        },
+        {
+          "subAssetClass": "Emerging Market Debt"
+        },
+        {
+          "sector": "Gold"
+        },
+        {
+          "region": "Middle East"
+        },
+        {
+          "exposureName": "Global Defence and Aerospace Equity Fund"
+        }
+      ],
+      "shock": {
+        "brent_pct": 12,
+        "equity_pct": {
+          "global": -4
+        },
+        "sector_overlay_pct": {
+          "Energy": 10,
+          "Industrials": 2
+        },
+        "gold_pct": 4,
+        "vix_points": 8,
+        "credit_spread_bps": {
+          "em": 40
+        }
+      },
+      "note": "Start of hostilities: energy up, risk assets down, safe havens bid, EM credit wider."
+    },
+    {
+      "eventId": "EV-005",
+      "match": [
+        {
+          "sector": "Energy"
+        },
+        {
+          "exposureName": "Pacific Orient Shipping"
+        },
+        {
+          "exposureName": "Gulf Marine Services"
+        },
+        {
+          "subAssetClass": "Diversified Commodities"
+        }
+      ],
+      "shock": {
+        "brent_pct": 12,
+        "sector_overlay_pct": {
+          "Energy": 8,
+          "Industrials": 5
+        }
+      },
+      "note": "Tanker traffic stalls; shipping and energy re-rate."
+    },
+    {
+      "eventId": "EV-006",
+      "match": [
+        {
+          "sector": "Energy"
+        },
+        {
+          "exposureName": "Pacific Orient Shipping"
+        },
+        {
+          "exposureName": "Gulf Marine Services"
+        },
+        {
+          "region": "Middle East"
+        },
+        {
+          "subAssetClass": "Diversified Commodities"
+        }
+      ],
+      "shock": {
+        "brent_pct": 40,
+        "equity_pct": {
+          "global": -6,
+          "asia_ex_japan": -5
+        },
+        "sector_overlay_pct": {
+          "Energy": 18,
+          "Industrials": 8
+        },
+        "gold_pct": 3,
+        "vix_points": 12,
+        "fx_pct_vs_usd": {
+          "SGD": -1.5,
+          "IDR": -3,
+          "INR": -1.5,
+          "THB": -3
+        }
+      },
+      "note": "Strait of Hormuz closed: the defining shock of 2026 for this book."
+    },
+    {
+      "eventId": "EV-007",
+      "match": [
+        {
+          "sector": "Energy"
+        },
+        {
+          "subAssetClass": "Yield Enhancement"
+        }
+      ],
+      "shock": {
+        "brent_pct": -8,
+        "sector_overlay_pct": {
+          "Energy": -4
+        }
+      },
+      "note": "Emergency reserve release: partial relief for energy-linked notes."
+    },
+    {
+      "eventId": "EV-008",
+      "match": [
+        {
+          "sector": "Energy"
+        },
+        {
+          "subAssetClass": "Inflation Linked"
+        },
+        {
+          "subAssetClass": "Government Bond"
+        }
+      ],
+      "shock": {
+        "brent_pct": 5,
+        "rates_bps": {
+          "USD": 15,
+          "EUR": 10
+        }
+      },
+      "note": "Largest supply disruption on record: inflation-sensitive assets reprice."
+    },
+    {
+      "eventId": "EV-009",
+      "match": [
+        {
+          "currency": "EUR",
+          "assetClass": "Fixed Income"
+        },
+        {
+          "currency": "EUR"
+        }
+      ],
+      "shock": {
+        "rates_bps": {
+          "EUR": 25
+        },
+        "fx_pct_vs_usd": {
+          "EUR": 1
+        }
+      },
+      "note": "ECB hikes into an energy-driven inflation impulse."
+    },
+    {
+      "eventId": "EV-010",
+      "match": [
+        {
+          "sector": "Energy"
+        },
+        {
+          "exposureName": "Pacific Orient Shipping"
+        }
+      ],
+      "shock": {
+        "brent_pct": 6,
+        "sector_overlay_pct": {
+          "Energy": 4
+        }
+      },
+      "note": "Brent peaks near USD 114."
+    },
+    {
+      "eventId": "EV-011",
+      "match": [
+        {
+          "sector": "Information Technology"
+        },
+        {
+          "exposureName": "Helios Cloud Systems"
+        },
+        {
+          "exposureName": "Meridian Semiconductor"
+        },
+        {
+          "hasFacility": true
+        }
+      ],
+      "shock": {
+        "equity_pct": {
+          "north_america": -5
+        },
+        "sector_overlay_pct": {
+          "Information Technology": -15
+        },
+        "vix_points": 10
+      },
+      "note": "Megacap technology sheds USD 2 trillion on AI capex concerns; collateral values on tech-heavy Lombard lines fall."
+    },
+    {
+      "eventId": "EV-012",
+      "match": [
+        {
+          "subAssetClass": "Government Bond"
+        },
+        {
+          "subAssetClass": "Investment Grade Credit"
+        },
+        {
+          "subAssetClass": "Subordinated Perpetual"
+        },
+        {
+          "currency": "USD",
+          "assetClass": "Fixed Income"
+        }
+      ],
+      "shock": {
+        "rates_bps": {
+          "USD": 10
+        },
+        "fx_pct_vs_usd": {
+          "SGD": -0.5,
+          "EUR": -0.5,
+          "JPY": -1
+        }
+      },
+      "note": "Fed holds under new Chair; easing pushed out."
+    },
+    {
+      "eventId": "EV-013",
+      "match": [
+        {
+          "subAssetClass": "Government Bond"
+        },
+        {
+          "subAssetClass": "Inflation Linked"
+        },
+        {
+          "subAssetClass": "Emerging Market Debt"
+        }
+      ],
+      "shock": {
+        "rates_bps": {
+          "USD": 20
+        }
+      },
+      "note": "US 10-year to 4.46%, highest in over a year."
+    },
+    {
+      "eventId": "EV-014",
+      "match": [
+        {
+          "subAssetClass": "Private Credit"
+        },
+        {
+          "liquidityTier": "Quarterly Gate"
+        },
+        {
+          "sector": "Information Technology"
+        }
+      ],
+      "shock": {
+        "credit_spread_bps": {
+          "hy": 50
+        },
+        "sector_overlay_pct": {
+          "Information Technology": 3
+        }
+      },
+      "note": "Half-year: narrow tech leadership, private credit redemption stress."
+    },
+    {
+      "eventId": "EV-015",
+      "match": [
+        {
+          "subAssetClass": "Government Bond"
+        },
+        {
+          "subAssetClass": "Investment Grade Credit"
+        },
+        {
+          "subAssetClass": "Subordinated Perpetual"
+        },
+        {
+          "sector": "Information Technology"
+        },
+        {
+          "assetClass": "Structured Products"
+        }
+      ],
+      "shock": {
+        "rates_bps": {
+          "USD": 25
+        },
+        "equity_pct": {
+          "north_america": -3
+        },
+        "sector_overlay_pct": {
+          "Information Technology": -4
+        }
+      },
+      "note": "Fed holds with three dissents; pricing shifts from cuts to possible hikes; duration and growth valuations hit."
+    },
+    {
+      "eventId": "EV-016",
+      "match": [
+        {
+          "sector": "Energy"
+        },
+        {
+          "exposureName": "Pacific Orient Shipping"
+        },
+        {
+          "exposureName": "Gulf Marine Services"
+        },
+        {
+          "region": "Middle East"
+        },
+        {
+          "subAssetClass": "Yield Enhancement"
+        }
+      ],
+      "shock": {
+        "brent_pct": 15,
+        "sector_overlay_pct": {
+          "Energy": 8,
+          "Industrials": 6
+        },
+        "equity_pct": {
+          "global": -2
+        },
+        "vix_points": 6
+      },
+      "note": "Naval blockade reimposed; energy risk premium re-widens."
+    }
+  ],
+  "derived": {
+    "$comment": "Market-context series that become derived signals when the move between consecutive snapshots exceeds `threshold` (percent for unit=pct, absolute for unit=abs). `match` selects instruments; `shock` entries set shock.path = move x factor.",
+    "series": [
+      {
+        "seriesId": "UST_10Y_PCT",
+        "unit": "abs",
+        "threshold": 0.15,
+        "match": [
+          {
+            "subAssetClass": "Government Bond"
+          },
+          {
+            "subAssetClass": "Investment Grade Credit"
+          },
+          {
+            "subAssetClass": "Inflation Linked"
+          },
+          {
+            "subAssetClass": "Subordinated Perpetual"
+          }
+        ],
+        "shock": [
+          {
+            "path": "rates_bps.USD",
+            "factor": 100
+          }
+        ]
+      },
+      {
+        "seriesId": "BRENT_USD_BBL",
+        "unit": "pct",
+        "threshold": 10,
+        "match": [
+          {
+            "sector": "Energy"
+          },
+          {
+            "subAssetClass": "Diversified Commodities"
+          }
+        ],
+        "shock": [
+          {
+            "path": "brent_pct",
+            "factor": 1
+          },
+          {
+            "path": "sector_overlay_pct.Energy",
+            "factor": 0.5
+          }
+        ]
+      },
+      {
+        "seriesId": "GOLD_USD_OZ",
+        "unit": "pct",
+        "threshold": 6,
+        "match": [
+          {
+            "sector": "Gold"
+          }
+        ],
+        "shock": [
+          {
+            "path": "gold_pct",
+            "factor": 1
+          }
+        ]
+      },
+      {
+        "seriesId": "VIX",
+        "unit": "abs",
+        "threshold": 6,
+        "match": [
+          {
+            "assetClass": "Equity"
+          },
+          {
+            "assetClass": "Structured Products"
+          }
+        ],
+        "shock": [
+          {
+            "path": "vix_points",
+            "factor": 1
+          }
+        ]
+      },
+      {
+        "seriesId": "SPX",
+        "unit": "pct",
+        "threshold": 4,
+        "match": [
+          {
+            "region": "North America"
+          },
+          {
+            "region": "Global",
+            "assetClass": "Equity"
+          }
+        ],
+        "shock": [
+          {
+            "path": "equity_pct.north_america",
+            "factor": 1
+          },
+          {
+            "path": "equity_pct.global",
+            "factor": 0.7
+          }
+        ]
+      },
+      {
+        "seriesId": "NASDAQ_COMP",
+        "unit": "pct",
+        "threshold": 5,
+        "match": [
+          {
+            "sector": "Information Technology"
+          }
+        ],
+        "shock": [
+          {
+            "path": "sector_overlay_pct.Information Technology",
+            "factor": 1
+          }
+        ]
+      },
+      {
+        "seriesId": "HSI",
+        "unit": "pct",
+        "threshold": 4,
+        "match": [
+          {
+            "region": "Hong Kong"
+          },
+          {
+            "region": "Greater China"
+          }
+        ],
+        "shock": [
+          {
+            "path": "equity_pct.greater_china",
+            "factor": 1
+          }
+        ]
+      },
+      {
+        "seriesId": "STI",
+        "unit": "pct",
+        "threshold": 3,
+        "match": [
+          {
+            "region": "Singapore"
+          }
+        ],
+        "shock": [
+          {
+            "path": "equity_pct.asia_ex_japan",
+            "factor": 1
+          }
+        ]
+      },
+      {
+        "seriesId": "MSCI_ASIA_XJP",
+        "unit": "pct",
+        "threshold": 4,
+        "match": [
+          {
+            "region": "Asia ex-Japan"
+          },
+          {
+            "region": "Southeast Asia"
+          },
+          {
+            "region": "Asia"
+          }
+        ],
+        "shock": [
+          {
+            "path": "equity_pct.asia_ex_japan",
+            "factor": 1
+          }
+        ]
+      },
+      {
+        "seriesId": "USDSGD",
+        "unit": "pct",
+        "threshold": 1.5,
+        "match": [
+          {
+            "currency": "SGD"
+          }
+        ],
+        "shock": [
+          {
+            "path": "fx_pct_vs_usd.SGD",
+            "factor": -1
+          }
+        ]
+      },
+      {
+        "seriesId": "EURUSD",
+        "unit": "pct",
+        "threshold": 2,
+        "match": [
+          {
+            "currency": "EUR"
+          }
+        ],
+        "shock": [
+          {
+            "path": "fx_pct_vs_usd.EUR",
+            "factor": 1
+          }
+        ]
+      },
+      {
+        "seriesId": "USDJPY",
+        "unit": "pct",
+        "threshold": 2.5,
+        "match": [
+          {
+            "currency": "JPY"
+          }
+        ],
+        "shock": [
+          {
+            "path": "fx_pct_vs_usd.JPY",
+            "factor": -1
+          }
+        ]
+      },
+      {
+        "seriesId": "USDIDR",
+        "unit": "pct",
+        "threshold": 3,
+        "match": [
+          {
+            "currency": "IDR"
+          }
+        ],
+        "shock": [
+          {
+            "path": "fx_pct_vs_usd.IDR",
+            "factor": -1
+          }
+        ]
+      },
+      {
+        "seriesId": "USDTHB",
+        "unit": "pct",
+        "threshold": 3,
+        "match": [
+          {
+            "currency": "THB"
+          }
+        ],
+        "shock": [
+          {
+            "path": "fx_pct_vs_usd.THB",
+            "factor": -1
+          }
+        ]
+      },
+      {
+        "seriesId": "USDINR",
+        "unit": "pct",
+        "threshold": 2,
+        "match": [
+          {
+            "currency": "INR"
+          }
+        ],
+        "shock": [
+          {
+            "path": "fx_pct_vs_usd.INR",
+            "factor": -1
+          }
+        ]
+      },
+      {
+        "seriesId": "TTF_GAS_EUR_MWH",
+        "unit": "pct",
+        "threshold": 25,
+        "match": [
+          {
+            "sector": "Energy"
+          }
+        ],
+        "shock": [
+          {
+            "path": "sector_overlay_pct.Energy",
+            "factor": 0.2
+          }
+        ]
+      },
+      {
+        "seriesId": "US_CPI_YOY_PCT",
+        "unit": "abs",
+        "threshold": 0.4,
+        "match": [
+          {
+            "subAssetClass": "Inflation Linked"
+          },
+          {
+            "subAssetClass": "Government Bond"
+          }
+        ],
+        "shock": [
+          {
+            "path": "rates_bps.USD",
+            "factor": 40
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -7,7 +7,7 @@ from typing import Any
 
 import pandas as pd
 
-from app.data.frames import BASELINE, CURRENT, Frames
+from app.data.frames import Frames
 from app.features.fx import Fx
 
 
@@ -23,15 +23,19 @@ def compute_client_factual(frames: Frames, fx: Fx, client_id: str, today: str) -
     c = frames.clients.loc[frames.clients.client_id == client_id].iloc[0]
     portfolios = frames.portfolios.loc[frames.portfolios.client_id == client_id]
     holdings = frames.holdings.loc[frames.holdings.client_id == client_id]
-    aum_now = float(holdings.loc[holdings.snapshot_date == CURRENT, "market_value_usd"].sum())
-    aum_base = float(holdings.loc[holdings.snapshot_date == BASELINE, "market_value_usd"].sum())
+    aum_now = float(
+        holdings.loc[holdings.snapshot_date == frames.current, "market_value_usd"].sum()
+    )
+    aum_base = float(
+        holdings.loc[holdings.snapshot_date == frames.baseline, "market_value_usd"].sum()
+    )
     notes = frames.rm_notes.loc[frames.rm_notes.client_id == client_id].sort_values("note_date")
     last_contact = str(notes.note_date.iloc[-1]) if len(notes) else None
     needs = frames.planned_cash_needs.loc[frames.planned_cash_needs.client_id == client_id]
     facs = frames.credit_facilities.loc[frames.credit_facilities.client_id == client_id]
     fac_now = frames.credit_facility_snapshots.loc[
         frames.credit_facility_snapshots.facility_id.isin(facs.facility_id)
-        & (frames.credit_facility_snapshots.snapshot_date == CURRENT)
+        & (frames.credit_facility_snapshots.snapshot_date == frames.current)
     ]
     commits = frames.commitments.loc[frames.commitments.client_id == client_id]
     kyc_days = _days(today, str(c.kyc_review_due))
@@ -98,7 +102,7 @@ def compute_client_factual(frames: Frames, fx: Fx, client_id: str, today: str) -
                 "description": n.description,
                 "currency": n.currency,
                 "amount": float(n.amount),
-                "amount_usd": round(fx.to_usd(float(n.amount), n.currency, CURRENT), 2),
+                "amount_usd": round(fx.to_usd(float(n.amount), n.currency, frames.current), 2),
                 "due_from": str(n.due_from),
                 "due_to": str(n.due_to),
                 "recurrence": n.recurrence,

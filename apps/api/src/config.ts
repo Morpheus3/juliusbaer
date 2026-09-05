@@ -11,7 +11,8 @@ const ConfigSchema = z.object({
   DATASET_TODAY: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .default('2026-08-26'),
+    .optional(),
+  DATASET_NAME: z.string().default('Loaded dataset'),
   ANTHROPIC_API_KEY: z.string().optional(),
   CLAUDE_ANALYSIS_MODEL: z.string().default('claude-sonnet-5'),
   CLAUDE_FAST_MODEL: z.string().default('claude-haiku-4-5'),

@@ -20,7 +20,7 @@ Rules you must follow:
   observed behaviour, noting the stated value as a caveat.
 - Do not reference world events except those listed under "events" in the input.
 - Every evidence item must name its source in square brackets, for example [vector.cash_pct=5.8] or
-  [note 2026-08-11] or [rules.capacity].
+  [note YYYY-MM-DD] or [rules.capacity].
 - If the evidence is thin, say so in caveats rather than sounding certain.
 - Write for a relationship manager who will read this in a client meeting: plain, specific, brief.`,
 };

@@ -1,12 +1,14 @@
 """Typed access to the raw dataset as pandas frames.
 
-Two sources: Postgres (the running system) and the CSV directory (tests and offline runs).
-Both return identical column names so the feature code never knows which it got.
+Two sources: Postgres (the running system) and a CSV directory (tests and offline runs).
+Both return identical column names so the feature code never knows which it got. Snapshot
+dates are discovered from the data, never assumed.
 """
 
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any
@@ -14,9 +16,7 @@ from typing import Any
 import pandas as pd
 import psycopg
 
-SNAPSHOT_DATES = ["2025-12-31", "2026-02-27", "2026-03-31", "2026-06-30", "2026-08-26"]
-CURRENT = SNAPSHOT_DATES[-1]
-BASELINE = SNAPSHOT_DATES[0]
+SNAPSHOT_COLUMN = re.compile(r"^([a-z_]+)_(\d{4}-\d{2}-\d{2})$")
 
 
 @dataclass(frozen=True)
@@ -36,39 +36,54 @@ class Frames:
     event_log: pd.DataFrame
     rm_notes: pd.DataFrame
 
+    @property
+    def snapshots(self) -> list[str]:
+        """Sorted snapshot dates present in holdings."""
+        return sorted(str(d) for d in self.holdings.snapshot_date.unique())
+
+    @property
+    def current(self) -> str:
+        return self.snapshots[-1]
+
+    @property
+    def baseline(self) -> str:
+        return self.snapshots[0]
+
 
 _RAW_TABLES = [f.name for f in fields(Frames)]
 
 
+def _wide_prefixes(columns: list[str]) -> dict[str, list[str]]:
+    """Group wide columns by prefix: {'aum': ['aum_2025-12-31', ...]}."""
+    out: dict[str, list[str]] = {}
+    for c in columns:
+        m = SNAPSHOT_COLUMN.match(c)
+        if m:
+            out.setdefault(m.group(1), []).append(c)
+    return out
+
+
 def _unpivot(df: pd.DataFrame, id_col: str, prefix: str, value_col: str) -> pd.DataFrame:
-    cols = [f"{prefix}_{d}" for d in SNAPSHOT_DATES]
+    cols = _wide_prefixes(list(df.columns)).get(prefix, [])
     long = df[[id_col, *cols]].melt(id_vars=id_col, var_name="snapshot_date", value_name=value_col)
     long["snapshot_date"] = long["snapshot_date"].str.replace(f"{prefix}_", "", regex=False)
     return long
 
 
 def from_csv_dir(data_dir: Path) -> Frames:
-    """Read the dataset directly from data/. Mirrors the unpivoting done by the TS loader."""
+    """Read the dataset from a data directory. Mirrors the unpivoting done by the TS loader."""
 
     def read(name: str) -> pd.DataFrame:
         return pd.read_csv(data_dir / f"{name}.csv")
 
-    def snapshot_cols(prefix: str) -> list[str]:
-        return [f"{prefix}_{d}" for d in SNAPSHOT_DATES]
-
     portfolios = read("portfolios")
     instruments = read("instruments")
     facilities = read("credit_facilities")
+    fac_prefixes = ["drawn", "collateral_market_value", "lending_value", "ltv_pct", "headroom"]
 
-    fac_snaps = None
-    for prefix, col in [
-        ("drawn", "drawn"),
-        ("collateral_market_value", "collateral_market_value"),
-        ("lending_value", "lending_value"),
-        ("ltv_pct", "ltv_pct"),
-        ("headroom", "headroom"),
-    ]:
-        part = _unpivot(facilities, "facility_id", prefix, col)
+    fac_snaps: pd.DataFrame | None = None
+    for prefix in fac_prefixes:
+        part = _unpivot(facilities, "facility_id", prefix, prefix)
         fac_snaps = (
             part
             if fac_snaps is None
@@ -78,30 +93,21 @@ def from_csv_dir(data_dir: Path) -> Frames:
 
     event_log = read("event_log")
     event_log.insert(0, "event_id", [f"EV-{i + 1:03d}" for i in range(len(event_log))])
-
     notes = pd.DataFrame(json.loads((data_dir / "rm_notes.json").read_text()))
+
+    def drop_wide(df: pd.DataFrame, prefixes: list[str]) -> pd.DataFrame:
+        wide = _wide_prefixes(list(df.columns))
+        return df.drop(columns=[c for p in prefixes for c in wide.get(p, [])])
 
     return Frames(
         clients=read("clients"),
-        portfolios=portfolios.drop(columns=snapshot_cols("aum")),
+        portfolios=drop_wide(portfolios, ["aum"]),
         portfolio_aum=_unpivot(portfolios, "portfolio_id", "aum", "aum_base"),
         holdings=read("holdings"),
-        instruments=instruments.drop(columns=snapshot_cols("price")),
+        instruments=drop_wide(instruments, ["price"]),
         mandates=read("mandates"),
         transactions=read("transactions"),
-        credit_facilities=facilities.drop(
-            columns=[
-                c
-                for p in [
-                    "drawn",
-                    "collateral_market_value",
-                    "lending_value",
-                    "ltv_pct",
-                    "headroom",
-                ]
-                for c in snapshot_cols(p)
-            ]
-        ),
+        credit_facilities=drop_wide(facilities, fac_prefixes),
         credit_facility_snapshots=fac_snaps,
         commitments=read("commitments"),
         planned_cash_needs=read("planned_cash_needs"),
@@ -126,7 +132,6 @@ def from_postgres(conn: psycopg.Connection[Any]) -> Frames:
                 if len(sample) and hasattr(sample.iloc[0], "isoformat"):
                     df[c] = df[c].map(lambda v: v.isoformat() if v is not None else None)
         out[table] = df
-    # numeric columns arrive as Decimal from psycopg; coerce.
     for df in out.values():
         for c in df.columns:
             if (
@@ -135,7 +140,6 @@ def from_postgres(conn: psycopg.Connection[Any]) -> Frames:
                 and type(df[c].dropna().iloc[0]).__name__ == "Decimal"
             ):
                 df[c] = pd.to_numeric(df[c])
-    # sustainability_excluded etc. come back as bool; CSV gives 'Y'/'N'. Normalise to bool.
     inst = out["instruments"]
     for c in ["sustainability_excluded", "concentration_limit_applies"]:
         if inst[c].dtype == object:

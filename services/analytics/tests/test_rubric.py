@@ -27,8 +27,9 @@ def test_rules_appetite_reads_behaviour_not_the_file(vectors) -> None:  # noqa: 
     voss = assess_rules("appetite", vectors["CL-0003"])
     assert voss.score == 3  # 71% equity inherited: behaviour of the portfolio, not the person
     ravi = assess_rules("appetite", vectors["CL-0002"])
-    assert ravi.score == 3
-    assert any(c.rule == "bought into drawdowns" for c in ravi.contributions)
+    assert ravi.score == 3  # 68% risk assets, one-line concentration, leverage rising
+    kim = assess_rules("appetite", vectors["CL-0015"])
+    assert any(c.rule == "bought into drawdowns" for c in kim.contributions)
 
 
 def test_rules_horizon_shortens_for_drawdown_and_age(vectors) -> None:  # noqa: ANN001

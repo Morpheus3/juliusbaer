@@ -9,8 +9,8 @@ import { fmtUsdCompact } from '@/lib/format';
 import { SnapshotSelect, useSnapshotParam } from './PortfolioPage';
 
 export function ExposureTab(): JSX.Element {
-  const { clientId = 'CL-0002' } = useParams();
-  const [snapshot, setSnapshot] = useSnapshotParam();
+  const { clientId = '' } = useParams();
+  const [snapshot, setSnapshot, snapshotOptions] = useSnapshotParam();
   const q = useQuery({
     queryKey: ['exposure', clientId, snapshot],
     queryFn: () =>
@@ -27,7 +27,7 @@ export function ExposureTab(): JSX.Element {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4 text-[12.5px] text-muted">
-        <SnapshotSelect value={snapshot} onChange={setSnapshot} />
+        <SnapshotSelect value={snapshot} onChange={setSnapshot} options={snapshotOptions} />
         <span className="ml-auto">
           Household {fmtUsdCompact(d.totalUsd)} · {d.legs.length} structured-product legs looked
           through · {breached.length} name{breached.length === 1 ? '' : 's'} over limit

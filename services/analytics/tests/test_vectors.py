@@ -29,9 +29,19 @@ def test_ravi_leverage_and_stress_buying(result) -> None:  # noqa: ANN001
     f = _vec(result, "CL-0002")
     assert f["ltv_pct"] == pytest.approx(73.71, abs=0.01)
     assert f["ltv_headroom_pts"] == pytest.approx(1.29, abs=0.01)
-    assert f["ltv_change_since_march_pts"] == pytest.approx(73.71 - 61.68, abs=0.01)
-    # Drew the facility and bought a pre-IPO secondary into the June drawdown.
-    assert f["stress_behaviour_score"] is not None and f["stress_behaviour_score"] > 0
+    assert f["ltv_change_2_snapshots_pts"] == pytest.approx(73.71 - 61.68, abs=0.01)
+    # The June technology drawdown recovered by the half-year snapshot and is graded High, not
+    # Severe, so it is not a data-derived stress window; Ravi's June purchase scores neutral.
+    assert f["stress_behaviour_score"] == 0.0
+
+
+def test_stress_windows_come_from_the_data(result) -> None:  # noqa: ANN001
+    kim = _vec(result, "CL-0015")  # subscribed an FCN on 18 Mar 2026, inside the Hormuz window
+    assert kim["stress_behaviour_score"] is not None and kim["stress_behaviour_score"] > 0
+    ev = next(v for v in result.vectors if v.client_id == "CL-0015").evidence[
+        "stress_behaviour_score"
+    ]
+    assert ("2026-02-27", "2026-03-31") in [tuple(w) for w in ev["windows"]]  # type: ignore[index]
 
 
 def test_lau_is_one_bet_on_hong_kong_property(result) -> None:  # noqa: ANN001

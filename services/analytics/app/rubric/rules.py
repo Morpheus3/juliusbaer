@@ -127,13 +127,13 @@ def assess_rules(dimension: Dimension, f: dict[str, float | None]) -> RulesResul
                 0.5,
                 "more than 10% in notes with payoff complexity",
             )
-        head = _val(f, "ltv_change_since_march_pts")
+        head = _val(f, "ltv_change_2_snapshots_pts")
         if head is not None and head > 5:
             add(
                 "leverage rising into volatility",
-                "ltv_change_since_march_pts",
+                "ltv_change_2_snapshots_pts",
                 0.5,
-                "LTV up more than 5 points since March",
+                "LTV up more than 5 points over the last two snapshots",
             )
     else:
         stated = _val(f, "stated_horizon_years") or 0.0

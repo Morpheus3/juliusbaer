@@ -1,0 +1,1 @@
+DROP TABLE "derived"."signal_thresholds" CASCADE;

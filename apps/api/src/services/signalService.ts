@@ -11,6 +11,7 @@ import { daysBetween } from '../domain/dates.js';
 import { buildSignals, snapshotForClock } from '../domain/signals/build.js';
 import type { ClientDetailRepository } from '../repositories/clientDetailRepository.js';
 import type { SignalRepository } from '../repositories/signalRepository.js';
+import type { DatasetContext } from './datasetContext.js';
 import { AnalyticsUnavailableError } from './analyticsClient.js';
 import { ClientNotFoundError } from './vectorService.js';
 
@@ -22,17 +23,18 @@ export class SignalService {
     private readonly signals: SignalRepository,
     private readonly clients: ClientDetailRepository,
     private readonly analyticsUrl: string,
-    private readonly today: string,
+    private readonly ctx: DatasetContext,
     private readonly fetchImpl: typeof fetch = fetch,
   ) {}
 
-  private clampClock(clock: string | undefined): string {
-    const c = clock ?? this.today;
-    return c > this.today ? this.today : c;
+  private async clampClock(clock: string | undefined): Promise<string> {
+    const today = await this.ctx.today();
+    const c = clock ?? today;
+    return c > today ? today : c;
   }
 
   async feed(clock: string | undefined, clientId: string | undefined): Promise<SignalsResponse> {
-    const at = this.clampClock(clock);
+    const at = await this.clampClock(clock);
     const [inputs, bundle] = await Promise.all([
       this.signals.inputs(),
       clientId ? this.clients.bundle(clientId) : null,
@@ -40,7 +42,7 @@ export class SignalService {
     if (clientId && !bundle) {
       throw new ClientNotFoundError(clientId);
     }
-    const snapshot = snapshotForClock(at);
+    const snapshot = snapshotForClock(inputs.snapshots, at);
     const snapshotAgeDays = daysBetween(snapshot, at);
     return {
       clock: at,
@@ -84,16 +86,16 @@ export class SignalService {
     req: ImpactRequest,
     clock: string | undefined,
   ): Promise<ImpactResponse> {
-    const at = this.clampClock(clock);
-    const snapshot = req.snapshotDate ?? snapshotForClock(at);
+    const at = await this.clampClock(clock);
     const [inputs, bundle] = await Promise.all([
       this.signals.inputs(),
       this.clients.bundle(clientId),
     ]);
+    const snapshot = req.snapshotDate ?? snapshotForClock(inputs.snapshots, at);
     if (!bundle) {
       throw new ClientNotFoundError(clientId);
     }
-    const all = buildSignals(inputs, this.today, null);
+    const all = buildSignals(inputs, await this.ctx.today(), null);
     const chosen = all.filter((s) => req.signalIds.includes(s.id));
     const missing = req.signalIds.filter((id) => !chosen.some((s) => s.id === id));
     if (missing.length > 0) {

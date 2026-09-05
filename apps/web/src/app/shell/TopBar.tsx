@@ -3,6 +3,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { HealthResponse, type HealthResponse as Health } from '@jb/contracts';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtDateTime } from '@/lib/format';
+import { useMeta } from '@/lib/meta';
 import { ClockControl } from './ClockControl';
 
 export function useHealth(): UseQueryResult<Health> {
@@ -15,6 +16,7 @@ export function useHealth(): UseQueryResult<Health> {
 
 export function TopBar(): JSX.Element {
   const health = useHealth();
+  const meta = useMeta();
   const data = health.data;
   const tone =
     health.isError || !data?.database.reachable ? 'crit' : data.status === 'ok' ? 'ok' : 'warn';
@@ -32,9 +34,9 @@ export function TopBar(): JSX.Element {
   return (
     <header className="flex h-14 items-center gap-6 border-b border-line bg-surface px-8">
       <div className="text-[13px] text-muted">
-        RM <span className="font-medium text-ink">Priscilla Ong</span>
+        RM <span className="font-medium text-ink">{meta.data?.rm.name ?? '—'}</span>
         <span className="mx-2 text-line-2">·</span>
-        <span className="font-mono text-[12px]">RM-SG-014</span>
+        <span className="font-mono text-[12px]">{meta.data?.rm.id ?? ''}</span>
       </div>
       <div className="ml-auto flex items-center gap-5 text-[12.5px] text-muted">
         <ClockControl />

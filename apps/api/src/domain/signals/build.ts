@@ -4,28 +4,29 @@
  * chosen client, the holdings each signal touches. Fully deterministic.
  */
 import {
-  SNAPSHOT_DATES,
   Shock,
   type AffectedHolding,
   type Signal,
   type SignalSeverity,
   type SnapshotDate,
 } from '@jb/contracts';
-import type { eventLog, instruments, marketContext, signalRules, signalThresholds } from '@jb/db';
+import type { eventLog, instruments, marketContext, signalRules, signalSeriesRules } from '@jb/db';
 import { daysBetween, round2, round4 } from '../dates.js';
 import type { ClientBundle } from '../../repositories/clientDetailRepository.js';
 
 export type EventRecord = typeof eventLog.$inferSelect;
 export type RuleRecord = typeof signalRules.$inferSelect;
-export type ThresholdRecord = typeof signalThresholds.$inferSelect;
+export type SeriesRuleRecord = typeof signalSeriesRules.$inferSelect;
 export type MarketRecord = typeof marketContext.$inferSelect;
 type InstrumentRecord = typeof instruments.$inferSelect;
 
 export interface SignalInputs {
   events: EventRecord[];
   rules: RuleRecord[];
-  thresholds: ThresholdRecord[];
+  seriesRules: SeriesRuleRecord[];
   market: MarketRecord[];
+  /** Sorted snapshot dates present in the data. */
+  snapshots: string[];
   instruments: Map<string, InstrumentRecord>;
   issuers: Map<string, string>;
   lookthrough: {
@@ -42,9 +43,9 @@ export type MatchRule = Record<string, string | boolean>;
 const SEVERITY_ORDER: Record<SignalSeverity, number> = { SEVERE: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
 
 /** Latest snapshot on or before the clock date. */
-export function snapshotForClock(clock: string): SnapshotDate {
-  let chosen: SnapshotDate = SNAPSHOT_DATES[0];
-  for (const d of SNAPSHOT_DATES) {
+export function snapshotForClock(snapshots: readonly string[], clock: string): SnapshotDate {
+  let chosen: SnapshotDate = snapshots[0] ?? clock;
+  for (const d of snapshots) {
     if (d <= clock) {
       chosen = d;
     }
@@ -235,7 +236,7 @@ export function buildSignals(
   clock: string,
   bundle: ClientBundle | null,
 ): Signal[] {
-  const snapshot = snapshotForClock(clock);
+  const snapshot = snapshotForClock(inputs.snapshots, clock);
   const rulesByEvent = new Map(inputs.rules.map((r) => [r.eventId, r]));
   const out: Signal[] = [];
 
@@ -244,11 +245,8 @@ export function buildSignals(
       continue;
     }
     const rule = rulesByEvent.get(ev.eventId);
-    if (!rule) {
-      continue;
-    }
-    const match = rule.match as MatchRule[];
-    const shock = Shock.parse(rule.shock);
+    const match = (rule?.match ?? []) as MatchRule[];
+    const shock = Shock.parse(rule?.shock ?? {});
     const ageDays = daysBetween(ev.eventDate, clock);
     const channels = ev.primaryTransmission.split(',').map((c) => c.trim());
     const conf = {
@@ -318,102 +316,27 @@ function clientView(
   };
 }
 
-/** Series moves between consecutive snapshots above threshold become derived signals. */
-const SERIES_RULES: Record<
-  string,
-  { rules: MatchRule[]; shock: (move: number, from: number) => Partial<Shock>; unit: 'pct' | 'abs' }
-> = {
-  UST_10Y_PCT: {
-    unit: 'abs',
-    rules: [
-      { subAssetClass: 'Government Bond' },
-      { subAssetClass: 'Investment Grade Credit' },
-      { subAssetClass: 'Inflation Linked' },
-      { subAssetClass: 'Subordinated Perpetual' },
-    ],
-    shock: (m) => ({ rates_bps: { USD: Math.round(m * 100) } }),
-  },
-  BRENT_USD_BBL: {
-    unit: 'pct',
-    rules: [{ sector: 'Energy' }, { subAssetClass: 'Diversified Commodities' }],
-    shock: (m) => ({ brent_pct: round2(m), sector_overlay_pct: { Energy: round2(m * 0.5) } }),
-  },
-  GOLD_USD_OZ: {
-    unit: 'pct',
-    rules: [{ sector: 'Gold' }],
-    shock: (m) => ({ gold_pct: round2(m) }),
-  },
-  VIX: {
-    unit: 'abs',
-    rules: [{ assetClass: 'Equity' }, { assetClass: 'Structured Products' }],
-    shock: (m) => ({ vix_points: round2(m) }),
-  },
-  SPX: {
-    unit: 'pct',
-    rules: [{ region: 'North America' }, { region: 'Global', assetClass: 'Equity' }],
-    shock: (m) => ({ equity_pct: { north_america: round2(m), global: round2(m * 0.7) } }),
-  },
-  NASDAQ_COMP: {
-    unit: 'pct',
-    rules: [{ sector: 'Information Technology' }],
-    shock: (m) => ({ sector_overlay_pct: { 'Information Technology': round2(m) } }),
-  },
-  HSI: {
-    unit: 'pct',
-    rules: [{ region: 'Hong Kong' }, { region: 'Greater China' }],
-    shock: (m) => ({ equity_pct: { greater_china: round2(m) } }),
-  },
-  STI: {
-    unit: 'pct',
-    rules: [{ region: 'Singapore' }],
-    shock: (m) => ({ equity_pct: { asia_ex_japan: round2(m) } }),
-  },
-  MSCI_ASIA_XJP: {
-    unit: 'pct',
-    rules: [{ region: 'Asia ex-Japan' }, { region: 'Southeast Asia' }, { region: 'Asia' }],
-    shock: (m) => ({ equity_pct: { asia_ex_japan: round2(m) } }),
-  },
-  USDSGD: {
-    unit: 'pct',
-    rules: [{ currency: 'SGD' }],
-    shock: (m) => ({ fx_pct_vs_usd: { SGD: round2(-m) } }),
-  },
-  EURUSD: {
-    unit: 'pct',
-    rules: [{ currency: 'EUR' }],
-    shock: (m) => ({ fx_pct_vs_usd: { EUR: round2(m) } }),
-  },
-  USDJPY: {
-    unit: 'pct',
-    rules: [{ currency: 'JPY' }],
-    shock: (m) => ({ fx_pct_vs_usd: { JPY: round2(-m) } }),
-  },
-  USDIDR: {
-    unit: 'pct',
-    rules: [{ currency: 'IDR' }],
-    shock: (m) => ({ fx_pct_vs_usd: { IDR: round2(-m) } }),
-  },
-  USDTHB: {
-    unit: 'pct',
-    rules: [{ currency: 'THB' }],
-    shock: (m) => ({ fx_pct_vs_usd: { THB: round2(-m) } }),
-  },
-  USDINR: {
-    unit: 'pct',
-    rules: [{ currency: 'INR' }],
-    shock: (m) => ({ fx_pct_vs_usd: { INR: round2(-m) } }),
-  },
-  TTF_GAS_EUR_MWH: {
-    unit: 'pct',
-    rules: [{ sector: 'Energy' }],
-    shock: (m) => ({ sector_overlay_pct: { Energy: round2(m * 0.2) } }),
-  },
-  US_CPI_YOY_PCT: {
-    unit: 'abs',
-    rules: [{ subAssetClass: 'Inflation Linked' }, { subAssetClass: 'Government Bond' }],
-    shock: (m) => ({ rates_bps: { USD: Math.round(m * 40) } }),
-  },
-};
+/** Apply a shock template (path = move x factor) from the series rule. */
+export function shockFromTemplate(
+  template: readonly { path: string; factor: number }[],
+  move: number,
+): Shock {
+  const raw: Record<string, unknown> = {};
+  for (const t of template) {
+    const [field, key] = t.path.split('.', 2);
+    if (!field) {
+      continue;
+    }
+    const value = round2(move * t.factor);
+    if (key === undefined) {
+      raw[field] = value;
+    } else {
+      const obj = (raw[field] ??= {}) as Record<string, number>;
+      obj[key] = value;
+    }
+  }
+  return Shock.parse(raw);
+}
 
 function derivedSignals(
   inputs: SignalInputs,
@@ -421,7 +344,7 @@ function derivedSignals(
   snapshot: SnapshotDate,
   bundle: ClientBundle | null,
 ): Signal[] {
-  const thresholds = new Map(inputs.thresholds.map((t) => [t.seriesId, t.threshold]));
+  const rulesBySeries = new Map(inputs.seriesRules.map((r) => [r.seriesId, r]));
   const bySeries = new Map<string, MarketRecord[]>();
   for (const m of inputs.market) {
     const list = bySeries.get(m.seriesId) ?? [];
@@ -430,11 +353,12 @@ function derivedSignals(
   }
   const out: Signal[] = [];
   for (const [seriesId, rows] of bySeries) {
-    const spec = SERIES_RULES[seriesId];
-    const threshold = thresholds.get(seriesId);
-    if (!spec || threshold === undefined) {
+    const spec = rulesBySeries.get(seriesId);
+    if (!spec) {
       continue;
     }
+    const threshold = spec.threshold;
+    const specRules = spec.match as MatchRule[];
     const sorted = [...rows].sort((a, b) => a.snapshotDate.localeCompare(b.snapshotDate));
     for (let i = 1; i < sorted.length; i++) {
       const prev = sorted[i - 1];
@@ -463,7 +387,7 @@ function derivedSignals(
         sourceReliability: 85,
         modelConfidence: 70,
       };
-      const shock = Shock.parse(spec.shock(move, prev.value));
+      const shock = shockFromTemplate(spec.shock, move);
       out.push({
         id: `MK-${seriesId}-${cur.snapshotDate}`,
         kind: 'derived',
@@ -480,7 +404,7 @@ function derivedSignals(
           reference: `${seriesId} @ ${cur.snapshotDate}`,
           detail: `${cur.category} · ${cur.unit} · derived from two snapshot points`,
         },
-        affectedAssetClasses: affectedClasses(spec.rules, inputs),
+        affectedAssetClasses: affectedClasses(specRules, inputs),
         shock,
         confidence: {
           ...conf,
@@ -492,7 +416,7 @@ function derivedSignals(
             'Model confidence 70: the factor shock is the observed move; the holding mapping is by attribute.',
           ],
         },
-        client: bundle ? clientView(bundle, inputs, spec.rules, snapshot, cur.seriesName) : null,
+        client: bundle ? clientView(bundle, inputs, specRules, snapshot, cur.seriesName) : null,
       });
     }
   }

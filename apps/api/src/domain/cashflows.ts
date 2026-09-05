@@ -1,10 +1,9 @@
-import { CURRENT_SNAPSHOT, SnapshotDateSchema, type CashflowsResponse } from '@jb/contracts';
+import { SnapshotDateSchema, type CashflowsResponse } from '@jb/contracts';
 import type { ClientBundle } from '../repositories/clientDetailRepository.js';
 import { addMonths, daysBetween, monthKey, round2 } from './dates.js';
 import { Fx } from './fx.js';
 import { holdingsAt } from './holdingsView.js';
 
-const CURRENT = CURRENT_SNAPSHOT;
 const INCOME = new Set(['Dividend', 'Coupon', 'Interest', 'Distribution']);
 const FEES = new Set(['Management Fee', 'Interest Charge']);
 const FIRM = new Set(['Confirmed', 'Likely']);
@@ -31,7 +30,7 @@ export function needWithin12m(
   return (amountUsd * overlap) / windowDays;
 }
 
-export function cashflows(bundle: ClientBundle, today: string): CashflowsResponse {
+export function cashflows(bundle: ClientBundle, today: string, CURRENT: string): CashflowsResponse {
   const fx = new Fx(bundle.fx);
   const monthly = new Map<
     string,

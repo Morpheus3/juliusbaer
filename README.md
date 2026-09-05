@@ -10,6 +10,7 @@ recommendation traceable to its evidence and carrying a machine-checked confiden
 
 - **Product blueprint:** [docs/BLUEPRINT.html](docs/BLUEPRINT.html) (scope, screens, engines, plan)
 - **Decisions:** [docs/adr/](docs/adr/) · **Dataset docs:** [docs/dataset/](docs/dataset/)
+- **Bring your own dataset:** [docs/DATASET_CONTRACT.md](docs/DATASET_CONTRACT.md) (required files, vocabulary, optional reference files)
 - **Challenge brief:** [docs/dataset/CHALLENGE_README.md](docs/dataset/CHALLENGE_README.md)
 
 ## Run it
@@ -22,7 +23,7 @@ cp .env.example .env         # add ANTHROPIC_API_KEY when you have one; without 
 npm install
 npm run db:up                # Postgres 17 + pgvector on localhost:5433
 npm run db:migrate
-npm run db:seed              # loads data/ and builds the data-quality register
+npm run db:seed              # loads data/ (or DATA_DIR) and builds the data-quality register
 npm run dev                  # API on :4000, web on :5173
 ```
 
@@ -43,7 +44,7 @@ apps/api/            Fastify API: routes → services → repositories, engines,
 packages/contracts/  Zod schemas and types shared by web, API and loader
 db/                  Drizzle schema (raw + derived), migrations, dataset loader, quality checks
 services/analytics/  Python FastAPI: customer vectors, impact models, validator
-data/                The SingHacks dataset, unchanged
+data/                The SingHacks dataset, unchanged; data/reference holds dataset-specific judgement files
 docs/                Blueprint, ADRs, dataset dictionary
 ```
 

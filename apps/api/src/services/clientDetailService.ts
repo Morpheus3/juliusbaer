@@ -1,8 +1,5 @@
 import {
   AssetClassSchema,
-  BASELINE_SNAPSHOT,
-  CURRENT_SNAPSHOT,
-  SNAPSHOT_DATES,
   type CashflowsResponse,
   type ChangeResponse,
   type ClientOverviewResponse,
@@ -24,23 +21,15 @@ import type {
   ClientBundle,
   ClientDetailRepository,
 } from '../repositories/clientDetailRepository.js';
+import type { DatasetContext } from './datasetContext.js';
 import { ClientNotFoundError } from './vectorService.js';
 
-const CURRENT = CURRENT_SNAPSHOT;
-const BASELINE = BASELINE_SNAPSHOT;
-const SNAPSHOT_LABEL: Record<SnapshotDate, string> = {
-  '2025-12-31': 'Year-end 2025',
-  '2026-02-27': 'Pre-conflict',
-  '2026-03-31': 'Post-Hormuz',
-  '2026-06-30': 'Half-year',
-  '2026-08-26': 'Today',
-};
 const INCOME = new Set(['Dividend', 'Coupon', 'Interest', 'Distribution']);
 
 export class ClientDetailService {
   constructor(
     private readonly repo: ClientDetailRepository,
-    private readonly today: string,
+    private readonly ctx: DatasetContext,
   ) {}
 
   private async bundle(clientId: string): Promise<ClientBundle> {
@@ -52,7 +41,10 @@ export class ClientDetailService {
   }
 
   async overview(clientId: string): Promise<ClientOverviewResponse> {
-    const b = await this.bundle(clientId);
+    const [b, meta] = await Promise.all([this.bundle(clientId), this.ctx.meta()]);
+    const CURRENT = meta.current;
+    const BASELINE = meta.baseline;
+    const today = meta.today;
     const now = holdingsAt(b, CURRENT);
     const aum = householdTotalUsd(now);
     const aumBase = householdTotalUsd(holdingsAt(b, BASELINE));
@@ -71,22 +63,23 @@ export class ClientDetailService {
     const income = b.transactions
       .filter((t) => INCOME.has(t.transactionType))
       .reduce((s, t) => s + fx.toUsd(t.amount, t.currency, CURRENT), 0);
+    const firstTx = b.transactions[0]?.tradeDate ?? today;
     const monthsElapsed = Math.max(
-      (Date.parse(`${this.today}T00:00:00Z`) - Date.parse('2026-01-01T00:00:00Z')) /
+      (Date.parse(`${today}T00:00:00Z`) - Date.parse(`${firstTx}T00:00:00Z`)) /
         (30.4375 * 86_400_000),
       1,
     );
 
     const mandate = mandateStatus(b, CURRENT);
     const exp = exposure(b, CURRENT);
-    const cf = cashflows(b, this.today);
-    const alerts = deriveAlerts(b, mandate, exp, cf, this.today);
+    const cf = cashflows(b, today, CURRENT);
+    const alerts = deriveAlerts(b, mandate, exp, cf, today);
     const lastNote = b.notes.at(-1);
 
     const series = (portfolioId?: string): ClientOverviewResponse['aumSeries'] =>
-      SNAPSHOT_DATES.map((d) => ({
+      meta.snapshots.map(({ date: d, label }) => ({
         snapshotDate: d,
-        label: SNAPSHOT_LABEL[d],
+        label,
         valueUsd: round2(
           b.holdings
             .filter(
@@ -99,7 +92,7 @@ export class ClientDetailService {
       }));
 
     return {
-      asOf: this.today,
+      asOf: today,
       client: {
         clientId: b.client.clientId,
         name: b.client.clientName,
@@ -147,13 +140,13 @@ export class ClientDetailService {
     snapshotDate: SnapshotDate,
     portfolioId?: string,
   ): Promise<HoldingsResponse> {
-    const b = await this.bundle(clientId);
+    const [b, snapshots] = await Promise.all([this.bundle(clientId), this.ctx.snapshotDates()]);
     const rows = buildHoldingRows(b, snapshotDate).filter(
       (r) => portfolioId === undefined || r.portfolioId === portfolioId,
     );
     return {
       snapshotDate,
-      snapshots: [...SNAPSHOT_DATES],
+      snapshots,
       totalUsd: round2(rows.reduce((s, r) => s + r.marketValueUsd, 0)),
       rows,
     };
@@ -172,7 +165,8 @@ export class ClientDetailService {
   }
 
   async cashflows(clientId: string): Promise<CashflowsResponse> {
-    return cashflows(await this.bundle(clientId), this.today);
+    const [b, meta] = await Promise.all([this.bundle(clientId), this.ctx.meta()]);
+    return cashflows(b, meta.today, meta.current);
   }
 
   async transactions(
@@ -180,7 +174,8 @@ export class ClientDetailService {
     portfolioId?: string,
     type?: string,
   ): Promise<TransactionsResponse> {
-    const b = await this.bundle(clientId);
+    const [b, meta] = await Promise.all([this.bundle(clientId), this.ctx.meta()]);
+    const current = meta.current;
     const fx = new Fx(b.fx);
     const all = b.transactions.map((t) => ({
       transactionId: t.transactionId,
@@ -193,7 +188,7 @@ export class ClientDetailService {
       priceLocal: t.priceLocal,
       currency: t.currency,
       amount: t.amount,
-      amountUsd: round2(fx.toUsd(t.amount, t.currency, CURRENT)),
+      amountUsd: round2(fx.toUsd(t.amount, t.currency, current)),
       narrative: t.narrative,
     }));
     const rows = all

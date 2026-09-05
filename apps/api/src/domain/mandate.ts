@@ -46,7 +46,7 @@ export function mandateStatus(
       const managed = p.serviceModel !== 'Custody';
       const bands = bundle.mandates.filter((m) => m.mandateCode === p.mandateCode);
       const limit = singlePositionLimit(bundle.mandates, p.mandateCode);
-      const isSustainable = p.mandateCode === 'SUSBAL';
+      const isSustainable = bands.some((b) => /exclusion/i.test(b.mandateNotes));
       return {
         portfolioId: p.portfolioId,
         name: p.portfolioName,
