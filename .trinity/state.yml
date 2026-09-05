@@ -3,7 +3,7 @@ project: jb-rm-workbench
 phase: develop
 artifacts:
   intent_and_spec: docs/BLUEPRINT.html
-  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector, ADR-004 look-through and attribution, ADR-005 signals and impact, ADR-006 rubric and Claude gateway, ADR-007 dataset agnosticism, ADR-008 combined risk and actions, ADR-009 book cockpit
+  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector, ADR-004 look-through and attribution, ADR-005 signals and impact, ADR-006 rubric and Claude gateway, ADR-007 dataset agnosticism, ADR-008 combined risk and actions, ADR-009 book cockpit, ADR-010 workflow and outreach
 iterations:
   - id: 0
     name: Foundation
@@ -37,8 +37,11 @@ iterations:
     name: Book cockpit and horizon lanes
     status: done
     completed: 2026-09-05
-  - { id: 7, name: Workflow and outreach, status: next }
-  - { id: 8, name: Assistant and polish, status: planned }
+  - id: 7
+    name: Workflow and outreach
+    status: done
+    completed: 2026-09-05
+  - { id: 8, name: Assistant and polish, status: next }
 decisions:
   D1: { where: ~/Desktop/juliusbaer, branch: feat/rm-workbench, status: confirmed }
   D2: { claude_access: recorded mode until ANTHROPIC_API_KEY provided, status: confirmed }

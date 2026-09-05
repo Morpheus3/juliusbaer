@@ -12,6 +12,7 @@ import { LoadRunRepository } from './repositories/loadRunRepository.js';
 import { RubricRepository } from './repositories/rubricRepository.js';
 import { SignalRepository } from './repositories/signalRepository.js';
 import { VectorRepository } from './repositories/vectorRepository.js';
+import { WorkflowRepository } from './repositories/workflowRepository.js';
 import { clientDetailRoutes } from './routes/clientDetail.js';
 import { clientRoutes } from './routes/clients.js';
 import { dataQualityRoutes } from './routes/dataQuality.js';
@@ -22,6 +23,7 @@ import { riskRoutes } from './routes/risk.js';
 import { rubricRoutes } from './routes/rubric.js';
 import { signalRoutes } from './routes/signals.js';
 import { vectorRoutes } from './routes/vectors.js';
+import { workflowRoutes } from './routes/workflow.js';
 import { AnalyticsClient } from './services/analyticsClient.js';
 import { ClientDetailService } from './services/clientDetailService.js';
 import { DatasetContext } from './services/datasetContext.js';
@@ -33,6 +35,7 @@ import { RiskService } from './services/riskService.js';
 import { RubricService } from './services/rubricService.js';
 import { SignalService } from './services/signalService.js';
 import { VectorService } from './services/vectorService.js';
+import { WorkflowService } from './services/workflowService.js';
 
 export const API_VERSION = '0.1.0';
 
@@ -55,6 +58,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   const clients = new ClientRepository(app.db);
   const vectors = new VectorRepository(app.db);
   const detail = new ClientDetailRepository(app.db);
+  const workflow = new WorkflowRepository(app.db);
   const signals = new SignalRepository(app.db);
   const rubric = new RubricRepository(app.db);
   const decisions = new DecisionRepository(app.db);
@@ -73,7 +77,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   const dataQuality = new DataQualityService(loadRuns, issues);
   const clientService = new ClientService(clients, ctx);
   const vectorService = new VectorService(vectors, new AnalyticsClient(config.ANALYTICS_URL));
-  const detailService = new ClientDetailService(detail, ctx);
+  const detailService = new ClientDetailService(detail, ctx, workflow);
   const signalService = new SignalService(signals, detail, config.ANALYTICS_URL, ctx);
   const rubricService = new RubricService(
     rubric,
@@ -93,7 +97,20 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     signalService,
     ctx,
   );
-  const bookService = new BookService(clients, detail, signals, rubric, ctx);
+  const bookService = new BookService(clients, detail, signals, rubric, ctx, workflow);
+  const workflowService = new WorkflowService(
+    workflow,
+    detail,
+    rubric,
+    decisions,
+    signals,
+    riskService,
+    signalService,
+    gateway,
+    ctx,
+    config.RM_LEVEL,
+    config.CHECKER_ID,
+  );
 
   await app.register(healthRoutes(health));
   await app.register(
@@ -107,6 +124,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(rubricRoutes(rubricService));
       await v1.register(riskRoutes(riskService));
       await v1.register(bookRoutes(bookService));
+      await v1.register(workflowRoutes(workflowService));
     },
     { prefix: '/api/v1' },
   );

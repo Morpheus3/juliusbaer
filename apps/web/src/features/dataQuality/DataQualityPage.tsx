@@ -1,7 +1,15 @@
 import type { JSX, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DataQualitySummary, type DataQualityCode, type DataQualitySeverity } from '@jb/contracts';
+import {
+  AuditResponse,
+  DataQualitySummary,
+  type DataQualityCode,
+  type DataQualitySeverity,
+} from '@jb/contracts';
 import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Pill } from '@/components/Pill';
+import { fmtDateTime } from '@/lib/format';
 import { getJson } from '@/lib/api';
 
 const CODE_LABEL: Record<DataQualityCode, string> = {
@@ -29,6 +37,141 @@ const SEV_CLASS: Record<DataQualitySeverity, string> = {
 
 /** L3 · the data-quality register written by the loader. */
 export function DataQualityPage(): JSX.Element {
+  const [sp, setSp] = useSearchParams();
+  const tab = sp.get('tab') === 'register' ? 'register' : 'audit';
+  const setTab = (t: 'audit' | 'register'): void => {
+    const next = new URLSearchParams(sp);
+    next.set('tab', t);
+    setSp(next, { replace: true });
+  };
+  return (
+    <div className="max-w-6xl">
+      <div className="mb-5">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brass">
+          RM view · L3
+        </div>
+        <h1 className="font-serif text-[26px] font-semibold text-ink">Audit &amp; data quality</h1>
+        <nav className="mt-2 flex gap-1 border-b border-line" aria-label="Audit sections">
+          {(['audit', 'register'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => {
+                setTab(t);
+              }}
+              className={`-mb-px border-b-2 px-3 py-2 text-[13px] ${tab === t ? 'border-accent font-medium text-ink' : 'border-transparent text-muted hover:text-ink'}`}
+            >
+              {t === 'audit' ? 'Audit trail' : 'Data-quality register'}
+            </button>
+          ))}
+        </nav>
+      </div>
+      {tab === 'audit' ? <AuditTrail clientId={sp.get('client')} /> : <Register />}
+    </div>
+  );
+}
+
+function AuditTrail({ clientId }: { clientId: string | null }): JSX.Element {
+  const [kind, setKind] = useState('all');
+  const q = useQuery({
+    queryKey: ['audit', clientId ?? 'all'],
+    queryFn: () =>
+      getJson(`/api/v1/audit${clientId ? `?clientId=${clientId}` : ''}`, AuditResponse),
+    refetchInterval: 15_000,
+  });
+  const events = (q.data?.events ?? []).filter((e) => kind === 'all' || e.kind === kind);
+  const kinds = [...new Set((q.data?.events ?? []).map((e) => e.kind))].sort();
+  return (
+    <div className="space-y-3">
+      <p className="m-0 max-w-3xl text-[13.5px] text-ink-2">
+        Every assessment, override, lock, approval, rejection, triage, draft and send is recorded
+        with its actor and timestamp. The log is append-only.
+        {clientId && (
+          <>
+            {' '}
+            Showing <span className="font-mono">{clientId}</span> ·{' '}
+            <Link to="/audit">all clients</Link>
+          </>
+        )}
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        <button
+          type="button"
+          onClick={() => {
+            setKind('all');
+          }}
+          className={`rounded-full border px-3 py-1 text-[12px] ${kind === 'all' ? 'border-transparent bg-ink text-white' : 'border-line bg-surface text-ink-2'}`}
+        >
+          All · {q.data?.events.length ?? 0}
+        </button>
+        {kinds.map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => {
+              setKind(k);
+            }}
+            className={`rounded-full border px-3 py-1 text-[12px] ${kind === k ? 'border-transparent bg-ink text-white' : 'border-line bg-surface text-ink-2'}`}
+          >
+            {k.replace(/_/g, ' ').toLowerCase()} ·{' '}
+            {(q.data?.events ?? []).filter((e) => e.kind === k).length}
+          </button>
+        ))}
+      </div>
+      <div className="overflow-x-auto rounded-md border border-line bg-surface">
+        <table className="w-full text-[12.5px]">
+          <thead className="bg-surface-2 text-[10.5px] uppercase tracking-[0.08em] text-muted">
+            <tr>
+              <th className="px-3 py-2 text-left font-semibold">When</th>
+              <th className="px-3 py-2 text-left font-semibold">Event</th>
+              <th className="px-3 py-2 text-left font-semibold">Actor</th>
+              <th className="px-3 py-2 text-left font-semibold">Client</th>
+              <th className="px-3 py-2 text-left font-semibold">Summary</th>
+            </tr>
+          </thead>
+          <tbody>
+            {events.map((e) => (
+              <tr key={e.id} className="border-t border-line align-top">
+                <td className="whitespace-nowrap px-3 py-1.5 font-mono text-[11.5px] text-muted">
+                  {fmtDateTime(e.createdAt)}
+                </td>
+                <td className="px-3 py-1.5">
+                  <Pill
+                    tone={
+                      e.kind.includes('REJECTED') || e.kind.includes('DISMISSED')
+                        ? 'neutral'
+                        : ['APPROVED', 'LOCKED', 'SENT'].some((k) => e.kind.includes(k))
+                          ? 'ok'
+                          : e.kind.includes('OVERRIDE')
+                            ? 'brass'
+                            : 'info'
+                    }
+                  >
+                    {e.kind.replace(/_/g, ' ').toLowerCase()}
+                  </Pill>
+                </td>
+                <td className="px-3 py-1.5 font-mono text-[11.5px] text-ink-2">{e.actor}</td>
+                <td className="px-3 py-1.5 font-mono text-[11.5px]">
+                  {e.clientId ? <Link to={`/clients/${e.clientId}`}>{e.clientId}</Link> : '—'}
+                </td>
+                <td className="px-3 py-1.5 text-ink-2">{e.summary}</td>
+              </tr>
+            ))}
+            {events.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-3 py-6 text-center text-muted">
+                  No events yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function Register(): JSX.Element {
   const [severity, setSeverity] = useState<DataQualitySeverity | 'all'>('all');
   const q = useQuery({
     queryKey: ['data-quality'],

@@ -21,6 +21,7 @@ import type {
   ClientBundle,
   ClientDetailRepository,
 } from '../repositories/clientDetailRepository.js';
+import type { WorkflowRepository } from '../repositories/workflowRepository.js';
 import type { DatasetContext } from './datasetContext.js';
 import { ClientNotFoundError } from './vectorService.js';
 
@@ -30,6 +31,7 @@ export class ClientDetailService {
   constructor(
     private readonly repo: ClientDetailRepository,
     private readonly ctx: DatasetContext,
+    private readonly workflow: WorkflowRepository,
   ) {}
 
   private async bundle(clientId: string): Promise<ClientBundle> {
@@ -41,7 +43,11 @@ export class ClientDetailService {
   }
 
   async overview(clientId: string): Promise<ClientOverviewResponse> {
-    const [b, meta] = await Promise.all([this.bundle(clientId), this.ctx.meta()]);
+    const [b, meta, triage] = await Promise.all([
+      this.bundle(clientId),
+      this.ctx.meta(),
+      this.workflow.triageFor(clientId),
+    ]);
     const CURRENT = meta.current;
     const BASELINE = meta.baseline;
     const today = meta.today;
@@ -73,7 +79,9 @@ export class ClientDetailService {
     const mandate = mandateStatus(b, CURRENT);
     const exp = exposure(b, CURRENT);
     const cf = cashflows(b, today, CURRENT);
-    const alerts = deriveAlerts(b, mandate, exp, cf, today);
+    const alerts = deriveAlerts(b, mandate, exp, cf, today).filter(
+      (a) => triage.get(a.id)?.decision !== 'dismissed',
+    );
     const lastNote = b.notes.at(-1);
 
     const series = (portfolioId?: string): ClientOverviewResponse['aumSeries'] =>

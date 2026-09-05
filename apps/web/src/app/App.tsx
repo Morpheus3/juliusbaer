@@ -16,6 +16,7 @@ import { OverviewTab } from '@/features/portfolio/OverviewTab';
 import { PortfolioPage } from '@/features/portfolio/PortfolioPage';
 import { TransactionsTab } from '@/features/portfolio/TransactionsTab';
 import { VectorPage } from '@/features/vector/VectorPage';
+import { WorkflowPage } from '@/features/workflow/WorkflowPage';
 import { AppShell } from './shell/AppShell';
 import { DefaultClientRedirect } from './shell/DefaultClientRedirect';
 import { PlaceholderPage } from './shell/PlaceholderPage';
@@ -62,6 +63,11 @@ export function App(): JSX.Element {
           element={<DefaultClientRedirect to={(id) => `/clients/${id}/portfolio`} />}
         />
         <Route path="/clients/:clientId/vector" element={<VectorPage />} />
+        <Route
+          path="/workflow"
+          element={<DefaultClientRedirect to={(id) => `/clients/${id}/workflow`} />}
+        />
+        <Route path="/clients/:clientId/workflow" element={<WorkflowPage />} />
         <Route
           path="/vector"
           element={<DefaultClientRedirect to={(id) => `/clients/${id}/vector`} />}

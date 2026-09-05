@@ -279,3 +279,39 @@ export const actionDecisions = derived.table(
     index('action_decisions_action_idx').on(t.actionId),
   ],
 );
+
+/** RM triage of data-derived alerts: acknowledged into review, or dismissed with a reason. */
+export const alertTriage = derived.table(
+  'alert_triage',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    alertId: text().notNull(),
+    clientId: text().notNull(),
+    decision: text().notNull(),
+    reason: text(),
+    actor: text().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('alert_triage_client_idx').on(t.clientId, t.createdAt)],
+);
+
+/** Client outreach drafts and sends. Nothing leaves the system; "sent" records the RM's decision. */
+export const outreach = derived.table(
+  'outreach',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    clientId: text().notNull(),
+    channel: text().notNull(),
+    language: text().notNull(),
+    subject: text().notNull(),
+    body: text().notNull(),
+    status: text().notNull().default('draft'),
+    source: text().notNull(),
+    llmTraceId: uuid(),
+    context: jsonb().$type<Record<string, unknown>>().notNull().default({}),
+    actor: text().notNull(),
+    sentAt: timestamp({ withTimezone: true }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('outreach_client_idx').on(t.clientId, t.createdAt)],
+);

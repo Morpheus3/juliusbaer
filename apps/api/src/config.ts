@@ -13,6 +13,8 @@ const ConfigSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
   DATASET_NAME: z.string().default('Loaded dataset'),
+  RM_LEVEL: z.coerce.number().int().min(1).max(3).default(2),
+  CHECKER_ID: z.string().default('RM-CHECKER'),
   ANTHROPIC_API_KEY: z.string().optional(),
   CLAUDE_ANALYSIS_MODEL: z.string().default('claude-sonnet-5'),
   CLAUDE_FAST_MODEL: z.string().default('claude-haiku-4-5'),

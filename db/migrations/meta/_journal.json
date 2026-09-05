@@ -57,6 +57,13 @@
       "when": 1788604706675,
       "tag": "0007_windy_martin_li",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788612827940,
+      "tag": "0008_absurd_zaladane",
+      "breakpoints": true
     }
   ]
 }

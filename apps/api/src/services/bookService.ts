@@ -21,6 +21,7 @@ import type {
 import type { ClientRepository } from '../repositories/clientRepository.js';
 import type { RubricRepository } from '../repositories/rubricRepository.js';
 import type { SignalRepository } from '../repositories/signalRepository.js';
+import type { WorkflowRepository } from '../repositories/workflowRepository.js';
 import type { DatasetContext } from './datasetContext.js';
 
 const METHOD = [
@@ -28,7 +29,7 @@ const METHOD = [
   'The same computation runs at the previous snapshot; an item that moved up a lane is marked escalated, one that appears for the first time is marked new.',
   'Signal items come from the most exposed high or severe signal of the last 30 days; severe signals reaching 20% or more of a household go to Now.',
   'Client urgency = Σ lane weight (Now 3, week 2, month 1) × severity weight (high 3, medium 2, low 1) + 1 per new or escalated item. Ties break by AUM.',
-  'No language model is involved in the cockpit; every card links to the screen where its numbers live.',
+  'Alerts the RM dismissed in the workflow are excluded. No language model is involved in the cockpit; every card links to the screen where its numbers live.',
 ];
 
 const BOARD_METHOD = [
@@ -45,6 +46,7 @@ export class BookService {
     private readonly signals: SignalRepository,
     private readonly rubric: RubricRepository,
     private readonly ctx: DatasetContext,
+    private readonly workflow: WorkflowRepository,
   ) {}
 
   private async bundles(): Promise<ClientBundle[]> {
@@ -56,10 +58,11 @@ export class BookService {
   async cockpit(clock: string | undefined): Promise<BookResponse> {
     const meta = await this.ctx.meta();
     const at = clock && clock < meta.today ? clock : meta.today;
-    const [bundles, inputs, rubrics] = await Promise.all([
+    const [bundles, inputs, rubrics, dismissed] = await Promise.all([
       this.bundles(),
       this.signals.inputs(),
       this.rubric.latestForAll(),
+      this.workflow.dismissedAll(),
     ]);
     const dates = inputs.snapshots;
     const snapshot = snapshotForClock(dates, at);
@@ -78,6 +81,9 @@ export class BookService {
 
     for (const b of bundles) {
       const nowInputs = laneInputs(b, inputs, at, snapshot, prevSnapshot);
+      nowInputs.alerts = nowInputs.alerts.filter(
+        (a) => !dismissed.has(`${b.client.clientId}|${a.id}`),
+      );
       let previous: Map<string, Urgency> | null = null;
       if (prevSnapshot) {
         const prevPrev = idx > 1 ? (dates[idx - 2] ?? null) : null;
