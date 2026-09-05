@@ -5,7 +5,7 @@ import { AnalyticsUnavailableError } from '../services/analyticsClient.js';
 import { LockedError, NoAssessmentError, type RubricService } from '../services/rubricService.js';
 import { ClientNotFoundError, NoVectorRunError } from '../services/vectorService.js';
 
-const Params = z.object({ clientId: z.string().regex(/^CL-\d{4}$/) });
+const Params = z.object({ clientId: z.string().min(1).max(64) });
 const ClockQuery = z.object({
   clock: z
     .string()
@@ -13,10 +13,7 @@ const ClockQuery = z.object({
     .optional(),
 });
 const AuditQuery = z.object({
-  clientId: z
-    .string()
-    .regex(/^CL-\d{4}$/)
-    .optional(),
+  clientId: z.string().min(1).max(64).optional(),
 });
 
 export const rubricRoutes =
@@ -35,7 +32,7 @@ export const rubricRoutes =
     ) => {
       const p = Params.safeParse(params);
       if (!p.success) {
-        return reply.badRequest('clientId must look like CL-0001');
+        return reply.badRequest('clientId is required');
       }
       try {
         return await run(p.data.clientId);
@@ -60,7 +57,7 @@ export const rubricRoutes =
     app.get('/audit', async (req, reply) => {
       const q = AuditQuery.safeParse(req.query);
       if (!q.success) {
-        return reply.badRequest('clientId must look like CL-0001');
+        return reply.badRequest('clientId is required');
       }
       return service.audit(q.data.clientId);
     });

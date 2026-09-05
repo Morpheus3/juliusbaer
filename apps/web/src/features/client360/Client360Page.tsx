@@ -16,6 +16,7 @@ import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
 import { useClockDate } from '@/state/clock';
+import { useCombinedRisk } from '../risk/riskApi';
 import { SEVERITY_SHORT, SEVERITY_TONE, ageLabel } from '../signals/signalFormat';
 
 const ALERT_KIND_LABEL: Record<ClientAlert['kind'], string> = {
@@ -268,12 +269,7 @@ function Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
 
         <div className="space-y-4">
           <SignalsPanel clientId={d.client.clientId} />
-          <Panel title="RM action queue" right="iteration 5">
-            <p className="m-0 text-[12.5px] text-muted">
-              Ranked actions with suitability checks and approve-and-log arrive with the combined
-              risk engine. Until then the alerts above are the queue.
-            </p>
-          </Panel>
+          <ActionQueuePanel clientId={d.client.clientId} />
           <RubricPanel clientId={d.client.clientId} />
         </div>
       </div>
@@ -425,6 +421,54 @@ function RubricPanel({ clientId }: { clientId: string }): JSX.Element {
             {r.status === 'locked' ? 'Locked' : 'Draft'} · LLM assessor {r.llmMode} · scored{' '}
             {new Date(r.createdAt).toLocaleDateString('en-GB')}
           </div>
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+function ActionQueuePanel({ clientId }: { clientId: string }): JSX.Element {
+  const q = useCombinedRisk(clientId);
+  const top = (q.data?.actions ?? []).filter((a) => !a.decision).slice(0, 3);
+  return (
+    <Panel
+      title="RM action queue"
+      right={<Link to={`/clients/${clientId}/actions`}>All actions →</Link>}
+    >
+      {q.isPending && <p className="m-0 text-[12.5px] text-muted">Ranking…</p>}
+      {q.data && top.length === 0 && (
+        <p className="m-0 text-[12.5px] text-muted">Nothing outstanding.</p>
+      )}
+      <ol className="m-0 list-none space-y-2 p-0">
+        {top.map((a) => (
+          <li key={a.id} className="text-[12.5px]">
+            <div className="flex items-start gap-2">
+              <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-ink font-mono text-[10.5px] text-white">
+                {a.rank}
+              </span>
+              <div>
+                <Link
+                  to={`/clients/${clientId}/actions`}
+                  className="font-medium text-ink no-underline hover:text-accent"
+                >
+                  {a.title}
+                </Link>
+                <div className="text-[11px] text-muted">
+                  <Pill
+                    tone={a.urgency === 'now' ? 'crit' : a.urgency === 'week' ? 'warn' : 'neutral'}
+                  >
+                    {a.urgency === 'now' ? 'Now' : a.urgency === 'week' ? '7 days' : '30 days'}
+                  </Pill>{' '}
+                  {a.evidence.slice(0, 110)}
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {q.data && (
+        <div className="mt-2 text-[11px] text-muted">
+          Matrix: {q.data.matrix.cell} · composite {q.data.gauge.composite}/10
         </div>
       )}
     </Panel>

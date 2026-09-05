@@ -8,13 +8,10 @@ import { ClientNotFoundError } from '../services/vectorService.js';
 const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const FeedQuery = z.object({
   clock: IsoDate.optional(),
-  clientId: z
-    .string()
-    .regex(/^CL-\d{4}$/)
-    .optional(),
+  clientId: z.string().min(1).max(64).optional(),
 });
 const ClockQuery = z.object({ clock: IsoDate.optional() });
-const Params = z.object({ clientId: z.string().regex(/^CL-\d{4}$/) });
+const Params = z.object({ clientId: z.string().min(1).max(64) });
 
 export const signalRoutes =
   (service: SignalService): FastifyPluginCallback =>
@@ -50,7 +47,7 @@ export const signalRoutes =
       const q = ClockQuery.safeParse(req.query);
       const body = ImpactRequest.safeParse(req.body ?? {});
       if (!p.success || !q.success) {
-        return reply.badRequest('clientId must look like CL-0001; clock must be YYYY-MM-DD');
+        return reply.badRequest('clientId is required; clock must be YYYY-MM-DD');
       }
       if (!body.success) {
         return reply.badRequest(
@@ -76,7 +73,7 @@ export const signalRoutes =
     app.get('/clients/:clientId/impact/runs', async (req, reply) => {
       const p = Params.safeParse(req.params);
       if (!p.success) {
-        return reply.badRequest('clientId must look like CL-0001');
+        return reply.badRequest('clientId is required');
       }
       return service.savedRuns(p.data.clientId);
     });

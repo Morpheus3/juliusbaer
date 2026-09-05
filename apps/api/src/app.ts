@@ -6,6 +6,7 @@ import { ClaudeGateway } from './llm/gateway.js';
 import dbPlugin from './plugins/db.js';
 import { ClientDetailRepository } from './repositories/clientDetailRepository.js';
 import { ClientRepository } from './repositories/clientRepository.js';
+import { DecisionRepository } from './repositories/decisionRepository.js';
 import { DataQualityRepository } from './repositories/dataQualityRepository.js';
 import { LoadRunRepository } from './repositories/loadRunRepository.js';
 import { RubricRepository } from './repositories/rubricRepository.js';
@@ -16,6 +17,7 @@ import { clientRoutes } from './routes/clients.js';
 import { dataQualityRoutes } from './routes/dataQuality.js';
 import { healthRoutes } from './routes/health.js';
 import { metaRoutes } from './routes/meta.js';
+import { riskRoutes } from './routes/risk.js';
 import { rubricRoutes } from './routes/rubric.js';
 import { signalRoutes } from './routes/signals.js';
 import { vectorRoutes } from './routes/vectors.js';
@@ -25,6 +27,7 @@ import { DatasetContext } from './services/datasetContext.js';
 import { ClientService } from './services/clientService.js';
 import { DataQualityService } from './services/dataQualityService.js';
 import { HealthService } from './services/healthService.js';
+import { RiskService } from './services/riskService.js';
 import { RubricService } from './services/rubricService.js';
 import { SignalService } from './services/signalService.js';
 import { VectorService } from './services/vectorService.js';
@@ -52,6 +55,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   const detail = new ClientDetailRepository(app.db);
   const signals = new SignalRepository(app.db);
   const rubric = new RubricRepository(app.db);
+  const decisions = new DecisionRepository(app.db);
   const gateway = new ClaudeGateway(
     {
       apiKey: config.ANTHROPIC_API_KEY,
@@ -78,6 +82,15 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     config.ANALYTICS_URL,
     ctx,
   );
+  const riskService = new RiskService(
+    detail,
+    signals,
+    rubric,
+    vectors,
+    decisions,
+    signalService,
+    ctx,
+  );
 
   await app.register(healthRoutes(health));
   await app.register(
@@ -89,6 +102,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(clientDetailRoutes(detailService, ctx));
       await v1.register(signalRoutes(signalService));
       await v1.register(rubricRoutes(rubricService));
+      await v1.register(riskRoutes(riskService));
     },
     { prefix: '/api/v1' },
   );

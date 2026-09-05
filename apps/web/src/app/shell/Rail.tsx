@@ -20,6 +20,7 @@ const CUSTOMER_VIEW: Module[] = [
   { to: '/impact', label: 'Signal impact', hint: 'Stress waterfall' },
   { to: '/rubric', label: 'Risk rubric', hint: 'Capacity · Appetite · Horizon' },
   { to: '/actions', label: 'Risk & actions', hint: 'Matrix and ranked actions' },
+  { to: '/trade-ideas', label: 'Trade ideas', hint: 'Signals × portfolio × rubric' },
   { to: '/vector', label: 'Customer vector', hint: 'Factual record · behavioural features' },
 ];
 

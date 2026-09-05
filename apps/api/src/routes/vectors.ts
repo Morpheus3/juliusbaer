@@ -7,7 +7,7 @@ import {
   type VectorService,
 } from '../services/vectorService.js';
 
-const Params = z.object({ clientId: z.string().regex(/^CL-\d{4}$/) });
+const Params = z.object({ clientId: z.string().min(1).max(64) });
 
 export const vectorRoutes =
   (service: VectorService): FastifyPluginCallback =>
@@ -37,7 +37,7 @@ export const vectorRoutes =
     app.get('/clients/:clientId/vector', async (req, reply) => {
       const params = Params.safeParse(req.params);
       if (!params.success) {
-        return reply.badRequest('clientId must look like CL-0001');
+        return reply.badRequest('clientId is required');
       }
       try {
         return await service.forClient(params.data.clientId);

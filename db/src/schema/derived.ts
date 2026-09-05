@@ -258,3 +258,24 @@ export const auditEvents = derived.table(
     index('audit_kind_idx').on(t.kind),
   ],
 );
+
+/** RM decisions on generated actions and trade ideas. Generation is deterministic; this stores the human overlay. */
+export const actionDecisions = derived.table(
+  'action_decisions',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    /** Deterministic id of the generated item (client + kind + entity). */
+    actionId: text().notNull(),
+    clientId: text().notNull(),
+    entityType: text().notNull(),
+    decision: text().notNull(),
+    note: text(),
+    actor: text().notNull(),
+    snapshot: jsonb().$type<Record<string, unknown>>().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('action_decisions_client_idx').on(t.clientId, t.createdAt),
+    index('action_decisions_action_idx').on(t.actionId),
+  ],
+);

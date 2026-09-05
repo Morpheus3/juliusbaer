@@ -3,7 +3,7 @@ project: jb-rm-workbench
 phase: develop
 artifacts:
   intent_and_spec: docs/BLUEPRINT.html
-  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector, ADR-004 look-through and attribution, ADR-005 signals and impact, ADR-006 rubric and Claude gateway, ADR-007 dataset agnosticism
+  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector, ADR-004 look-through and attribution, ADR-005 signals and impact, ADR-006 rubric and Claude gateway, ADR-007 dataset agnosticism, ADR-008 combined risk and actions
 iterations:
   - id: 0
     name: Foundation
@@ -29,8 +29,11 @@ iterations:
     name: Dataset agnosticism refactor
     status: done
     completed: 2026-09-05
-  - { id: 5, name: Combined risk, actions, trade ideas, status: next }
-  - { id: 6, name: Book cockpit and horizon lanes, status: planned }
+  - id: 5
+    name: Combined risk, actions, trade ideas
+    status: done
+    completed: 2026-09-05
+  - { id: 6, name: Book cockpit and horizon lanes, status: next }
   - { id: 7, name: Workflow and outreach, status: planned }
   - { id: 8, name: Assistant and polish, status: planned }
 decisions:

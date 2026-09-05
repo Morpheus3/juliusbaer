@@ -4,6 +4,8 @@ import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
 import { Client360Page } from '@/features/client360/Client360Page';
 import { ImpactPage } from '@/features/impact/ImpactPage';
+import { RiskActionsPage } from '@/features/risk/RiskActionsPage';
+import { TradeIdeasPage } from '@/features/risk/TradeIdeasPage';
 import { RubricPage } from '@/features/rubric/RubricPage';
 import { SignalsPage } from '@/features/signals/SignalsPage';
 import { CashflowsTab } from '@/features/portfolio/CashflowsTab';
@@ -36,8 +38,14 @@ export function App(): JSX.Element {
         <Route path="/clients/:clientId/rubric" element={<RubricPage />} />
         <Route
           path="/actions"
-          element={<PlaceholderPage title="Combined risk and actions" iteration={5} />}
+          element={<DefaultClientRedirect to={(id) => `/clients/${id}/actions`} />}
         />
+        <Route path="/clients/:clientId/actions" element={<RiskActionsPage />} />
+        <Route
+          path="/trade-ideas"
+          element={<DefaultClientRedirect to={(id) => `/clients/${id}/trade-ideas`} />}
+        />
+        <Route path="/clients/:clientId/trade-ideas" element={<TradeIdeasPage />} />
         <Route path="/clients/:clientId" element={<Client360Page />} />
         <Route path="/clients/:clientId/portfolio" element={<PortfolioPage />}>
           <Route index element={<OverviewTab />} />

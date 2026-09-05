@@ -4,10 +4,7 @@ import { DataQualityCode } from '@jb/contracts';
 import { NoLoadRunError, type DataQualityService } from '../services/dataQualityService.js';
 
 const Query = z.object({
-  clientId: z
-    .string()
-    .regex(/^CL-\d{4}$/)
-    .optional(),
+  clientId: z.string().min(1).max(64).optional(),
   code: DataQualityCode.optional(),
 });
 

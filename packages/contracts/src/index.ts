@@ -8,3 +8,4 @@ export * from './api/clientDetail.js';
 export * from './api/signals.js';
 export * from './api/rubric.js';
 export * from './api/meta.js';
+export * from './api/risk.js';

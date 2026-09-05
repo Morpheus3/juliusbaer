@@ -5,7 +5,7 @@ import type { ClientDetailService } from '../services/clientDetailService.js';
 import type { DatasetContext } from '../services/datasetContext.js';
 import { ClientNotFoundError } from '../services/vectorService.js';
 
-const Params = z.object({ clientId: z.string().regex(/^CL-\d{4}$/) });
+const Params = z.object({ clientId: z.string().min(1).max(64) });
 const SnapshotQuery = z.object({ snapshot: SnapshotDateSchema.optional() });
 const HoldingsQuery = SnapshotQuery.extend({
   portfolio: z
@@ -36,7 +36,7 @@ export const clientDetailRoutes =
       ) => {
         const p = Params.safeParse(req.params);
         if (!p.success) {
-          return reply.badRequest('clientId must look like CL-0001');
+          return reply.badRequest('clientId is required');
         }
         const q = querySchema.safeParse(req.query);
         if (!q.success) {
