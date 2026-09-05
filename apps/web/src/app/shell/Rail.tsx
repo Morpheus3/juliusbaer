@@ -60,7 +60,10 @@ function Group({ title, items }: { title: string; items: Module[] }): JSX.Elemen
 export function Rail(): JSX.Element {
   const meta = useMeta();
   return (
-    <nav aria-label="Modules" className="flex h-full flex-col bg-rail text-rail-ink">
+    <nav
+      aria-label="Modules"
+      className="flex h-full flex-col overflow-y-auto bg-rail text-rail-ink"
+    >
       <div className="flex items-center gap-3 px-5 pb-3 pt-5">
         <div className="grid h-8 w-8 place-items-center rounded-md bg-brass font-serif text-[13px] font-semibold text-rail">
           PB
