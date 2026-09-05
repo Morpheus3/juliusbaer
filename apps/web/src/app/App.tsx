@@ -3,6 +3,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
 import { Client360Page } from '@/features/client360/Client360Page';
+import { ImpactPage } from '@/features/impact/ImpactPage';
+import { SignalsPage } from '@/features/signals/SignalsPage';
 import { CashflowsTab } from '@/features/portfolio/CashflowsTab';
 import { ExposureTab } from '@/features/portfolio/ExposureTab';
 import { HoldingsTab } from '@/features/portfolio/HoldingsTab';
@@ -19,8 +21,12 @@ export function App(): JSX.Element {
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/book" replace />} />
         <Route path="/book" element={<BookPage />} />
-        <Route path="/signals" element={<PlaceholderPage title="Market signals" iteration={3} />} />
-        <Route path="/impact" element={<PlaceholderPage title="Signal impact" iteration={3} />} />
+        <Route path="/signals" element={<SignalsPage />} />
+        <Route
+          path="/impact"
+          element={<Navigate to="/clients/CL-0019/impact?scenario=hormuz-reopens" replace />}
+        />
+        <Route path="/clients/:clientId/impact" element={<ImpactPage />} />
         <Route
           path="/rubric"
           element={<PlaceholderPage title="Customer risk rubric" iteration={4} />}

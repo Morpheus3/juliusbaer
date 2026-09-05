@@ -22,6 +22,13 @@
       "when": 1788598537929,
       "tag": "0002_silly_sauron",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788600059027,
+      "tag": "0003_nifty_namor",
+      "breakpoints": true
     }
   ]
 }

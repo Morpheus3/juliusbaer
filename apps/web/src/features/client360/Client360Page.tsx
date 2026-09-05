@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClientOverviewResponse, type ClientAlert } from '@jb/contracts';
+import { ClientOverviewResponse, SignalsResponse, type ClientAlert } from '@jb/contracts';
 import type { JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ClientPicker } from '@/components/ClientPicker';
@@ -10,6 +10,8 @@ import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
+import { useClock } from '@/state/clock';
+import { SEVERITY_SHORT, SEVERITY_TONE, ageLabel } from '../signals/signalFormat';
 
 const ALERT_KIND_LABEL: Record<ClientAlert['kind'], string> = {
   MARGIN_CALL_PROXIMITY: 'Collateral',
@@ -260,12 +262,7 @@ function Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
         </Panel>
 
         <div className="space-y-4">
-          <Panel title="Live market signals" right="iteration 3">
-            <p className="m-0 text-[12.5px] text-muted">
-              Signals from the event log will appear here filtered to this client's exposures, each
-              with source, confidence and affected holdings.
-            </p>
-          </Panel>
+          <SignalsPanel clientId={d.client.clientId} />
           <Panel title="RM action queue" right="iteration 5">
             <p className="m-0 text-[12.5px] text-muted">
               Ranked actions with suitability checks and approve-and-log arrive with the combined
@@ -321,5 +318,50 @@ function AlertsBanner({
         ))}
       </ul>
     </div>
+  );
+}
+
+function SignalsPanel({ clientId }: { clientId: string }): JSX.Element {
+  const clock = useClock((s) => s.clock);
+  const q = useQuery({
+    queryKey: ['signals', clock, clientId],
+    queryFn: () => getJson(`/api/v1/signals?clock=${clock}&clientId=${clientId}`, SignalsResponse),
+  });
+  const relevant = (q.data?.signals ?? [])
+    .filter((s) => (s.client?.exposedPct ?? 0) > 0)
+    .slice(0, 4);
+  return (
+    <Panel
+      title="Live market signals"
+      right={<Link to={`/signals?client=${clientId}`}>All signals →</Link>}
+    >
+      {q.isPending && <p className="m-0 text-[12.5px] text-muted">Loading…</p>}
+      {q.data && relevant.length === 0 && (
+        <p className="m-0 text-[12.5px] text-muted">
+          No signal before {fmtDate(clock)} reaches this client's holdings.
+        </p>
+      )}
+      <ul className="m-0 list-none space-y-2 p-0">
+        {relevant.map((s) => (
+          <li key={s.id} className="text-[12.5px]">
+            <div className="flex items-start gap-2">
+              <Pill tone={SEVERITY_TONE[s.severity]}>{SEVERITY_SHORT[s.severity]}</Pill>
+              <div>
+                <Link
+                  to={`/clients/${clientId}/impact?signals=${s.id}`}
+                  className="font-medium text-ink no-underline hover:text-accent"
+                >
+                  {s.title}
+                </Link>
+                <div className="text-[11px] text-muted">
+                  {ageLabel(s.ageDays)} · conf {s.confidence.overall}% ·{' '}
+                  {s.client?.exposedPct.toFixed(1)}% of household exposed
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Panel>
   );
 }

@@ -136,3 +136,32 @@ export const issuerGroups = derived.table('issuer_groups', {
   instrumentId: text().primaryKey(),
   exposureName: text().notNull(),
 });
+
+/** Reference: how each event reaches portfolios (match rules) and the factor shock it implies. */
+export const signalRules = derived.table('signal_rules', {
+  eventId: text().primaryKey(),
+  match: jsonb().$type<Record<string, unknown>[]>().notNull(),
+  shock: jsonb().$type<Record<string, unknown>>().notNull(),
+  note: text().notNull(),
+});
+
+export const signalThresholds = derived.table('signal_thresholds', {
+  seriesId: text().primaryKey(),
+  threshold: numeric({ precision: 12, scale: 4, mode: 'number' }).notNull(),
+});
+
+/** Saved impact runs: the request that produced them and the full result, for audit and replay. */
+export const impactRuns = derived.table(
+  'impact_runs',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    clientId: text().notNull(),
+    snapshotDate: text().notNull(),
+    label: text(),
+    request: jsonb().$type<Record<string, unknown>>().notNull(),
+    result: jsonb().$type<Record<string, unknown>>().notNull(),
+    engineVersion: text().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('impact_runs_client_idx').on(t.clientId, t.createdAt)],
+);

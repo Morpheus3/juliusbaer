@@ -28,6 +28,8 @@ ignore = ["ANN401", "S101"]
 [tool.ruff.lint.per-file-ignores]
 # Feature descriptions are prose shown to the RM; keep each on one line.
 "app/features/manifest.py" = ["E501"]
+"app/impact/scenarios.py" = ["E501"]
+"app/impact/engine.py" = ["E501"]
 
 [tool.mypy]
 strict = true

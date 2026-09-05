@@ -3,7 +3,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import type { Db } from '../../client.js';
-import { issuerGroups, lookthroughLegs } from '../../schema/derived.js';
+import {
+  issuerGroups,
+  lookthroughLegs,
+  signalRules,
+  signalThresholds,
+} from '../../schema/derived.js';
 
 const Leg = z.object({
   instrumentId: z.string(),
@@ -58,4 +63,56 @@ export async function loadReference(
     await tx.insert(issuerGroups).values(ref.issuers);
   });
   return { legs: ref.legs.length, issuers: ref.issuers.length };
+}
+
+const SignalRule = z.object({
+  eventId: z.string().regex(/^EV-\d{3}$/),
+  match: z.array(z.record(z.string(), z.union([z.string(), z.boolean()]))).min(1),
+  shock: z.record(z.string(), z.unknown()),
+  note: z.string(),
+});
+const SignalFile = z.object({
+  $comment: z.string().optional(),
+  events: z.array(SignalRule),
+  derived: z.object({
+    $comment: z.string().optional(),
+    thresholds: z.record(z.string(), z.number().positive()),
+  }),
+});
+
+export async function readSignalRules(): Promise<z.infer<typeof SignalFile>> {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const text = await readFile(path.join(here, 'signal_rules.json'), 'utf8');
+  return SignalFile.parse(JSON.parse(text));
+}
+
+/** Replaces the signal reference tables. Every event in the log must have exactly one rule. */
+export async function loadSignalRules(
+  db: Db,
+  eventIds: ReadonlySet<string>,
+): Promise<{ rules: number; thresholds: number }> {
+  const ref = await readSignalRules();
+  const ruleIds = new Set(ref.events.map((e) => e.eventId));
+  for (const id of eventIds) {
+    if (!ruleIds.has(id)) {
+      throw new Error(`signal_rules.json has no rule for ${id}`);
+    }
+  }
+  for (const id of ruleIds) {
+    if (!eventIds.has(id)) {
+      throw new Error(`signal_rules.json rule ${id} does not match any event`);
+    }
+  }
+  await db.transaction(async (tx) => {
+    await tx.delete(signalRules);
+    await tx.delete(signalThresholds);
+    await tx.insert(signalRules).values(ref.events);
+    await tx.insert(signalThresholds).values(
+      Object.entries(ref.derived.thresholds).map(([seriesId, threshold]) => ({
+        seriesId,
+        threshold,
+      })),
+    );
+  });
+  return { rules: ref.events.length, thresholds: Object.keys(ref.derived.thresholds).length };
 }

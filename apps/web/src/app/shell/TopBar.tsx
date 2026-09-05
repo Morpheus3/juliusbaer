@@ -3,6 +3,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { HealthResponse, type HealthResponse as Health } from '@jb/contracts';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtDateTime } from '@/lib/format';
+import { ClockControl } from './ClockControl';
 
 export function useHealth(): UseQueryResult<Health> {
   return useQuery({
@@ -36,9 +37,10 @@ export function TopBar(): JSX.Element {
         <span className="font-mono text-[12px]">RM-SG-014</span>
       </div>
       <div className="ml-auto flex items-center gap-5 text-[12.5px] text-muted">
+        <ClockControl />
         {data && (
           <div>
-            As of <span className="font-medium text-ink">{fmtDate(data.datasetToday)}</span>
+            Data to <span className="font-medium text-ink">{fmtDate(data.datasetToday)}</span>
           </div>
         )}
         <div className="flex items-center gap-2">
