@@ -3,7 +3,16 @@
  * load bookkeeping and the data-quality register; later iterations add vectors,
  * rubric scores, signals, insights, actions and the audit log.
  */
-import { index, integer, jsonb, pgSchema, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  customType,
+  index,
+  integer,
+  jsonb,
+  pgSchema,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 export const derived = pgSchema('derived');
 
@@ -41,3 +50,66 @@ export const dataQualityIssues = derived.table(
     index('dq_issues_code_idx').on(t.code),
   ],
 );
+
+/** pgvector column. Stored as `vector(n)`; read back as a JSON-ish "[...]" string which we parse. */
+const vector = (dims: number) =>
+  customType<{ data: number[]; driverData: string }>({
+    dataType: () => `vector(${dims})`,
+    toDriver: (value) => `[${value.join(',')}]`,
+    fromDriver: (value) => JSON.parse(value) as number[],
+  });
+
+export const NOTE_EMBEDDING_DIMS = 256;
+
+export const vectorRuns = derived.table('vector_runs', {
+  id: uuid().primaryKey().defaultRandom(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  datasetToday: text().notNull(),
+  engineVersion: text().notNull(),
+  /** Ordered feature manifest: name, label, unit, description, rubric dimension, direction. */
+  manifest: jsonb().$type<FeatureManifestEntry[]>().notNull(),
+  clientCount: integer().notNull(),
+});
+
+export interface FeatureManifestEntry {
+  name: string;
+  label: string;
+  unit: string;
+  description: string;
+  rubric: 'capacity' | 'appetite' | 'horizon' | 'context';
+  /** What a higher value means for the rubric dimension. */
+  higherMeans: string;
+  group: string;
+}
+
+export const clientFactual = derived.table('client_factual', {
+  clientId: text().primaryKey(),
+  runId: uuid()
+    .notNull()
+    .references(() => vectorRuns.id, { onDelete: 'cascade' }),
+  facts: jsonb().$type<Record<string, unknown>>().notNull(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+});
+
+export const clientVectors = derived.table('client_vectors', {
+  clientId: text().primaryKey(),
+  runId: uuid()
+    .notNull()
+    .references(() => vectorRuns.id, { onDelete: 'cascade' }),
+  /** Feature name → value (null where not computable, e.g. LTV for a client with no facility). */
+  features: jsonb().$type<Record<string, number | null>>().notNull(),
+  /** Feature name → percentile rank in the book, 0–100. */
+  percentiles: jsonb().$type<Record<string, number | null>>().notNull(),
+  /** Feature name → list of evidence references (table/row ids) used to compute it. */
+  evidence: jsonb().$type<Record<string, unknown>>().notNull(),
+  peers: jsonb().$type<PeerRef[]>().notNull(),
+  noteEmbedding: vector(NOTE_EMBEDDING_DIMS)(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+});
+
+export interface PeerRef {
+  clientId: string;
+  distance: number;
+  /** Features where this peer differs most from the subject, with both values. */
+  differences: { feature: string; subject: number | null; peer: number | null }[];
+}

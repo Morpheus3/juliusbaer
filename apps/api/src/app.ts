@@ -6,12 +6,16 @@ import dbPlugin from './plugins/db.js';
 import { ClientRepository } from './repositories/clientRepository.js';
 import { DataQualityRepository } from './repositories/dataQualityRepository.js';
 import { LoadRunRepository } from './repositories/loadRunRepository.js';
+import { VectorRepository } from './repositories/vectorRepository.js';
 import { clientRoutes } from './routes/clients.js';
 import { dataQualityRoutes } from './routes/dataQuality.js';
 import { healthRoutes } from './routes/health.js';
+import { vectorRoutes } from './routes/vectors.js';
+import { AnalyticsClient } from './services/analyticsClient.js';
 import { ClientService } from './services/clientService.js';
 import { DataQualityService } from './services/dataQualityService.js';
 import { HealthService } from './services/healthService.js';
+import { VectorService } from './services/vectorService.js';
 
 export const API_VERSION = '0.1.0';
 
@@ -31,16 +35,19 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   const loadRuns = new LoadRunRepository(app.db);
   const issues = new DataQualityRepository(app.db);
   const clients = new ClientRepository(app.db);
+  const vectors = new VectorRepository(app.db);
 
   const health = new HealthService(loadRuns, API_VERSION, config.DATASET_TODAY);
   const dataQuality = new DataQualityService(loadRuns, issues);
   const clientService = new ClientService(clients, config.DATASET_TODAY);
+  const vectorService = new VectorService(vectors, new AnalyticsClient(config.ANALYTICS_URL));
 
   await app.register(healthRoutes(health));
   await app.register(
     async (v1) => {
       await v1.register(dataQualityRoutes(dataQuality));
       await v1.register(clientRoutes(clientService));
+      await v1.register(vectorRoutes(vectorService));
     },
     { prefix: '/api/v1' },
   );

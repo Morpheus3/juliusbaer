@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from app import db
+from app.routers import vectors
 from app.settings import settings
 
 app = FastAPI(
@@ -9,6 +10,7 @@ app = FastAPI(
     version=settings.service_version,
     description="Deterministic numeric engines: customer vectors, impact models, validator.",
 )
+app.include_router(vectors.router)
 
 
 class Health(BaseModel):

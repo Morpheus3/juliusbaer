@@ -1,0 +1,2069 @@
+{
+  "id": "f5be04f0-8743-40b1-922f-a3f0fe2ff66a",
+  "prevId": "61dd7c0c-274c-41b2-a25d-65b42218e4ea",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "raw.clients": {
+      "name": "clients",
+      "schema": "raw",
+      "columns": {
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_name": {
+          "name": "client_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "age": {
+          "name": "age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nationality": {
+          "name": "nationality",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country_of_residence": {
+          "name": "country_of_residence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tax_domicile": {
+          "name": "tax_domicile",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "booking_centre": {
+          "name": "booking_centre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rm_id": {
+          "name": "rm_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rm_name": {
+          "name": "rm_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rm_desk": {
+          "name": "rm_desk",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "base_currency": {
+          "name": "base_currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wealth_band": {
+          "name": "wealth_band",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_aum_usd": {
+          "name": "total_aum_usd",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "life_stage": {
+          "name": "life_stage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_of_wealth": {
+          "name": "source_of_wealth",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "risk_profile": {
+          "name": "risk_profile",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "risk_tolerance_score": {
+          "name": "risk_tolerance_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "investment_horizon_years": {
+          "name": "investment_horizon_years",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "liquidity_needs": {
+          "name": "liquidity_needs",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objectives": {
+          "name": "objectives",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_since": {
+          "name": "client_since",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kyc_review_due": {
+          "name": "kyc_review_due",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pep_status": {
+          "name": "pep_status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reporting_language": {
+          "name": "reporting_language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.commitments": {
+      "name": "commitments",
+      "schema": "raw",
+      "columns": {
+        "commitment_id": {
+          "name": "commitment_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "portfolio_id": {
+          "name": "portfolio_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fund_name": {
+          "name": "fund_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "committed": {
+          "name": "committed",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "called_to_date": {
+          "name": "called_to_date",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uncalled": {
+          "name": "uncalled",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expected_call_window": {
+          "name": "expected_call_window",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "commitments_client_id_clients_client_id_fk": {
+          "name": "commitments_client_id_clients_client_id_fk",
+          "tableFrom": "commitments",
+          "tableTo": "clients",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "client_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "commitments_portfolio_id_portfolios_portfolio_id_fk": {
+          "name": "commitments_portfolio_id_portfolios_portfolio_id_fk",
+          "tableFrom": "commitments",
+          "tableTo": "portfolios",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "portfolio_id"
+          ],
+          "columnsTo": [
+            "portfolio_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.credit_facilities": {
+      "name": "credit_facilities",
+      "schema": "raw",
+      "columns": {
+        "facility_id": {
+          "name": "facility_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collateral_portfolio_id": {
+          "name": "collateral_portfolio_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "facility_type": {
+          "name": "facility_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "facility_ccy": {
+          "name": "facility_ccy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "credit_limit": {
+          "name": "credit_limit",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "interest_rate_pct": {
+          "name": "interest_rate_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "margin_call_ltv_pct": {
+          "name": "margin_call_ltv_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "utilisation_pct_current": {
+          "name": "utilisation_pct_current",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "credit_facilities_client_id_clients_client_id_fk": {
+          "name": "credit_facilities_client_id_clients_client_id_fk",
+          "tableFrom": "credit_facilities",
+          "tableTo": "clients",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "client_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "credit_facilities_collateral_portfolio_id_portfolios_portfolio_id_fk": {
+          "name": "credit_facilities_collateral_portfolio_id_portfolios_portfolio_id_fk",
+          "tableFrom": "credit_facilities",
+          "tableTo": "portfolios",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "collateral_portfolio_id"
+          ],
+          "columnsTo": [
+            "portfolio_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.credit_facility_snapshots": {
+      "name": "credit_facility_snapshots",
+      "schema": "raw",
+      "columns": {
+        "facility_id": {
+          "name": "facility_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "drawn": {
+          "name": "drawn",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collateral_market_value": {
+          "name": "collateral_market_value",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lending_value": {
+          "name": "lending_value",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ltv_pct": {
+          "name": "ltv_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "headroom": {
+          "name": "headroom",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "credit_facility_snapshots_facility_id_credit_facilities_facility_id_fk": {
+          "name": "credit_facility_snapshots_facility_id_credit_facilities_facility_id_fk",
+          "tableFrom": "credit_facility_snapshots",
+          "tableTo": "credit_facilities",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "facility_id"
+          ],
+          "columnsTo": [
+            "facility_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "credit_facility_snapshots_snapshot_date_snapshots_snapshot_date_fk": {
+          "name": "credit_facility_snapshots_snapshot_date_snapshots_snapshot_date_fk",
+          "tableFrom": "credit_facility_snapshots",
+          "tableTo": "snapshots",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "snapshot_date"
+          ],
+          "columnsTo": [
+            "snapshot_date"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "credit_facility_snapshots_facility_id_snapshot_date_pk": {
+          "name": "credit_facility_snapshots_facility_id_snapshot_date_pk",
+          "columns": [
+            "facility_id",
+            "snapshot_date"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.event_log": {
+      "name": "event_log",
+      "schema": "raw",
+      "columns": {
+        "event_id": {
+          "name": "event_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "event_date": {
+          "name": "event_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "primary_transmission": {
+          "name": "primary_transmission",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ordinal": {
+          "name": "ordinal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.holdings": {
+      "name": "holdings",
+      "schema": "raw",
+      "columns": {
+        "holding_id": {
+          "name": "holding_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "holdings_holding_id_seq",
+            "schema": "raw",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "portfolio_id": {
+          "name": "portfolio_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instrument_name": {
+          "name": "instrument_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asset_class": {
+          "name": "asset_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sub_asset_class": {
+          "name": "sub_asset_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sector": {
+          "name": "sector",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instrument_ccy": {
+          "name": "instrument_ccy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price_local": {
+          "name": "price_local",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "market_value_local": {
+          "name": "market_value_local",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "portfolio_ccy": {
+          "name": "portfolio_ccy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "market_value_base": {
+          "name": "market_value_base",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "market_value_usd": {
+          "name": "market_value_usd",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight_pct": {
+          "name": "weight_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avg_cost_local": {
+          "name": "avg_cost_local",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cost_basis_base": {
+          "name": "cost_basis_base",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unrealised_pnl_base": {
+          "name": "unrealised_pnl_base",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unrealised_pnl_pct": {
+          "name": "unrealised_pnl_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lending_value_base": {
+          "name": "lending_value_base",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "advance_rate_pct": {
+          "name": "advance_rate_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "liquidity_tier": {
+          "name": "liquidity_tier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valuation_date": {
+          "name": "valuation_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "acquired_date": {
+          "name": "acquired_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "holdings_unique_position": {
+          "name": "holdings_unique_position",
+          "columns": [
+            {
+              "expression": "portfolio_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "snapshot_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "instrument_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "holdings_client_snapshot_idx": {
+          "name": "holdings_client_snapshot_idx",
+          "columns": [
+            {
+              "expression": "client_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "snapshot_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "holdings_instrument_idx": {
+          "name": "holdings_instrument_idx",
+          "columns": [
+            {
+              "expression": "instrument_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "holdings_snapshot_date_snapshots_snapshot_date_fk": {
+          "name": "holdings_snapshot_date_snapshots_snapshot_date_fk",
+          "tableFrom": "holdings",
+          "tableTo": "snapshots",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "snapshot_date"
+          ],
+          "columnsTo": [
+            "snapshot_date"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "holdings_portfolio_id_portfolios_portfolio_id_fk": {
+          "name": "holdings_portfolio_id_portfolios_portfolio_id_fk",
+          "tableFrom": "holdings",
+          "tableTo": "portfolios",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "portfolio_id"
+          ],
+          "columnsTo": [
+            "portfolio_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "holdings_client_id_clients_client_id_fk": {
+          "name": "holdings_client_id_clients_client_id_fk",
+          "tableFrom": "holdings",
+          "tableTo": "clients",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "client_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "holdings_instrument_id_instruments_instrument_id_fk": {
+          "name": "holdings_instrument_id_instruments_instrument_id_fk",
+          "tableFrom": "holdings",
+          "tableTo": "instruments",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "instrument_id"
+          ],
+          "columnsTo": [
+            "instrument_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.instrument_prices": {
+      "name": "instrument_prices",
+      "schema": "raw",
+      "columns": {
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price_local": {
+          "name": "price_local",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "instrument_prices_instrument_id_instruments_instrument_id_fk": {
+          "name": "instrument_prices_instrument_id_instruments_instrument_id_fk",
+          "tableFrom": "instrument_prices",
+          "tableTo": "instruments",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "instrument_id"
+          ],
+          "columnsTo": [
+            "instrument_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "instrument_prices_snapshot_date_snapshots_snapshot_date_fk": {
+          "name": "instrument_prices_snapshot_date_snapshots_snapshot_date_fk",
+          "tableFrom": "instrument_prices",
+          "tableTo": "snapshots",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "snapshot_date"
+          ],
+          "columnsTo": [
+            "snapshot_date"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "instrument_prices_instrument_id_snapshot_date_pk": {
+          "name": "instrument_prices_instrument_id_snapshot_date_pk",
+          "columns": [
+            "instrument_id",
+            "snapshot_date"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.instruments": {
+      "name": "instruments",
+      "schema": "raw",
+      "columns": {
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "instrument_name": {
+          "name": "instrument_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asset_class": {
+          "name": "asset_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sub_asset_class": {
+          "name": "sub_asset_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sector": {
+          "name": "sector",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "liquidity_tier": {
+          "name": "liquidity_tier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "underlying_reference": {
+          "name": "underlying_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sustainability_excluded": {
+          "name": "sustainability_excluded",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "concentration_limit_applies": {
+          "name": "concentration_limit_applies",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.mandates": {
+      "name": "mandates",
+      "schema": "raw",
+      "columns": {
+        "mandate_code": {
+          "name": "mandate_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mandate_name": {
+          "name": "mandate_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asset_class": {
+          "name": "asset_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "min_pct": {
+          "name": "min_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_pct": {
+          "name": "target_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_pct": {
+          "name": "max_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_single_position_pct": {
+          "name": "max_single_position_pct",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mandate_notes": {
+          "name": "mandate_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "mandates_mandate_code_asset_class_pk": {
+          "name": "mandates_mandate_code_asset_class_pk",
+          "columns": [
+            "mandate_code",
+            "asset_class"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.market_context": {
+      "name": "market_context",
+      "schema": "raw",
+      "columns": {
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "series_id": {
+          "name": "series_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "series_name": {
+          "name": "series_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "numeric(20, 6)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_label": {
+          "name": "snapshot_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "market_context_snapshot_date_snapshots_snapshot_date_fk": {
+          "name": "market_context_snapshot_date_snapshots_snapshot_date_fk",
+          "tableFrom": "market_context",
+          "tableTo": "snapshots",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "snapshot_date"
+          ],
+          "columnsTo": [
+            "snapshot_date"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "market_context_series_id_snapshot_date_pk": {
+          "name": "market_context_series_id_snapshot_date_pk",
+          "columns": [
+            "series_id",
+            "snapshot_date"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.planned_cash_needs": {
+      "name": "planned_cash_needs",
+      "schema": "raw",
+      "columns": {
+        "need_id": {
+          "name": "need_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_from": {
+          "name": "due_from",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_to": {
+          "name": "due_to",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recurrence": {
+          "name": "recurrence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "certainty": {
+          "name": "certainty",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "planned_cash_needs_client_id_clients_client_id_fk": {
+          "name": "planned_cash_needs_client_id_clients_client_id_fk",
+          "tableFrom": "planned_cash_needs",
+          "tableTo": "clients",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "client_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.portfolio_aum": {
+      "name": "portfolio_aum",
+      "schema": "raw",
+      "columns": {
+        "portfolio_id": {
+          "name": "portfolio_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aum_base": {
+          "name": "aum_base",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "portfolio_aum_portfolio_id_portfolios_portfolio_id_fk": {
+          "name": "portfolio_aum_portfolio_id_portfolios_portfolio_id_fk",
+          "tableFrom": "portfolio_aum",
+          "tableTo": "portfolios",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "portfolio_id"
+          ],
+          "columnsTo": [
+            "portfolio_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "portfolio_aum_snapshot_date_snapshots_snapshot_date_fk": {
+          "name": "portfolio_aum_snapshot_date_snapshots_snapshot_date_fk",
+          "tableFrom": "portfolio_aum",
+          "tableTo": "snapshots",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "snapshot_date"
+          ],
+          "columnsTo": [
+            "snapshot_date"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "portfolio_aum_portfolio_id_snapshot_date_pk": {
+          "name": "portfolio_aum_portfolio_id_snapshot_date_pk",
+          "columns": [
+            "portfolio_id",
+            "snapshot_date"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.portfolios": {
+      "name": "portfolios",
+      "schema": "raw",
+      "columns": {
+        "portfolio_id": {
+          "name": "portfolio_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "portfolio_name": {
+          "name": "portfolio_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mandate_code": {
+          "name": "mandate_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mandate_name": {
+          "name": "mandate_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "service_model": {
+          "name": "service_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "base_currency": {
+          "name": "base_currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inception_date": {
+          "name": "inception_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "benchmark": {
+          "name": "benchmark",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aum_usd_current": {
+          "name": "aum_usd_current",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "portfolios_client_idx": {
+          "name": "portfolios_client_idx",
+          "columns": [
+            {
+              "expression": "client_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "portfolios_client_id_clients_client_id_fk": {
+          "name": "portfolios_client_id_clients_client_id_fk",
+          "tableFrom": "portfolios",
+          "tableTo": "clients",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "client_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.rm_notes": {
+      "name": "rm_notes",
+      "schema": "raw",
+      "columns": {
+        "note_id": {
+          "name": "note_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note_date": {
+          "name": "note_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rm_id": {
+          "name": "rm_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rm_name": {
+          "name": "rm_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "channel": {
+          "name": "channel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "rm_notes_client_idx": {
+          "name": "rm_notes_client_idx",
+          "columns": [
+            {
+              "expression": "client_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "note_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "rm_notes_client_id_clients_client_id_fk": {
+          "name": "rm_notes_client_id_clients_client_id_fk",
+          "tableFrom": "rm_notes",
+          "tableTo": "clients",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "client_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.snapshots": {
+      "name": "snapshots",
+      "schema": "raw",
+      "columns": {
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "date",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ordinal": {
+          "name": "ordinal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "raw.transactions": {
+      "name": "transactions",
+      "schema": "raw",
+      "columns": {
+        "transaction_id": {
+          "name": "transaction_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "trade_date": {
+          "name": "trade_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "settlement_date": {
+          "name": "settlement_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "portfolio_id": {
+          "name": "portfolio_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transaction_type": {
+          "name": "transaction_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instrument_id": {
+          "name": "instrument_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instrument_name": {
+          "name": "instrument_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_local": {
+          "name": "price_local",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric(20, 4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "narrative": {
+          "name": "narrative",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "transactions_client_date_idx": {
+          "name": "transactions_client_date_idx",
+          "columns": [
+            {
+              "expression": "client_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "trade_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "transactions_portfolio_idx": {
+          "name": "transactions_portfolio_idx",
+          "columns": [
+            {
+              "expression": "portfolio_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "transactions_portfolio_id_portfolios_portfolio_id_fk": {
+          "name": "transactions_portfolio_id_portfolios_portfolio_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "portfolios",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "portfolio_id"
+          ],
+          "columnsTo": [
+            "portfolio_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "transactions_client_id_clients_client_id_fk": {
+          "name": "transactions_client_id_clients_client_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "clients",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "client_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "transactions_instrument_id_instruments_instrument_id_fk": {
+          "name": "transactions_instrument_id_instruments_instrument_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "instruments",
+          "schemaTo": "raw",
+          "columnsFrom": [
+            "instrument_id"
+          ],
+          "columnsTo": [
+            "instrument_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "derived.client_factual": {
+      "name": "client_factual",
+      "schema": "derived",
+      "columns": {
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "run_id": {
+          "name": "run_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "facts": {
+          "name": "facts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "client_factual_run_id_vector_runs_id_fk": {
+          "name": "client_factual_run_id_vector_runs_id_fk",
+          "tableFrom": "client_factual",
+          "tableTo": "vector_runs",
+          "schemaTo": "derived",
+          "columnsFrom": [
+            "run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "derived.client_vectors": {
+      "name": "client_vectors",
+      "schema": "derived",
+      "columns": {
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "run_id": {
+          "name": "run_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "features": {
+          "name": "features",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "percentiles": {
+          "name": "percentiles",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidence": {
+          "name": "evidence",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "peers": {
+          "name": "peers",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note_embedding": {
+          "name": "note_embedding",
+          "type": "vector(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "client_vectors_run_id_vector_runs_id_fk": {
+          "name": "client_vectors_run_id_vector_runs_id_fk",
+          "tableFrom": "client_vectors",
+          "tableTo": "vector_runs",
+          "schemaTo": "derived",
+          "columnsFrom": [
+            "run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "derived.data_quality_issues": {
+      "name": "data_quality_issues",
+      "schema": "derived",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "load_run_id": {
+          "name": "load_run_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_type": {
+          "name": "entity_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "detail": {
+          "name": "detail",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "detected_at": {
+          "name": "detected_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "dq_issues_run_idx": {
+          "name": "dq_issues_run_idx",
+          "columns": [
+            {
+              "expression": "load_run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "dq_issues_client_idx": {
+          "name": "dq_issues_client_idx",
+          "columns": [
+            {
+              "expression": "client_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "dq_issues_code_idx": {
+          "name": "dq_issues_code_idx",
+          "columns": [
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "data_quality_issues_load_run_id_load_runs_id_fk": {
+          "name": "data_quality_issues_load_run_id_load_runs_id_fk",
+          "tableFrom": "data_quality_issues",
+          "tableTo": "load_runs",
+          "schemaTo": "derived",
+          "columnsFrom": [
+            "load_run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "derived.load_runs": {
+      "name": "load_runs",
+      "schema": "derived",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'running'"
+        },
+        "dataset_today": {
+          "name": "dataset_today",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_dir": {
+          "name": "source_dir",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "row_counts": {
+          "name": "row_counts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "issue_count": {
+          "name": "issue_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "error": {
+          "name": "error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "derived.vector_runs": {
+      "name": "vector_runs",
+      "schema": "derived",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "dataset_today": {
+          "name": "dataset_today",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "engine_version": {
+          "name": "engine_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "manifest": {
+          "name": "manifest",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_count": {
+          "name": "client_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {
+    "raw": "raw",
+    "derived": "derived"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

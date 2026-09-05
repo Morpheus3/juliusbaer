@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.6", "mypy>=1.11", "pandas-stubs"]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.6", "mypy>=1.11"]
 
 [tool.ruff]
 line-length = 100
@@ -25,10 +25,24 @@ target-version = "py312"
 select = ["E", "F", "I", "B", "UP", "N", "ANN", "S", "RUF"]
 ignore = ["ANN401", "S101"]
 
+[tool.ruff.lint.per-file-ignores]
+# Feature descriptions are prose shown to the RM; keep each on one line.
+"app/features/manifest.py" = ["E501"]
+
 [tool.mypy]
 strict = true
 python_version = "3.12"
 plugins = ["pydantic.mypy"]
+
+# pandas, numpy-on-pandas and sklearn are treated as untyped: their stubs make every row
+# access a 12-way union and add nothing to the correctness of our own code.
+[[tool.mypy.overrides]]
+module = ["pandas.*", "sklearn.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["app.data.frames", "app.features.*"]
+warn_return_any = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

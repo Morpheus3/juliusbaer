@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
+import { VectorPage } from '@/features/vector/VectorPage';
 import { AppShell } from './shell/AppShell';
 import { PlaceholderPage } from './shell/PlaceholderPage';
 
@@ -25,6 +26,8 @@ export function App(): JSX.Element {
           path="/clients/:clientId"
           element={<PlaceholderPage title="Client 360" iteration={2} />}
         />
+        <Route path="/clients/:clientId/vector" element={<VectorPage />} />
+        <Route path="/vector" element={<Navigate to="/clients/CL-0002/vector" replace />} />
         <Route path="/audit" element={<DataQualityPage />} />
         <Route path="*" element={<PlaceholderPage title="Not found" />} />
       </Route>

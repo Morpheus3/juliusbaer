@@ -26,8 +26,14 @@ npm run db:seed              # loads data/ and builds the data-quality register
 npm run dev                  # API on :4000, web on :5173
 ```
 
-Open <http://localhost:5173>. The analytics service (iteration 1 onwards) runs with
-`docker compose --profile analytics up -d`.
+Then build the customer vectors (needs the analytics service):
+
+```bash
+docker compose --profile analytics up -d --build
+npm run vectors:build
+```
+
+Open <http://localhost:5173>. The customer vector explorer is under Customer view.
 
 ## Repository layout
 
