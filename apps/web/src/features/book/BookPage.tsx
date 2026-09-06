@@ -5,6 +5,9 @@ import { Kpi } from '@/components/Kpi';
 import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
+import { Brief } from '@/features/today/Brief';
+import { CallSheet } from '@/features/today/CallSheet';
+import { chapterFor } from '@/features/today/chapterFor';
 import { useBook } from '@/lib/book';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
 
@@ -24,7 +27,7 @@ const THEME_LABEL: Record<Theme, string> = {
   signal: 'Signal',
 };
 
-/** The Monday-morning screen: who to call first, and why, across the whole book. Wireframe slide 01 shell. */
+/** Today: the morning brief, the call sheet, the lanes and the book by urgency. Wireframe slide 01 shell. */
 export function BookPage(): JSX.Element {
   const q = useBook();
   const [centre, setCentre] = useState('all');
@@ -58,7 +61,7 @@ export function BookPage(): JSX.Element {
     <div className="max-w-[1600px]">
       <PageHeader
         eyebrow="RM view · L1"
-        title="Book cockpit"
+        title="Today"
         right={
           d && (
             <span className="text-[12.5px] text-muted">
@@ -84,6 +87,8 @@ export function BookPage(): JSX.Element {
       )}
       {d && (
         <div className="space-y-4">
+          <Brief book={d} />
+          <CallSheet />
           <div className="grid grid-cols-6 gap-3">
             <Kpi
               label="Book AUM"
@@ -210,7 +215,7 @@ export function BookPage(): JSX.Element {
           </div>
 
           <Panel
-            title="Who to call first"
+            title="The book by urgency"
             right="ranked by urgency score · click a row to filter the lanes"
           >
             <table className="w-full text-[12.5px]">
@@ -345,7 +350,11 @@ function ItemCard({ i, onClient }: { i: HorizonItem; onClient: () => void }): JS
           </Pill>
         </span>
       </div>
-      <Link to={i.link} className="mt-0.5 block text-ink-2 no-underline hover:text-accent">
+      <Link
+        to={`/clients/${i.clientId}#${chapterFor(i.theme)}`}
+        title="Open the client journey at this chapter"
+        className="mt-0.5 block text-ink-2 no-underline hover:text-accent"
+      >
         {i.title}
       </Link>
       <div className="mt-0.5 text-[11px] text-muted">{i.laneReason}</div>

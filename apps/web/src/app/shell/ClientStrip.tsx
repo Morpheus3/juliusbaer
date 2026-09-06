@@ -4,9 +4,10 @@ import type { JSX } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Pill, type Tone } from '@/components/Pill';
 import { useCombinedRisk } from '@/features/risk/riskApi';
+import { useCallPlan } from '@/features/today/callPlanApi';
 import { getJson } from '@/lib/api';
 import { useBook } from '@/lib/book';
-import { fmtUsdCompact } from '@/lib/format';
+import { fmtDate, fmtUsdCompact } from '@/lib/format';
 import { useClockDate } from '@/state/clock';
 import { clientIdFromPath } from '@/state/clientContext';
 
@@ -52,6 +53,8 @@ function StripBody({
     staleTime: 30_000,
   });
   const book = useBook();
+  const plan = useCallPlan();
+  const call = plan.data?.entries.find((e) => e.clientId === clientId) ?? null;
 
   const c = overview.data?.client;
   const k = overview.data?.kpis;
@@ -88,6 +91,16 @@ function StripBody({
             </span>
           )}
           {row?.topItem && <span className="truncate text-rail-ink">{row.topItem}</span>}
+          {call && (
+            <span className="text-rail-muted">
+              ·{' '}
+              {call.status === 'done'
+                ? 'call done today'
+                : call.status === 'deferred'
+                  ? `deferred to ${fmtDate(call.day)}`
+                  : `${call.kind === 'schedule' ? 'schedule' : 'call'} by ${call.dueBy <= clock ? 'today' : fmtDate(call.dueBy)}${call.slot ? ` · ${call.slot.rmStart}–${call.slot.rmEnd}` : ''} · ${call.channel} · ${call.language}`}
+            </span>
+          )}
           {!row && book.isPending && <span className="text-rail-muted">Ranking the book…</span>}
         </div>
       </div>

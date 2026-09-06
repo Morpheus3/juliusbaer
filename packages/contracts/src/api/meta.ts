@@ -16,6 +16,7 @@ export const DatasetMeta = z.object({
     lookthrough: z.boolean(),
     signalRules: z.boolean(),
     scenarios: z.boolean(),
+    callPolicy: z.boolean(),
   }),
 });
 export type DatasetMeta = z.infer<typeof DatasetMeta>;

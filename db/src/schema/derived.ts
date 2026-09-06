@@ -165,6 +165,13 @@ export const scenarios = derived.table('scenarios', {
   probabilityNote: text().notNull(),
 });
 
+/** Call-plan policy from data/reference/call_policy.json: one JSON document, versioned. */
+export const callPolicy = derived.table('call_policy', {
+  id: text().primaryKey(),
+  version: integer().notNull(),
+  policy: jsonb().$type<Record<string, unknown>>().notNull(),
+});
+
 /** Saved impact runs: the request that produced them and the full result, for audit and replay. */
 export const impactRuns = derived.table(
   'impact_runs',

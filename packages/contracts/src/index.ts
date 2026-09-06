@@ -12,3 +12,4 @@ export * from './api/risk.js';
 export * from './api/book.js';
 export * from './api/workflow.js';
 export * from './api/settings.js';
+export * from './api/callPlan.js';

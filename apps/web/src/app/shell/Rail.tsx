@@ -95,7 +95,7 @@ export function Rail(): JSX.Element {
       </div>
 
       <ul className="m-0 mt-2 list-none p-0">
-        <Item e={{ to: '/book', label: 'Today', hint: 'The book · who to call · lanes' }} />
+        <Item e={{ to: '/book', label: 'Today', hint: 'Brief · call sheet · lanes' }} />
         <Item
           e={{
             to: clientBase ?? '/client',

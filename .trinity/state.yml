@@ -3,7 +3,7 @@ project: jb-rm-workbench
 phase: develop
 artifacts:
   intent_and_spec: docs/BLUEPRINT.html
-  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector, ADR-004 look-through and attribution, ADR-005 signals and impact, ADR-006 rubric and Claude gateway, ADR-007 dataset agnosticism, ADR-008 combined risk and actions, ADR-009 book cockpit, ADR-010 workflow and outreach
+  adrs: docs/adr/ # ADR-001 stack, ADR-002 data model, ADR-003 customer vector, ADR-004 look-through and attribution, ADR-005 signals and impact, ADR-006 rubric and Claude gateway, ADR-007 dataset agnosticism, ADR-008 combined risk and actions, ADR-009 book cockpit, ADR-010 workflow and outreach, ADR-011 client journey and call plan
 iterations:
   - id: 0
     name: Foundation
@@ -45,7 +45,26 @@ iterations:
     name: Hardening pass from the 2026-09-05 review
     status: done
     completed: 2026-09-06
-  - { id: 8, name: Assistant and RM experience stitching, status: next }
+  - id: 8
+    name: The RM spine (client context, journey, call plan, Today)
+    status: done
+    completed: 2026-09-06
+    design: docs/rm-experience-design.html
+  - {
+      id: 9,
+      name: The conversation (router and drawer,
+      companion,
+      promise ledger,
+      idea desk),
+      status: next,
+    }
+  - {
+      id: 10,
+      name: The manager and the foundation (team page,
+      gateway and playbooks,
+      shadow mode),
+      status: planned,
+    }
 decisions:
   D1: { where: ~/Desktop/juliusbaer, branch: feat/rm-workbench, status: confirmed }
   D2: { claude_access: recorded mode until ANTHROPIC_API_KEY provided, status: confirmed }

@@ -5,6 +5,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import type { Config } from './config.js';
 import { ClaudeGateway } from './llm/gateway.js';
 import dbPlugin from './plugins/db.js';
+import { CallPlanRepository } from './repositories/callPlanRepository.js';
 import { ClientDetailRepository } from './repositories/clientDetailRepository.js';
 import { ClientRepository } from './repositories/clientRepository.js';
 import { DecisionRepository } from './repositories/decisionRepository.js';
@@ -27,6 +28,7 @@ import { signalRoutes } from './routes/signals.js';
 import { vectorRoutes } from './routes/vectors.js';
 import { workflowRoutes } from './routes/workflow.js';
 import { AnalyticsClient } from './services/analyticsClient.js';
+import { CallPlanService } from './services/callPlanService.js';
 import { ClientDetailService } from './services/clientDetailService.js';
 import { DatasetContext } from './services/datasetContext.js';
 import { ClientService } from './services/clientService.js';
@@ -105,6 +107,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     ctx,
   );
   const bookService = new BookService(clients, detail, signals, rubric, ctx, workflow);
+  const callPlanService = new CallPlanService(bookService, new CallPlanRepository(app.db), ctx);
   const workflowService = new WorkflowService(
     workflow,
     detail,
@@ -131,7 +134,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(signalRoutes(signalService));
       await v1.register(rubricRoutes(rubricService));
       await v1.register(riskRoutes(riskService));
-      await v1.register(bookRoutes(bookService));
+      await v1.register(bookRoutes(bookService, callPlanService));
       await v1.register(workflowRoutes(workflowService));
     },
     { prefix: '/api/v1' },

@@ -39,6 +39,14 @@ const BOARD_METHOD = [
   'A facility is "cured by market" when its LTV was above the trigger at one snapshot and below at the next with the drawn amount unchanged; "cured by action" when the drawn amount fell.',
 ];
 
+export interface PerClientBook {
+  at: string;
+  snapshot: string;
+  prevSnapshot: string | null;
+  dates: string[];
+  rows: { bundle: ClientBundle; inputs: LaneInputs; items: HorizonItem[] }[];
+}
+
 export class BookService {
   constructor(
     private readonly clients: ClientRepository,
@@ -55,31 +63,23 @@ export class BookService {
     return all.filter((b): b is ClientBundle => b !== null);
   }
 
-  async cockpit(clock: string | undefined): Promise<BookResponse> {
+  /**
+   * The per-client computation both the cockpit and the call plan rest on: alerts placed in lanes
+   * at the clock, with momentum against the previous snapshot and dismissed alerts removed.
+   */
+  async perClient(clock: string | undefined): Promise<PerClientBook> {
     const meta = await this.ctx.meta();
     const at = clock && clock < meta.today ? clock : meta.today;
-    const [bundles, inputs, rubrics, dismissed] = await Promise.all([
+    const [bundles, inputs, dismissed] = await Promise.all([
       this.bundles(),
       this.signals.inputs(),
-      this.rubric.latestForAll(),
       this.workflow.dismissedAll(),
     ]);
     const dates = inputs.snapshots;
     const snapshot = snapshotForClock(dates, at);
     const idx = dates.indexOf(snapshot);
     const prevSnapshot = idx > 0 ? (dates[idx - 1] ?? null) : null;
-    const rubricBy = new Map(rubrics.map((r) => [r.clientId, r]));
-
-    const items: HorizonItem[] = [];
-    const clientRows: BookClientRow[] = [];
-    let clientsInBreach = 0;
-    let facilitiesNearTrigger = 0;
-    let kycOverdue = 0;
-    let kycDueSoon = 0;
-    let aum = 0;
-    let aumBase = 0;
-
-    for (const b of bundles) {
+    const rows = bundles.map((b) => {
       const nowInputs = laneInputs(b, inputs, at, snapshot, prevSnapshot);
       nowInputs.alerts = nowInputs.alerts.filter(
         (a) => !dismissed.has(`${b.client.clientId}|${a.id}`),
@@ -94,7 +94,27 @@ export class BookService {
         );
         previous = new Map(prevItems.map((i) => [i.id, i.lane]));
       }
-      const mine = buildItems(nowInputs, previous, '/clients');
+      return { bundle: b, inputs: nowInputs, items: buildItems(nowInputs, previous, '/clients') };
+    });
+    return { at, snapshot, prevSnapshot, dates, rows };
+  }
+
+  async cockpit(clock: string | undefined): Promise<BookResponse> {
+    const [per, rubrics] = await Promise.all([this.perClient(clock), this.rubric.latestForAll()]);
+    const { at, snapshot, prevSnapshot, dates } = per;
+    const bundles = per.rows.map((r) => r.bundle);
+    const rubricBy = new Map(rubrics.map((r) => [r.clientId, r]));
+
+    const items: HorizonItem[] = [];
+    const clientRows: BookClientRow[] = [];
+    let clientsInBreach = 0;
+    let facilitiesNearTrigger = 0;
+    let kycOverdue = 0;
+    let kycDueSoon = 0;
+    let aum = 0;
+    let aumBase = 0;
+
+    for (const { bundle: b, inputs: nowInputs, items: mine } of per.rows) {
       items.push(...mine);
 
       const holdingsNow = b.holdings.filter((h) => h.snapshotDate === snapshot);

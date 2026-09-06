@@ -4,6 +4,7 @@ import {
   clients,
   loadRuns,
   lookthroughLegs,
+  callPolicy,
   scenarios,
   signalRules,
   snapshots,
@@ -39,7 +40,7 @@ export class DatasetContext {
     if (this.cache && Date.now() - this.cache.at < this.ttlMs) {
       return this.cache.meta;
     }
-    const [snaps, rmRows, clientRows, lt, sr, sc, run] = await Promise.all([
+    const [snaps, rmRows, clientRows, lt, sr, sc, cp, run] = await Promise.all([
       this.db.select().from(snapshots).orderBy(asc(snapshots.ordinal)),
       this.db
         .select({
@@ -56,6 +57,7 @@ export class DatasetContext {
       this.db.select({ n: sql<number>`count(*)` }).from(lookthroughLegs),
       this.db.select({ n: sql<number>`count(*)` }).from(signalRules),
       this.db.select({ n: sql<number>`count(*)` }).from(scenarios),
+      this.db.select({ n: sql<number>`count(*)` }).from(callPolicy),
       this.db
         .select({ today: loadRuns.datasetToday })
         .from(loadRuns)
@@ -96,6 +98,7 @@ export class DatasetContext {
         lookthrough: (lt[0]?.n ?? 0) > 0,
         signalRules: (sr[0]?.n ?? 0) > 0,
         scenarios: (sc[0]?.n ?? 0) > 0,
+        callPolicy: (cp[0]?.n ?? 0) > 0,
       },
     };
     this.cache = { at: Date.now(), meta };

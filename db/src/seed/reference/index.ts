@@ -10,6 +10,7 @@ import type { Db } from '../../client.js';
 import {
   issuerGroups,
   lookthroughLegs,
+  callPolicy,
   scenarios,
   signalRules,
   signalSeriesRules,
@@ -151,4 +152,18 @@ export async function loadScenarios(db: Db, referenceDir: string): Promise<numbe
     }
   });
   return ref?.scenarios.length ?? 0;
+}
+
+const CallPolicyFile = z.looseObject({ version: z.number().int().positive() });
+
+/** Loads the call-plan policy document if the dataset ships one. The API falls back to defaults. */
+export async function loadCallPolicy(db: Db, referenceDir: string): Promise<number> {
+  const ref = await readOptional(referenceDir, 'call_policy.json', CallPolicyFile);
+  await db.transaction(async (tx) => {
+    await tx.delete(callPolicy);
+    if (ref) {
+      await tx.insert(callPolicy).values({ id: 'default', version: ref.version, policy: ref });
+    }
+  });
+  return ref ? 1 : 0;
 }

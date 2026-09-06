@@ -6,7 +6,12 @@ import { dataQualityIssues, loadRuns } from '../schema/derived.js';
 import { readDataset } from './dataset.js';
 import { loadRaw } from './load.js';
 import { runQualityChecks } from './quality/index.js';
-import { loadReference, loadScenarios, loadSignalRules } from './reference/index.js';
+import {
+  loadCallPolicy,
+  loadReference,
+  loadScenarios,
+  loadSignalRules,
+} from './reference/index.js';
 
 export interface SeedOptions {
   sourceDir?: string | undefined;
@@ -50,6 +55,7 @@ export async function seed(db: Db, opts: SeedOptions = {}): Promise<SeedResult> 
       new Set(data.eventLog.map((_e, i) => `EV-${String(i + 1).padStart(3, '0')}`)),
     );
     rowCounts.scenarios = await loadScenarios(db, referenceDir);
+    rowCounts.call_policy = await loadCallPolicy(db, referenceDir);
     rowCounts.signal_rules = sig.rules;
     rowCounts.signal_series_rules = sig.series;
     const findings = runQualityChecks(data, today);

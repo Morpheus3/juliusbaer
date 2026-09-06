@@ -62,11 +62,20 @@ docs/                Blueprint, ADRs, dataset dictionary
 | #   | Scope                                                                            | Status |
 | --- | -------------------------------------------------------------------------------- | ------ |
 | 0   | Foundation: monorepo, Postgres, schema, loader, data-quality register, app shell | done   |
-| 1   | Customer factual data and behavioural vector                                     | next   |
-| 2   | Client 360 and portfolio deep dive                                               |        |
-| 3   | Market signals and impact analysis                                               |        |
-| 4   | Risk rubric (Capacity · Appetite · Horizon) and confidence scoring               |        |
-| 5   | Combined risk, ranked actions, trade ideas                                       |        |
-| 6   | Book cockpit with Now / 7-day / 30-day lanes                                     |        |
-| 7   | Workflow, approvals, outreach, audit                                             |        |
-| 8   | Assistant and polish                                                             |        |
+| 1   | Customer factual data and behavioural vector                                     | done   |
+| 2   | Client 360 and portfolio deep dive                                               | done   |
+| 3   | Market signals and impact analysis                                               | done   |
+| 4   | Risk rubric (Capacity · Appetite · Horizon) and confidence scoring               | done   |
+| 4.5 | Dataset agnosticism refactor                                                     | done   |
+| 5   | Combined risk, ranked actions, trade ideas                                       | done   |
+| 6   | Book cockpit with Now / 7-day / 30-day lanes                                     | done   |
+| 7   | Workflow, approvals, outreach, audit                                             | done   |
+| 7.6 | Hardening pass from the 2026-09-05 review                                        | done   |
+| 8a  | Client context: strip, ⌘K switcher, corridor rail                                | done   |
+| 8b  | Client journey: five chapters as the client's front door                         | done   |
+| 8c  | Call plan: whom to call and when, policy in reference data                       | done   |
+| 8d  | Today: morning brief, call sheet, lanes opening the journey                      | done   |
+| 9   | The conversation: intent router and drawer, companion, promise ledger, idea desk | next   |
+| 10  | The manager and the foundation: team page, gateway and playbooks, shadow mode    |        |
+
+The experience design behind iterations 8 to 10 is `docs/rm-experience-design.html` (the RM Spine).

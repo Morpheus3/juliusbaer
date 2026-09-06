@@ -14,7 +14,7 @@ import {
   type Scenario,
 } from '@jb/contracts';
 import { useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { Pill } from '@/components/Pill';
 import { Client360Body } from '@/features/client360/Client360Body';
 import { DecisionButtons } from '@/features/risk/DecisionButtons';
@@ -57,6 +57,7 @@ export function JourneyPage(): JSX.Element {
   });
   const [active, setActive] = useState<ChapterId>('stand');
   useScrollSpy(setActive, overview.data !== undefined && meta.data !== undefined);
+  useHashChapter(overview.data !== undefined && meta.data !== undefined);
 
   return (
     <div className="grid max-w-[1500px] grid-cols-[168px_minmax(0,1fr)] gap-8">
@@ -80,6 +81,22 @@ export function JourneyPage(): JSX.Element {
       </div>
     </div>
   );
+}
+
+/** Opens the chapter named in the URL hash (lane cards link to `#do`, `#happened`, …) once it exists. */
+function useHashChapter(ready: boolean): void {
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!ready || !hash) {
+      return;
+    }
+    const id = hash.slice(1);
+    if (CHAPTERS.some((c) => c.id === id)) {
+      requestAnimationFrame(() => {
+        document.getElementById(id)?.scrollIntoView({ block: 'start' });
+      });
+    }
+  }, [ready, hash]);
 }
 
 /** Highlights the chapter in view. Attaches once the chapters exist, hence the `ready` flag. */
