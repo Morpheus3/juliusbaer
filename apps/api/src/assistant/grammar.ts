@@ -84,6 +84,49 @@ export function planFromGrammar(text: string, ctx: GrammarContext): Plan {
     });
   }
 
+  /* ---- promises and the idea desk: before navigation, since “show all open promises” is a question */
+  if (
+    /\bpromis|\bowe\b|\bfollow[- ]?ups?\b|\boutstanding (items|commitments)\b|\bdecision debt\b|\bwhat did (i|we) (say (i|we) would|agree to)\b/i.test(
+      t,
+    )
+  ) {
+    return base({
+      intent: named || pronoun(t) || ctx.contextClientId ? 'ask' : 'find',
+      shape: 'promises',
+      scopeClientId: named
+        ? named.clientId
+        : /\b(all|book|across|every|my clients)\b/i.test(t)
+          ? null
+          : cid,
+      calls: [
+        {
+          tool: 'promises',
+          args: named
+            ? { clientId: named.clientId }
+            : /\b(all|book|across|every|my clients)\b/i.test(t) || !cid
+              ? {}
+              : { clientId: cid },
+        },
+      ],
+      rationale: 'promise ledger',
+    });
+  }
+  if (
+    /\b(which|who|what) clients? (fit|suit|should hear about|would benefit)|\bidea desk\b|\bideas? (for|about|on)\b|\bopportunit/i.test(
+      t,
+    ) &&
+    !named
+  ) {
+    const sig = resolveSignal(t, ctx.signals);
+    return base({
+      intent: 'find',
+      shape: 'idea-desk',
+      scopeClientId: null,
+      calls: [{ tool: 'ideas', args: { ...(sig ? { signalId: sig.id } : {}), q: t } }],
+      entities: sig ? { signalId: sig.id, signalTitle: sig.title } : {},
+      rationale: 'idea desk',
+    });
+  }
   /* ---- go */
   if (/^(show|open|go to|take me to|switch to|bring up|navigate to)\b/i.test(t)) {
     if (/switch to/i.test(t) && client) {
@@ -433,7 +476,7 @@ export function planFromGrammar(text: string, ctx: GrammarContext): Plan {
     });
   }
   const sell = instrumentPhrase(t);
-  if (sell && /\blimit|concentrat|clear|breach|exposure\b/i.test(t)) {
+  if (sell) {
     return base({
       shape: 'sell-clears-limit',
       calls: [

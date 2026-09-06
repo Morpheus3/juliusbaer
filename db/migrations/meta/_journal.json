@@ -71,6 +71,13 @@
       "when": 1788669906542,
       "tag": "0009_living_sinister_six",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788690105963,
+      "tag": "0010_skinny_molten_man",
+      "breakpoints": true
     }
   ]
 }

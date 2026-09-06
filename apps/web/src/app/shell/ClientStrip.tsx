@@ -4,6 +4,7 @@ import type { JSX } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Pill, type Tone } from '@/components/Pill';
 import { useCombinedRisk } from '@/features/risk/riskApi';
+import { usePromises } from '@/features/promises/promisesApi';
 import { useCallPlan } from '@/features/today/callPlanApi';
 import { getJson } from '@/lib/api';
 import { useBook } from '@/lib/book';
@@ -54,6 +55,8 @@ function StripBody({
   });
   const book = useBook();
   const plan = useCallPlan();
+  const promises = usePromises(clientId);
+  const openPromises = promises.data?.promises.filter((p) => p.status === 'open').length ?? null;
   const call = plan.data?.entries.find((e) => e.clientId === clientId) ?? null;
 
   const c = overview.data?.client;
@@ -91,6 +94,11 @@ function StripBody({
             </span>
           )}
           {row?.topItem && <span className="truncate text-rail-ink">{row.topItem}</span>}
+          {openPromises !== null && openPromises > 0 && (
+            <span className="text-rail-muted">
+              · {openPromises} open promise{openPromises === 1 ? '' : 's'}
+            </span>
+          )}
           {call && (
             <span className="text-rail-muted">
               ·{' '}

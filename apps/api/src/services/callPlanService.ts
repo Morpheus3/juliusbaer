@@ -18,6 +18,7 @@ import {
 } from '../repositories/callPlanRepository.js';
 import type { BookService } from './bookService.js';
 import type { DatasetContext } from './datasetContext.js';
+import type { PromiseService } from './promiseService.js';
 import { ClientNotFoundError } from './vectorService.js';
 
 export class InvalidDeferralError extends Error {
@@ -33,6 +34,7 @@ export class CallPlanService {
     private readonly book: BookService,
     private readonly repo: CallPlanRepository,
     private readonly ctx: DatasetContext,
+    private readonly promises: PromiseService,
   ) {}
 
   async plan(clock: string | undefined): Promise<CallPlanResponse> {
@@ -42,6 +44,7 @@ export class CallPlanService {
       this.repo.marks(),
     ]);
     const at = per.at;
+    const overdue = await this.promises.overdueByClient(at);
     const interval = per.prevSnapshot ? daysBetween(per.prevSnapshot, per.snapshot) : null;
 
     const entries: CallPlanEntry[] = per.rows.map(({ bundle: b, inputs, items }) => {
@@ -75,6 +78,7 @@ export class CallPlanService {
             }
           : null,
         doneAtClock: done ? done.clock : null,
+        overduePromises: overdue.get(b.client.clientId) ?? 0,
       };
       return buildEntry(input, { clock: at, policy });
     });

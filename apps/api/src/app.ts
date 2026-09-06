@@ -7,6 +7,7 @@ import { ClaudeGateway } from './llm/gateway.js';
 import dbPlugin from './plugins/db.js';
 import { AssistantTools } from './assistant/tools.js';
 import { CallPlanRepository } from './repositories/callPlanRepository.js';
+import { PromiseRepository } from './repositories/promiseRepository.js';
 import { ClientDetailRepository } from './repositories/clientDetailRepository.js';
 import { ClientRepository } from './repositories/clientRepository.js';
 import { DecisionRepository } from './repositories/decisionRepository.js';
@@ -23,6 +24,8 @@ import { healthRoutes } from './routes/health.js';
 import { metaRoutes } from './routes/meta.js';
 import { assistantRoutes } from './routes/assistant.js';
 import { bookRoutes } from './routes/book.js';
+import { companionRoutes } from './routes/companion.js';
+import { promiseRoutes } from './routes/promises.js';
 import { riskRoutes } from './routes/risk.js';
 import { rubricRoutes } from './routes/rubric.js';
 import { settingsRoutes } from './routes/settings.js';
@@ -32,6 +35,9 @@ import { workflowRoutes } from './routes/workflow.js';
 import { AnalyticsClient } from './services/analyticsClient.js';
 import { AssistantService } from './services/assistantService.js';
 import { CallPlanService } from './services/callPlanService.js';
+import { CompanionService } from './services/companionService.js';
+import { IdeasService } from './services/ideasService.js';
+import { PromiseService } from './services/promiseService.js';
 import { ClientDetailService } from './services/clientDetailService.js';
 import { DatasetContext } from './services/datasetContext.js';
 import { ClientService } from './services/clientService.js';
@@ -111,7 +117,9 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   );
   const bookService = new BookService(clients, detail, signals, rubric, ctx, workflow);
   const callPlanRepo = new CallPlanRepository(app.db);
-  const callPlanService = new CallPlanService(bookService, callPlanRepo, ctx);
+  const promiseRepo = new PromiseRepository(app.db);
+  const promiseService = new PromiseService(promiseRepo, detail, clients, ctx);
+  const callPlanService = new CallPlanService(bookService, callPlanRepo, ctx, promiseService);
   const workflowService = new WorkflowService(
     workflow,
     detail,
@@ -126,6 +134,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     config.CHECKER_ID,
   );
 
+  const ideasService = new IdeasService(bookService, rubric, signalService, workflow);
   const assistantService = new AssistantService(
     ctx,
     clients,
@@ -138,6 +147,8 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       riskService,
       rubricService,
       workflowService,
+      promiseService,
+      ideasService,
     ),
     gateway,
     signalService,
@@ -148,6 +159,16 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     callPlanRepo,
   );
 
+  const companionService = new CompanionService(
+    ctx,
+    detail,
+    rubric,
+    promiseRepo,
+    promiseService,
+    callPlanService,
+    workflowService,
+    callPlanRepo,
+  );
   await app.register(healthRoutes(health));
   await app.register(
     async (v1) => {
@@ -163,6 +184,8 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(bookRoutes(bookService, callPlanService));
       await v1.register(workflowRoutes(workflowService));
       await v1.register(assistantRoutes(assistantService));
+      await v1.register(promiseRoutes(promiseService));
+      await v1.register(companionRoutes(companionService, ideasService));
     },
     { prefix: '/api/v1' },
   );

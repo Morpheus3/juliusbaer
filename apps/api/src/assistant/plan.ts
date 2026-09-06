@@ -22,6 +22,8 @@ export const ToolName = z.enum([
   'impact',
   'findClients',
   'compareClients',
+  'promises',
+  'ideas',
 ]);
 export type ToolName = z.infer<typeof ToolName>;
 
@@ -62,6 +64,8 @@ export const Shape = z.enum([
   'kyc',
   'find',
   'compare',
+  'promises',
+  'idea-desk',
   'go',
   'do',
 ]);
@@ -110,4 +114,8 @@ export const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   findClients:
     'Clients matching filters: alertKind, theme, lane, uncontactedDays, signalId, minExposedPct, kycDueWithinDays, cashNeedWithinDays, wealthBand, place (centre or residence), language.',
   compareClients: 'Side-by-side facts for two to four clients. args: clientIds.',
+  promises:
+    'The promise ledger: commitments by the RM or the client with quoted source and due date. args: clientId? (omit for every open promise in the book).',
+  ideas:
+    'The idea desk: which clients an idea or a signal fits, with suitability, plus opportunities (lending, mandate, succession, next generation, deployment). args: q?, signalId?',
 };

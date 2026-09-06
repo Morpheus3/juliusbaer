@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { BoardPage } from '@/features/book/BoardPage';
 import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
+import { IdeasPage } from '@/features/ideas/IdeasPage';
 import { JourneyPage } from '@/features/journey/JourneyPage';
 import { ImpactPage } from '@/features/impact/ImpactPage';
 import { RiskActionsPage } from '@/features/risk/RiskActionsPage';
@@ -28,6 +29,7 @@ export function App(): JSX.Element {
         <Route index element={<Navigate to="/book" replace />} />
         <Route path="/book" element={<BookPage />} />
         <Route path="/board" element={<BoardPage />} />
+        <Route path="/ideas" element={<IdeasPage />} />
         <Route path="/signals" element={<SignalsPage />} />
         <Route
           path="/impact"

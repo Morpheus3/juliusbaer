@@ -1,0 +1,79 @@
+{
+  "$comment": "ILLUSTRATIVE cross-border conduct rules keyed by the client's country of residence. Structured so a compliance team can replace it; nothing here is legal advice. The companion shows these before and during a call.",
+  "version": 1,
+  "byResidence": {
+    "Singapore": {
+      "status": "none",
+      "rules": [
+        { "topic": "Existing holdings and portfolio review", "allowed": true, "detail": "Resident of the booking centre; full advisory scope under the mandate." },
+        { "topic": "New product offers", "allowed": true, "detail": "Permitted within the client's suitability profile." }
+      ],
+      "disclosures": ["Suitability confirmation before any structured product."]
+    },
+    "Hong Kong SAR": {
+      "status": "none",
+      "rules": [
+        { "topic": "Existing holdings and portfolio review", "allowed": true, "detail": "Resident of the booking centre; full advisory scope under the mandate." },
+        { "topic": "New product offers", "allowed": true, "detail": "Permitted within the client's suitability profile." },
+        { "topic": "Complex products", "allowed": true, "detail": "Risk disclosure statement must be acknowledged for derivatives and accumulators." }
+      ],
+      "disclosures": ["Complex-product risk disclosure acknowledged for accumulators and structured notes."]
+    },
+    "Thailand": {
+      "status": "restricted",
+      "rules": [
+        { "topic": "Existing holdings and portfolio review", "allowed": true, "detail": "Servicing existing positions is permitted." },
+        { "topic": "New product offers", "allowed": false, "detail": "Reverse enquiry only: do not initiate offers of new products to a Thai resident; document the client's own request." },
+        { "topic": "Structured products", "allowed": false, "detail": "Not to be marketed; discuss only on documented client request." },
+        { "topic": "Meetings in the country", "allowed": false, "detail": "No solicitation during visits; meetings are for servicing only." }
+      ],
+      "disclosures": ["Record that the conversation was client-initiated for any new product discussed."]
+    },
+    "Malaysia": {
+      "status": "restricted",
+      "rules": [
+        { "topic": "Existing holdings and portfolio review", "allowed": true, "detail": "Servicing existing positions is permitted." },
+        { "topic": "New product offers", "allowed": false, "detail": "Reverse enquiry only; no marketing of foreign securities to a Malaysian resident." },
+        { "topic": "Currency and remittance", "allowed": true, "detail": "Ringgit is non-deliverable offshore; funding conversations stay in offshore currencies." }
+      ],
+      "disclosures": ["Document reverse enquiry for any product discussed."]
+    },
+    "United Arab Emirates": {
+      "status": "restricted",
+      "rules": [
+        { "topic": "Existing holdings and portfolio review", "allowed": true, "detail": "Servicing existing positions is permitted." },
+        { "topic": "New product offers", "allowed": false, "detail": "Marketing to UAE residents needs a licensed local entity; keep to reverse enquiry." },
+        { "topic": "Shariah preferences", "allowed": true, "detail": "Ask and record the client's preference before proposing income instruments." }
+      ],
+      "disclosures": ["Reverse enquiry documented; local licensing confirmed before any offer."]
+    }
+  },
+  "default": {
+    "status": "unknown",
+    "rules": [{ "topic": "New product offers", "allowed": false, "detail": "No rule on file for this residence; treat as reverse enquiry only and confirm with compliance." }],
+    "disclosures": ["Confirm cross-border permissions with compliance before offering products."]
+  },
+  "notPermitted": [
+    "No performance promises or guarantees of any outcome.",
+    "No advice on the client's own business, property projects or tax position; refer to specialists.",
+    "No order is placed through this channel; decisions go to the desk after approval.",
+    "Nothing recorded without the client's knowledge."
+  ],
+  "sensitivityPatterns": [
+    "did not want to discuss",
+    "does not want",
+    "asked that we not",
+    "not to discuss",
+    "not to raise",
+    "do not raise",
+    "reluctan",
+    "not sell",
+    "would rather wait",
+    "grieving",
+    "sensitive",
+    "surprised",
+    "frustrat",
+    "unhappy",
+    "read as a signal"
+  ]
+}

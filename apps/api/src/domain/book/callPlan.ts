@@ -41,6 +41,8 @@ export interface CallPlanClientInput {
   clientSince: string;
   deferral: { until: string; reason: string; at: string; madeAtClock: string } | null;
   doneAtClock: string | null;
+  /** Open promises past their due date at the clock. */
+  overduePromises: number;
 }
 
 /* ------------------------------------------------------------------ dates */
@@ -225,13 +227,18 @@ export function scoreClient(inp: CallPlanClientInput, policy: CallPolicy, clock:
   const lc = lastContact(inp.notes, clock);
   const cadence = policy.cadenceDays[inp.wealthBand] ?? policy.cadenceDays.default ?? 90;
   const overdue = lc ? lc.daysAgo - cadence : daysBetween(inp.clientSince, clock) - cadence;
-  const debt =
+  const contactDebt =
     overdue > 0
       ? Math.min(
           policy.relationshipDebtCap,
           Math.ceil(overdue / 30) * policy.relationshipDebtPer30Days,
         )
       : 0;
+  const promiseDebt = Math.min(
+    policy.promiseOverdueCap,
+    inp.overduePromises * policy.promiseOverdueBonus,
+  );
+  const debt = contactDebt + promiseDebt;
 
   const topLane =
     inp.items.map((i) => i.lane).sort((a, b) => LANE_RANK[b] - LANE_RANK[a])[0] ?? null;
@@ -270,7 +277,7 @@ export function scoreClient(inp: CallPlanClientInput, policy: CallPolicy, clock:
       term: 'relationship',
       points: r1(debt),
       detail: lc
-        ? `last contact ${lc.date} (${lc.daysAgo} days ago) against a ${cadence}-day cadence for ${inp.wealthBand}${overdue > 0 ? `; ${overdue} days overdue` : ''}; promise ledger arrives in iteration 9`
+        ? `last contact ${lc.date} (${lc.daysAgo} days ago) against a ${cadence}-day cadence for ${inp.wealthBand}${overdue > 0 ? `; ${overdue} days overdue` : ''}${inp.overduePromises > 0 ? `; ${inp.overduePromises} promise${inp.overduePromises === 1 ? '' : 's'} past due (+${promiseDebt})` : '; no promise past due'}`
         : `no note on record since onboarding ${inp.clientSince}; ${cadence}-day cadence for ${inp.wealthBand}`,
     },
     {
@@ -443,7 +450,7 @@ export const CALL_PLAN_METHOD = [
   'Harm is the cockpit urgency: lane rank (Now 3, week 2, month 1) × severity (high 3, medium 2, low 1), +1 per new or escalated item, so the sheet and the lanes never disagree on direction.',
   'Clock multiplies each item by 1 + max(0, 1 − days to deadline / 30). Deadlines come from KYC dates, cash-need starts less the policy lead time, projected collateral breach (headroom ÷ fall per snapshot × snapshot interval) and a freshness window for severe signals.',
   'Convergence adds the policy bonus for every distinct theme beyond the first among Now and week items: one conversation, several outcomes.',
-  'Relationship debt adds one point per thirty days the client is overdue against the cadence for their wealth band, capped. Open promises will add to it once the promise ledger exists.',
+  'Relationship debt adds one point per thirty days the client is overdue against the cadence for their wealth band, capped, plus a point per open promise past its due date, capped.',
   'The damper halves an item whose theme appears in a note inside the damper window, unless it escalated since.',
   'Due-by is the earliest deadline; without one the lane decides. The slot is the first three hours where the client’s business day overlaps the RM’s, from the residence-to-timezone table. Channel follows the notes, forced to a call for collateral and unanswered messages and to a meeting for reviews.',
   'Calls are packed by due-by then priority into the daily capacity; overflow moves to the next business day and stays visible. Deferrals and done marks are audit events.',

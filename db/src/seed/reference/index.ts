@@ -11,6 +11,7 @@ import {
   issuerGroups,
   lookthroughLegs,
   callPolicy,
+  referenceDocs,
   scenarios,
   signalRules,
   signalSeriesRules,
@@ -166,4 +167,23 @@ export async function loadCallPolicy(db: Db, referenceDir: string): Promise<numb
     }
   });
   return ref ? 1 : 0;
+}
+
+const ReferenceDocFile = z.looseObject({ version: z.number().int().positive() });
+
+/** Loads one-document reference files (cross-border policy, playbooks) into derived.reference_docs. */
+export async function loadReferenceDocs(db: Db, referenceDir: string): Promise<number> {
+  const files: [string, string][] = [['cross_border_policy.json', 'cross-border-policy']];
+  let n = 0;
+  await db.transaction(async (tx) => {
+    await tx.delete(referenceDocs);
+    for (const [file, id] of files) {
+      const ref = await readOptional(referenceDir, file, ReferenceDocFile);
+      if (ref) {
+        await tx.insert(referenceDocs).values({ id, version: ref.version, doc: ref });
+        n += 1;
+      }
+    }
+  });
+  return n;
 }

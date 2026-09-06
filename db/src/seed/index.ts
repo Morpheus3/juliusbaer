@@ -9,6 +9,7 @@ import { runQualityChecks } from './quality/index.js';
 import {
   loadCallPolicy,
   loadReference,
+  loadReferenceDocs,
   loadScenarios,
   loadSignalRules,
 } from './reference/index.js';
@@ -56,6 +57,7 @@ export async function seed(db: Db, opts: SeedOptions = {}): Promise<SeedResult> 
     );
     rowCounts.scenarios = await loadScenarios(db, referenceDir);
     rowCounts.call_policy = await loadCallPolicy(db, referenceDir);
+    rowCounts.reference_docs = await loadReferenceDocs(db, referenceDir);
     rowCounts.signal_rules = sig.rules;
     rowCounts.signal_series_rules = sig.series;
     const findings = runQualityChecks(data, today);

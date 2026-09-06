@@ -35,7 +35,7 @@ import { ClientNotFoundError } from './vectorService.js';
 const LOOKBACK_DAYS = 90;
 const MAX_SIGNALS_FOR_STRESS = 5;
 
-interface StoredRubric {
+export interface StoredRubric {
   dimensions: {
     dimension: string;
     systemScore: number;
@@ -259,7 +259,7 @@ export class RiskService {
   }
 }
 
-function toScores(stored: StoredRubric): RubricScores {
+export function toScores(stored: StoredRubric): RubricScores {
   const get = (d: string): 1 | 2 | 3 => {
     const x = stored.dimensions.find((v) => v.dimension === d);
     const n = x?.effectiveScore ?? x?.overrideScore ?? x?.systemScore ?? 2;

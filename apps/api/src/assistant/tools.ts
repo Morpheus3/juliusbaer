@@ -13,8 +13,10 @@ import type {
   DatasetMeta,
   ExposureResponse,
   ImpactRequest,
+  IdeasResponse,
   ImpactResponse,
   NotesResponse,
+  PromisesResponse,
   RubricAssessmentResponse,
   Scenario,
   SignalsResponse,
@@ -32,6 +34,8 @@ import type { RiskService } from '../services/riskService.js';
 import type { RubricService } from '../services/rubricService.js';
 import type { SignalService } from '../services/signalService.js';
 import type { WorkflowService } from '../services/workflowService.js';
+import type { IdeasService } from '../services/ideasService.js';
+import type { PromiseService } from '../services/promiseService.js';
 import type { ToolCall, ToolName } from './plan.js';
 
 export interface FoundClient {
@@ -94,7 +98,9 @@ export type ToolResult =
   | { tool: 'scenarios'; data: { scenarios: Scenario[] } }
   | { tool: 'impact'; data: ImpactResponse }
   | { tool: 'findClients'; data: { filters: FindArgs; clients: FoundClient[] } }
-  | { tool: 'compareClients'; data: { rows: CompareRow[] } };
+  | { tool: 'compareClients'; data: { rows: CompareRow[] } }
+  | { tool: 'promises'; data: PromisesResponse }
+  | { tool: 'ideas'; data: IdeasResponse };
 
 export interface Executed {
   call: ToolCall;
@@ -118,6 +124,8 @@ export class AssistantTools {
     private readonly risk: RiskService,
     private readonly rubric: RubricService,
     private readonly workflow: WorkflowService,
+    private readonly promises: PromiseService,
+    private readonly ideas: IdeasService,
   ) {}
 
   async run(call: ToolCall, clock: string): Promise<Executed> {
@@ -248,6 +256,16 @@ export class AssistantTools {
           },
         };
       }
+      case 'promises':
+        return {
+          tool: 'promises',
+          data: cid ? await this.promises.list(cid, clock) : await this.promises.openAll(clock),
+        };
+      case 'ideas':
+        return {
+          tool: 'ideas',
+          data: await this.ideas.search(str(a.q), str(a.signalId), clock),
+        };
       default: {
         const never: never = call.tool;
         throw new Error(`unknown tool ${String(never)}`);
@@ -459,6 +477,12 @@ function summarise(r: ToolResult | null): string {
   }
   if (r.tool === 'compareClients') {
     return `${r.data.rows.length} clients`;
+  }
+  if (r.tool === 'promises') {
+    return `${r.data.promises.length} promises`;
+  }
+  if (r.tool === 'ideas') {
+    return `${r.data.matches.length} matches, ${r.data.blocked.length} blocked, ${r.data.opportunities.length} opportunities`;
   }
   return 'ok';
 }

@@ -49,6 +49,11 @@ export class WorkflowRepository {
     });
   }
 
+  /** Every outreach row in the book, newest first; the idea desk counts uptake from it. */
+  async allOutreach(): Promise<OutreachRow[]> {
+    return this.db.select().from(outreach).orderBy(desc(outreach.createdAt));
+  }
+
   async outreachFor(clientId: string): Promise<OutreachRow[]> {
     return this.db
       .select()

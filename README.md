@@ -76,7 +76,7 @@ docs/                Blueprint, ADRs, dataset dictionary
 | 8c  | Call plan: whom to call and when, policy in reference data                       | done   |
 | 8d  | Today: morning brief, call sheet, lanes opening the journey                      | done   |
 | 9a  | The conversation: assistant drawer on every screen, grammar + Claude planners    | done   |
-| 9b  | Companion (in-call cues), promise ledger, idea desk                              | next   |
-| 10  | The manager and the foundation: team page, gateway and playbooks, shadow mode    |        |
+| 9b  | Companion (in-call cues, guardrails), promise ledger, idea desk                  | done   |
+| 10  | The manager and the foundation: team page, gateway and playbooks, shadow mode    | next   |
 
 The experience design behind iterations 8 to 10 is `docs/rm-experience-design.html` (the RM Spine).

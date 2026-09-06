@@ -74,6 +74,11 @@ describe('planFromGrammar', () => {
     expect(p.shape).toBe('sell-clears-limit');
     expect(p.entities.instrument).toBe('Pacific Rim perpetual');
   });
+  it('treats a companion cue about selling as the what-if, even without the word limit', () => {
+    const p = planFromGrammar('asking about selling the Pacific Rim perpetual', ctx);
+    expect(p.shape).toBe('sell-clears-limit');
+    expect(p.entities.instrument).toBe('Pacific Rim perpetual');
+  });
   it('finds clients by signal reach and by contact gap without a client', () => {
     expect(planFromGrammar('who should hear about the fed hold?', ctx).calls[0]).toMatchObject({
       tool: 'findClients',
@@ -136,6 +141,19 @@ describe('planFromGrammar', () => {
     });
     expect(p.shape).toBe('notes');
     expect(p.entities.keyword).toBe('property');
+  });
+  it('routes promise and idea-desk questions', () => {
+    expect(planFromGrammar('what did I promise Lau?', ctx).shape).toBe('promises');
+    expect(planFromGrammar('what did I promise Lau?', ctx).calls[0]?.args).toMatchObject({
+      clientId: 'CL-0014',
+    });
+    expect(
+      planFromGrammar('show all open promises across the book', { ...ctx, contextClientId: null })
+        .calls[0]?.args,
+    ).toEqual({});
+    const i = planFromGrammar('which clients fit short-duration credit after the fed hold?', ctx);
+    expect(i.shape).toBe('idea-desk');
+    expect(i.calls[0]?.args).toMatchObject({ signalId: 's-fed' });
   });
   it('asks for a client when none can be resolved', () => {
     const p = planFromGrammar('what is the LTV?', { ...ctx, contextClientId: null });

@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { Brief } from '@/features/today/Brief';
+import { PromiseLedger } from '@/features/promises/PromiseLedger';
 import { CallSheet } from '@/features/today/CallSheet';
 import { chapterFor } from '@/features/today/chapterFor';
 import { useBook } from '@/lib/book';
@@ -89,6 +90,7 @@ export function BookPage(): JSX.Element {
         <div className="space-y-4">
           <Brief book={d} />
           <CallSheet />
+          <PromiseLedger clientId={null} compact showClient />
           <div className="grid grid-cols-6 gap-3">
             <Kpi
               label="Book AUM"

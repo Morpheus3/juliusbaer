@@ -52,6 +52,7 @@ const client = (over: Partial<CallPlanClientInput>): CallPlanClientInput => ({
   clientSince: '2019-01-01',
   deferral: null,
   doneAtClock: null,
+  overduePromises: 0,
   ...over,
 });
 
@@ -146,6 +147,28 @@ describe('scoreClient', () => {
     const by = Object.fromEntries(s.terms.map((t) => [t.term, t.points]));
     expect(by.relationship).toBe(2); // 77 days − 30 cadence = 47 overdue → 2
     expect(s.dueBy).toBe('2026-09-02'); // week lane, 5 business days
+  });
+  it('adds promise debt for overdue promises, capped', () => {
+    const s = scoreClient(
+      client({
+        items: [item({ lane: 'week' })],
+        overduePromises: 2,
+        notes: [{ date: '2026-08-20', channel: 'Call', text: 'x' }],
+      }),
+      policy,
+      CLOCK,
+    );
+    expect(s.terms.find((t) => t.term === 'relationship')?.points).toBe(2);
+    const capped = scoreClient(
+      client({
+        items: [item({ lane: 'week' })],
+        overduePromises: 9,
+        notes: [{ date: '2026-08-20', channel: 'Call', text: 'x' }],
+      }),
+      policy,
+      CLOCK,
+    );
+    expect(capped.terms.find((t) => t.term === 'relationship')?.points).toBe(3);
   });
   it('halves a theme discussed this week unless it escalated', () => {
     const notes = [

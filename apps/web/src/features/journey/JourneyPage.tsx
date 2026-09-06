@@ -14,9 +14,11 @@ import {
   type Scenario,
 } from '@jb/contracts';
 import { useEffect, useMemo, useState, type JSX, type ReactNode } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { Pill } from '@/components/Pill';
 import { Client360Body } from '@/features/client360/Client360Body';
+import { CompanionPanel } from '@/features/companion/CompanionPanel';
+import { PromiseLedger } from '@/features/promises/PromiseLedger';
 import { DecisionButtons } from '@/features/risk/DecisionButtons';
 import { useCombinedRisk } from '@/features/risk/riskApi';
 import { SuitabilityBadge } from '@/features/risk/SuitabilityBadge';
@@ -56,12 +58,31 @@ export function JourneyPage(): JSX.Element {
     queryFn: () => getJson(`/api/v1/clients/${clientId}/overview`, ClientOverviewResponse),
   });
   const [active, setActive] = useState<ChapterId>('stand');
+  const [sp, setSp] = useSearchParams();
+  const onCall = sp.get('call') === '1';
+  const setCall = (v: boolean): void => {
+    const next = new URLSearchParams(sp);
+    if (v) {
+      next.set('call', '1');
+    } else {
+      next.delete('call');
+    }
+    setSp(next, { replace: true });
+  };
   useScrollSpy(setActive, overview.data !== undefined && meta.data !== undefined);
   useHashChapter(overview.data !== undefined && meta.data !== undefined);
 
   return (
-    <div className="grid max-w-[1500px] grid-cols-[168px_minmax(0,1fr)] gap-8">
-      <ChapterRail active={active} />
+    <div
+      className={`grid max-w-[1500px] gap-8 ${onCall ? 'grid-cols-[168px_minmax(0,1fr)_420px]' : 'grid-cols-[168px_minmax(0,1fr)]'}`}
+    >
+      <ChapterRail
+        active={active}
+        onCall={onCall}
+        onStartCall={() => {
+          setCall(true);
+        }}
+      />
       <div className="min-w-0 space-y-10">
         {overview.isPending && <p className="text-muted">Reading the client…</p>}
         {overview.isError && (
@@ -79,6 +100,17 @@ export function JourneyPage(): JSX.Element {
           </>
         )}
       </div>
+      {onCall && overview.data && (
+        <div className="sticky top-0 self-start">
+          <CompanionPanel
+            clientId={clientId}
+            clientName={overview.data.client.name}
+            onClose={() => {
+              setCall(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -129,7 +161,15 @@ function useScrollSpy(onChange: (id: ChapterId) => void, ready: boolean): void {
   }, [onChange, ready]);
 }
 
-function ChapterRail({ active }: { active: ChapterId }): JSX.Element {
+function ChapterRail({
+  active,
+  onCall,
+  onStartCall,
+}: {
+  active: ChapterId;
+  onCall: boolean;
+  onStartCall: () => void;
+}): JSX.Element {
   return (
     <nav aria-label="Chapters" className="sticky top-0 self-start pt-1">
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-brass">
@@ -153,7 +193,15 @@ function ChapterRail({ active }: { active: ChapterId }): JSX.Element {
           </li>
         ))}
       </ol>
-      <p className="mt-4 text-[11px] leading-relaxed text-muted">
+      <button
+        type="button"
+        disabled={onCall}
+        onClick={onStartCall}
+        className="mt-3 w-full rounded bg-brass px-2.5 py-1.5 text-[12.5px] font-semibold text-white hover:bg-brass/90 disabled:bg-surface-2 disabled:text-muted"
+      >
+        {onCall ? 'On the call' : 'Start call'}
+      </button>
+      <p className="mt-3 text-[11px] leading-relaxed text-muted">
         Read top to bottom. Every figure links to the room where its rows live.
       </p>
     </nav>
@@ -852,6 +900,9 @@ function Decided({ clientId, clock }: { clientId: string; clock: string }): JSX.
             )}
           </ul>
         </div>
+      </div>
+      <div className="mt-4">
+        <PromiseLedger clientId={clientId} />
       </div>
     </Chapter>
   );

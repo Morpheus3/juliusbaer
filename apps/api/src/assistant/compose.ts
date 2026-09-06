@@ -545,6 +545,89 @@ export function compose(
         followUps: ['who else has KYC due in 45 days?'],
       };
     }
+    case 'promises': {
+      const pr = pick(ex, 'promises');
+      if (!pr) {
+        break;
+      }
+      const open = pr.promises.filter((p) => p.status === 'open');
+      const overdue = open.filter((p) => (p.overdueDays ?? -1) > 0);
+      return {
+        ...base,
+        answer: `${open.length} open promise${open.length === 1 ? '' : 's'}${pr.clientId ? ` for ${who}` : ' across the book'}, ${overdue.length} past due${pr.extractedNow ? `; ${pr.extractedNow} newly extracted from the notes` : ''}.`,
+        cards: [
+          {
+            title: 'Promise ledger',
+            columns: ['Who', 'Promise', 'Due', 'Source', 'Client'],
+            rows: open.slice(0, 12).map((p) => ({
+              cells: [
+                p.party === 'rm' ? 'RM' : 'Client',
+                p.text.slice(0, 90),
+                p.dueDate
+                  ? `${day(p.dueDate)}${(p.overdueDays ?? 0) > 0 ? ` (${p.overdueDays}d late)` : ''}`
+                  : '—',
+                `${p.sourceKind}${p.sourceDate ? ` ${day(p.sourceDate)}` : ''}`,
+                p.clientName,
+              ],
+              link: `/clients/${p.clientId}#decided`,
+            })),
+          },
+        ],
+        followUps: overdue[0] ? [`draft the email for ${overdue[0].clientName.split(' ')[0]}`] : [],
+      };
+    }
+    case 'idea-desk': {
+      const d = pick(ex, 'ideas');
+      if (!d) {
+        break;
+      }
+      return {
+        ...base,
+        answer: `${d.matches.length} client${d.matches.length === 1 ? '' : 's'} fit${d.matches.length === 1 ? 's' : ''}${d.signal ? ` after ${d.signal.title}` : d.query ? ` “${d.query}”` : ''}; ${d.blocked.length} blocked by suitability and shown so you know why not; ${d.opportunities.length} opportunit${d.opportunities.length === 1 ? 'y' : 'ies'} on the side.`,
+        cards: [
+          {
+            title: 'Fits',
+            columns: ['Client', 'Idea', 'Confidence', 'Why'],
+            rows: d.matches.slice(0, 10).map((m) => ({
+              cells: [
+                m.clientName,
+                m.idea.title.slice(0, 90),
+                `${Math.round(m.idea.confidence * 100)}%`,
+                m.why.slice(0, 120),
+              ],
+              link: m.link,
+            })),
+          },
+          ...(d.blocked.length
+            ? [
+                {
+                  title: 'Blocked',
+                  columns: ['Client', 'Idea', 'Why not'],
+                  rows: d.blocked.slice(0, 6).map((m) => ({
+                    cells: [m.clientName, m.idea.title.slice(0, 90), m.why.slice(0, 120)],
+                    link: m.link,
+                  })),
+                },
+              ]
+            : []),
+          ...(d.opportunities.length
+            ? [
+                {
+                  title: 'Opportunities',
+                  columns: ['Client', 'Kind', 'Why'],
+                  rows: d.opportunities.slice(0, 8).map((o) => ({
+                    cells: [o.clientName, o.kind, (o.quote ? `“${o.quote}”` : o.why).slice(0, 120)],
+                    link: o.link,
+                  })),
+                },
+              ]
+            : []),
+        ],
+        followUps: d.matches[0]
+          ? [`draft the email for ${d.matches[0].clientName.split(' ')[0]}`]
+          : [],
+      };
+    }
     case 'find': {
       const f = pick(ex, 'findClients');
       if (!f) {

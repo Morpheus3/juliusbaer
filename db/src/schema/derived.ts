@@ -12,6 +12,7 @@ import {
   pgSchema,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
 
@@ -171,6 +172,41 @@ export const callPolicy = derived.table('call_policy', {
   version: integer().notNull(),
   policy: jsonb().$type<Record<string, unknown>>().notNull(),
 });
+
+/** Reference documents that are one JSON file each (cross-border policy, playbooks), versioned. */
+export const referenceDocs = derived.table('reference_docs', {
+  id: text().primaryKey(),
+  version: integer().notNull(),
+  doc: jsonb().$type<Record<string, unknown>>().notNull(),
+});
+
+/**
+ * The promise ledger: commitments by the RM or the client, extracted from notes or calls or added by
+ * hand, each with its quoted source sentence. Fingerprint keeps extraction idempotent.
+ */
+export const promises = derived.table(
+  'promises',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    clientId: text().notNull(),
+    party: text().notNull(),
+    kind: text().notNull().default('promise'),
+    text: text().notNull(),
+    quote: text().notNull(),
+    sourceKind: text().notNull(),
+    sourceRef: text(),
+    dueDate: text(),
+    status: text().notNull().default('open'),
+    actor: text().notNull(),
+    fingerprint: text().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    resolvedAt: timestamp({ withTimezone: true }),
+  },
+  (t) => [
+    index('promises_client_idx').on(t.clientId, t.status),
+    uniqueIndex('promises_fingerprint_idx').on(t.fingerprint),
+  ],
+);
 
 /** Saved impact runs: the request that produced them and the full result, for audit and replay. */
 export const impactRuns = derived.table(
