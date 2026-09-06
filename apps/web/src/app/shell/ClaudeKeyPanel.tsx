@@ -9,8 +9,10 @@ async function send<T>(
   body: unknown,
   parse: (v: unknown) => T,
 ): Promise<T> {
-  const init: RequestInit = { method, headers: { 'content-type': 'application/json' } };
+  const headers: Record<string, string> = { accept: 'application/json' };
+  const init: RequestInit = { method, headers };
   if (body !== undefined) {
+    headers['content-type'] = 'application/json';
     init.body = JSON.stringify(body);
   }
   const res = await fetch(url, init);

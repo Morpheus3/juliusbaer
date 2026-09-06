@@ -17,8 +17,11 @@ import { fmtDateTime } from '@/lib/format';
 import { useClockDate } from '@/state/clock';
 
 async function post<T>(url: string, body: unknown, parse: (v: unknown) => T): Promise<T> {
-  const init: RequestInit = { method: 'POST', headers: { 'content-type': 'application/json' } };
+  // Only declare a JSON body when there is one: Fastify rejects an empty body with a JSON content-type.
+  const headers: Record<string, string> = { accept: 'application/json' };
+  const init: RequestInit = { method: 'POST', headers };
   if (body !== undefined) {
+    headers['content-type'] = 'application/json';
     init.body = JSON.stringify(body);
   }
   const res = await fetch(url, init);
