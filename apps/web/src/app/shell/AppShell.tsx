@@ -1,6 +1,8 @@
 import { useEffect, useState, type JSX } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useAssistant } from '@/state/assistant';
 import { clientIdFromPath, useClientContext } from '@/state/clientContext';
+import { AssistantDrawer } from './AssistantDrawer';
 import { ClientStrip } from './ClientStrip';
 import { ClientSwitcher } from './ClientSwitcher';
 import { Rail } from './Rail';
@@ -28,6 +30,10 @@ export function AppShell(): JSX.Element {
         e.preventDefault();
         setSwitcher((v) => !v);
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        useAssistant.getState().toggle();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => {
@@ -44,9 +50,12 @@ export function AppShell(): JSX.Element {
       <div className="flex min-w-0 flex-col">
         <TopBar onSwitch={openSwitcher} />
         <ClientStrip onSwitch={openSwitcher} />
-        <main className="min-h-0 flex-1 overflow-y-auto px-8 py-6">
-          <Outlet />
-        </main>
+        <div className="flex min-h-0 flex-1">
+          <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-8 py-6">
+            <Outlet />
+          </main>
+          <AssistantDrawer />
+        </div>
       </div>
       <ClientSwitcher
         open={switcher}

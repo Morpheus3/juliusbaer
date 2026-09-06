@@ -4,6 +4,7 @@ import { HealthResponse, type HealthResponse as Health } from '@jb/contracts';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtDateTime } from '@/lib/format';
 import { useMeta } from '@/lib/meta';
+import { useAssistant } from '@/state/assistant';
 import { ClockControl } from './ClockControl';
 
 export function useHealth(): UseQueryResult<Health> {
@@ -39,6 +40,15 @@ export function TopBar({ onSwitch }: { onSwitch: () => void }): JSX.Element {
         <span className="font-mono text-[12px]">{meta.data?.rm.id ?? ''}</span>
       </div>
       <div className="ml-auto flex items-center gap-5 text-[12.5px] text-muted">
+        <button
+          type="button"
+          onClick={() => {
+            useAssistant.getState().toggle();
+          }}
+          className="rounded bg-ink px-2.5 py-1 text-[12px] font-medium text-white hover:bg-accent"
+        >
+          Ask <span className="ml-1 font-mono text-[11px] text-rail-muted">⌘/</span>
+        </button>
         <button
           type="button"
           onClick={onSwitch}

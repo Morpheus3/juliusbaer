@@ -13,3 +13,4 @@ export * from './api/book.js';
 export * from './api/workflow.js';
 export * from './api/settings.js';
 export * from './api/callPlan.js';
+export * from './api/assistant.js';

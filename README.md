@@ -75,7 +75,8 @@ docs/                Blueprint, ADRs, dataset dictionary
 | 8b  | Client journey: five chapters as the client's front door                         | done   |
 | 8c  | Call plan: whom to call and when, policy in reference data                       | done   |
 | 8d  | Today: morning brief, call sheet, lanes opening the journey                      | done   |
-| 9   | The conversation: intent router and drawer, companion, promise ledger, idea desk | next   |
+| 9a  | The conversation: assistant drawer on every screen, grammar + Claude planners    | done   |
+| 9b  | Companion (in-call cues), promise ledger, idea desk                              | next   |
 | 10  | The manager and the foundation: team page, gateway and playbooks, shadow mode    |        |
 
 The experience design behind iterations 8 to 10 is `docs/rm-experience-design.html` (the RM Spine).

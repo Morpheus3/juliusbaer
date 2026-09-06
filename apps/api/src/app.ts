@@ -5,6 +5,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import type { Config } from './config.js';
 import { ClaudeGateway } from './llm/gateway.js';
 import dbPlugin from './plugins/db.js';
+import { AssistantTools } from './assistant/tools.js';
 import { CallPlanRepository } from './repositories/callPlanRepository.js';
 import { ClientDetailRepository } from './repositories/clientDetailRepository.js';
 import { ClientRepository } from './repositories/clientRepository.js';
@@ -20,6 +21,7 @@ import { clientRoutes } from './routes/clients.js';
 import { dataQualityRoutes } from './routes/dataQuality.js';
 import { healthRoutes } from './routes/health.js';
 import { metaRoutes } from './routes/meta.js';
+import { assistantRoutes } from './routes/assistant.js';
 import { bookRoutes } from './routes/book.js';
 import { riskRoutes } from './routes/risk.js';
 import { rubricRoutes } from './routes/rubric.js';
@@ -28,6 +30,7 @@ import { signalRoutes } from './routes/signals.js';
 import { vectorRoutes } from './routes/vectors.js';
 import { workflowRoutes } from './routes/workflow.js';
 import { AnalyticsClient } from './services/analyticsClient.js';
+import { AssistantService } from './services/assistantService.js';
 import { CallPlanService } from './services/callPlanService.js';
 import { ClientDetailService } from './services/clientDetailService.js';
 import { DatasetContext } from './services/datasetContext.js';
@@ -107,7 +110,8 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     ctx,
   );
   const bookService = new BookService(clients, detail, signals, rubric, ctx, workflow);
-  const callPlanService = new CallPlanService(bookService, new CallPlanRepository(app.db), ctx);
+  const callPlanRepo = new CallPlanRepository(app.db);
+  const callPlanService = new CallPlanService(bookService, callPlanRepo, ctx);
   const workflowService = new WorkflowService(
     workflow,
     detail,
@@ -120,6 +124,28 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     ctx,
     config.RM_LEVEL,
     config.CHECKER_ID,
+  );
+
+  const assistantService = new AssistantService(
+    ctx,
+    clients,
+    new AssistantTools(
+      ctx,
+      bookService,
+      callPlanService,
+      detailService,
+      signalService,
+      riskService,
+      rubricService,
+      workflowService,
+    ),
+    gateway,
+    signalService,
+    riskService,
+    rubricService,
+    workflowService,
+    callPlanService,
+    callPlanRepo,
   );
 
   await app.register(healthRoutes(health));
@@ -136,6 +162,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
       await v1.register(riskRoutes(riskService));
       await v1.register(bookRoutes(bookService, callPlanService));
       await v1.register(workflowRoutes(workflowService));
+      await v1.register(assistantRoutes(assistantService));
     },
     { prefix: '/api/v1' },
   );
