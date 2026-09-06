@@ -6,6 +6,7 @@ import {
   type ExposureResponse,
   type HoldingsResponse,
   type MandateStatusResponse,
+  type NotesResponse,
   type SnapshotDate,
   type TransactionsResponse,
 } from '@jb/contracts';
@@ -170,6 +171,21 @@ export class ClientDetailService {
 
   async change(clientId: string, from: SnapshotDate, to: SnapshotDate): Promise<ChangeResponse> {
     return changeAttribution(await this.bundle(clientId), from, to);
+  }
+
+  /** Notes newest first. The UI quotes them; nothing here paraphrases. */
+  async notes(clientId: string): Promise<NotesResponse> {
+    const b = await this.bundle(clientId);
+    const notes = [...b.notes]
+      .sort((x, y) => (x.noteDate < y.noteDate ? 1 : x.noteDate > y.noteDate ? -1 : 0))
+      .map((n) => ({
+        noteId: n.noteId,
+        date: n.noteDate,
+        channel: n.channel,
+        rmName: n.rmName,
+        text: n.note,
+      }));
+    return { clientId, notes };
   }
 
   async cashflows(clientId: string): Promise<CashflowsResponse> {

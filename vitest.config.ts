@@ -1,8 +1,7 @@
+import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
+/** Root test run: resolve the web app's `@/` alias so its modules load outside Vite. */
 export default defineConfig({
-  test: {
-    include: ['apps/**/*.test.ts', 'db/**/*.test.ts', 'packages/**/*.test.ts'],
-    exclude: ['**/node_modules/**', '**/dist/**'],
-  },
+  resolve: { alias: { '@': path.resolve(import.meta.dirname, 'apps/web/src') } },
 });

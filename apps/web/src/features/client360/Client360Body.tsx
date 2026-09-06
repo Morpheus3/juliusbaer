@@ -1,19 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import {
-  ClientOverviewResponse,
   RubricAssessmentResponse,
   SignalsResponse,
   type ClientAlert,
+  type ClientOverviewResponse,
 } from '@jb/contracts';
 import type { JSX } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CHART, EChart, usdCompact } from '@/components/EChart';
 import { Kpi } from '@/components/Kpi';
-import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
+import { useMeta } from '@/lib/meta';
 import { useClockDate } from '@/state/clock';
 import { useCombinedRisk } from '../risk/riskApi';
 import { SEVERITY_SHORT, SEVERITY_TONE, ageLabel } from '../signals/signalFormat';
@@ -31,43 +31,15 @@ const ALERT_KIND_LABEL: Record<ClientAlert['kind'], string> = {
   UNANSWERED_CONTACT: 'Contact',
 };
 
-/** Client 360 (L1): scan the client in thirty seconds. Wireframe slide 02. */
-export function Client360Page(): JSX.Element {
-  const { clientId = '' } = useParams();
-  const q = useQuery({
-    queryKey: ['overview', clientId],
-    queryFn: () => getJson(`/api/v1/clients/${clientId}/overview`, ClientOverviewResponse),
-  });
+/**
+ * Client 360 body: the thirty-second scan (KPIs, alerts, snapshot, performance, signals, queue,
+ * rubric). Chapter 1 of the client journey. Wireframe slide 02.
+ */
+export function Client360Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
+  const meta = useMeta();
+  const baseline = meta.data?.baseline;
+  const snapshotCount = meta.data?.snapshots.length ?? d.aumSeries.length;
 
-  return (
-    <div className="max-w-[1400px]">
-      <PageHeader eyebrow="Customer view · L1" title={q.data ? q.data.client.name : 'Client 360'}>
-        {q.data && (
-          <div className="mt-1 flex flex-wrap items-center gap-2 text-[12.5px] text-muted">
-            <span className="font-mono">{q.data.client.clientId}</span>
-            <Pill tone="brass">{q.data.client.wealthBand}</Pill>
-            <Pill tone="info">
-              {q.data.client.riskProfile} · {q.data.client.riskToleranceScore}/10
-            </Pill>
-            <span>{q.data.client.lifeStage}</span>
-            <span>· {q.data.client.bookingCentre}</span>
-            <span>· reports in {q.data.client.baseCurrency}</span>
-          </div>
-        )}
-      </PageHeader>
-
-      {q.isPending && <p className="text-muted">Loading…</p>}
-      {q.isError && (
-        <div className="rounded border border-crit/30 bg-crit-soft px-4 py-3 text-crit">
-          {q.error.message}
-        </div>
-      )}
-      {q.data && <Body d={q.data} />}
-    </div>
-  );
-}
-
-function Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
   const high = d.alerts.filter((a) => a.severity === 'high');
   const donut = {
     tooltip: {
@@ -137,7 +109,7 @@ function Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
           sub={`${d.kpis.portfolioCount} portfolios · ${d.kpis.managedCount} managed`}
         />
         <Kpi
-          label="Since 31 Dec 2025"
+          label={baseline ? `Since ${fmtDate(baseline)}` : 'Since baseline'}
           value={`${d.kpis.ytdChangePct > 0 ? '+' : ''}${d.kpis.ytdChangePct.toFixed(1)}%`}
           tone={d.kpis.ytdChangePct < 0 ? 'crit' : 'ok'}
           sub="incl. flows · USD"
@@ -150,7 +122,7 @@ function Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
         <Kpi
           label="Income yield"
           value={`${d.kpis.incomeYieldPct.toFixed(1)}%`}
-          sub="annualised, 2026 receipts"
+          sub="annualised from receipts"
         />
         <Kpi
           label="Last contact"
@@ -233,7 +205,7 @@ function Body({ d }: { d: ClientOverviewResponse }): JSX.Element {
           </table>
         </Panel>
 
-        <Panel title="Performance and cash flow" right="USD · five snapshots">
+        <Panel title="Performance and cash flow" right={`USD · ${snapshotCount} snapshots`}>
           <EChart option={line} height={170} />
           <ul className="m-0 mt-2 list-none space-y-1 p-0 text-[12px]">
             {d.portfolios.map((p) => {

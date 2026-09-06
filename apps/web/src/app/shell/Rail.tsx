@@ -99,8 +99,8 @@ export function Rail(): JSX.Element {
         <Item
           e={{
             to: clientBase ?? '/client',
-            label: 'Client',
-            hint: clientId ? `In context · ${clientId} · ⌘K to switch` : 'Pick from the book',
+            label: 'Client journey',
+            hint: clientId ? `${clientId} in context · ⌘K to switch` : 'Pick from the book',
           }}
         />
       </ul>

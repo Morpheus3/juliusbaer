@@ -330,3 +330,19 @@ export const MandateStatusResponse = z.object({
   ),
 });
 export type MandateStatusResponse = z.infer<typeof MandateStatusResponse>;
+
+/** RM notes for a client, newest first. Text is quoted, never paraphrased, by the UI. */
+export const NoteView = z.object({
+  noteId: z.string(),
+  date: z.string(),
+  channel: z.string(),
+  rmName: z.string(),
+  text: z.string(),
+});
+export type NoteView = z.infer<typeof NoteView>;
+
+export const NotesResponse = z.object({
+  clientId: z.string(),
+  notes: z.array(NoteView),
+});
+export type NotesResponse = z.infer<typeof NotesResponse>;

@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { BoardPage } from '@/features/book/BoardPage';
 import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
-import { Client360Page } from '@/features/client360/Client360Page';
+import { JourneyPage } from '@/features/journey/JourneyPage';
 import { ImpactPage } from '@/features/impact/ImpactPage';
 import { RiskActionsPage } from '@/features/risk/RiskActionsPage';
 import { TradeIdeasPage } from '@/features/risk/TradeIdeasPage';
@@ -49,7 +49,11 @@ export function App(): JSX.Element {
           element={<DefaultClientRedirect to={(id) => `/clients/${id}/trade-ideas`} />}
         />
         <Route path="/clients/:clientId/trade-ideas" element={<TradeIdeasPage />} />
-        <Route path="/clients/:clientId" element={<Client360Page />} />
+        <Route path="/clients/:clientId" element={<JourneyPage />} />
+        <Route
+          path="/clients/:clientId/journey"
+          element={<Navigate to=".." relative="path" replace />}
+        />
         <Route path="/clients/:clientId/portfolio" element={<PortfolioPage />}>
           <Route index element={<OverviewTab />} />
           <Route path="holdings" element={<HoldingsTab />} />

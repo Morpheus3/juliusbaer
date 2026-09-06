@@ -84,6 +84,10 @@ export const clientDetailRoutes =
       }),
     );
     app.get(
+      '/clients/:clientId/notes',
+      handle(z.object({}), (id) => service.notes(id)),
+    );
+    app.get(
       '/clients/:clientId/cashflows',
       handle(z.object({}), (id) => service.cashflows(id)),
     );
