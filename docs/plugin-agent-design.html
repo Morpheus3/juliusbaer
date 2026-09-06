@@ -1,0 +1,1243 @@
+<title>RM Workbench Plugin</title>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface-2: #edf1f6;
+    --ink: #16202e;
+    --ink-2: #3c4858;
+    --muted: #66728a;
+    --line: #d9dfe8;
+    --line-2: #c3ccd9;
+    --accent: #1f4e79;
+    --accent-soft: #e3ecf5;
+    --brass: #8f6f3a;
+    --brass-soft: #f3ebdd;
+    --crit: #b3261e;
+    --crit-soft: #f9e5e3;
+    --warn: #9a6a00;
+    --warn-soft: #fbf0d2;
+    --ok: #1f7a4d;
+    --ok-soft: #dff2e6;
+    --rail: #14213d;
+    --rail-ink: #dfe6f2;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #0f141c;
+      --surface: #161d28;
+      --surface-2: #1d2634;
+      --ink: #e7ebf1;
+      --ink-2: #c4ccd8;
+      --muted: #95a1b4;
+      --line: #273241;
+      --line-2: #344256;
+      --accent: #7fb0e0;
+      --accent-soft: #1b2c40;
+      --brass: #d2b27c;
+      --brass-soft: #2a2418;
+      --crit: #f28b82;
+      --crit-soft: #3a1f1d;
+      --warn: #e6be5a;
+      --warn-soft: #332a14;
+      --ok: #7ccb9a;
+      --ok-soft: #173224;
+      --rail: #0b1220;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0f141c;
+    --surface: #161d28;
+    --surface-2: #1d2634;
+    --ink: #e7ebf1;
+    --ink-2: #c4ccd8;
+    --muted: #95a1b4;
+    --line: #273241;
+    --line-2: #344256;
+    --accent: #7fb0e0;
+    --accent-soft: #1b2c40;
+    --brass: #d2b27c;
+    --brass-soft: #2a2418;
+    --crit: #f28b82;
+    --crit-soft: #3a1f1d;
+    --warn: #e6be5a;
+    --warn-soft: #332a14;
+    --ok: #7ccb9a;
+    --ok-soft: #173224;
+    --rail: #0b1220;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: var(--accent);
+  }
+  .page {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 40px 32px 96px;
+  }
+  @media (max-width: 960px) {
+    .page {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding: 24px 18px 64px;
+    }
+    .toc {
+      position: static !important;
+    }
+  }
+  .toc {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    font-size: 13px;
+  }
+  .toc .brand {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .toc .sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-left: 1px solid var(--line);
+  }
+  .toc li a {
+    display: block;
+    padding: 4px 0 4px 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+  }
+  .toc li a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  main {
+    min-width: 0;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin: 8px 0 14px;
+    text-wrap: balance;
+    max-width: 22ch;
+  }
+  .lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0 0 20px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin: 64px 0 6px;
+    text-wrap: balance;
+  }
+  h2 + p.intro {
+    color: var(--ink-2);
+    margin: 0 0 22px;
+    max-width: 66ch;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 28px 0 8px;
+  }
+  p {
+    max-width: 68ch;
+  }
+  .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: -2px;
+  }
+  .thesis {
+    border-left: 3px solid var(--brass);
+    background: var(--brass-soft);
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+    margin: 20px 0;
+    max-width: 72ch;
+  }
+  .thesis p {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .thesis small {
+    display: block;
+    margin-top: 8px;
+    color: var(--ink-2);
+    font-family: var(--sans);
+    font-size: 13.5px;
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 720px) {
+    .grid2,
+    .grid3 {
+      grid-template-columns: 1fr;
+    }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .card b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card p,
+  .card li {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .card p {
+    margin: 0;
+  }
+  .card ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+  }
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    margin: 14px 0 6px;
+  }
+  th {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tr:last-child td {
+    border-bottom: 0;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .pill.crit {
+    background: var(--crit-soft);
+    color: var(--crit);
+  }
+  .pill.warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+  .pill.ok {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+  .pill.info {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .pill.brass {
+    background: var(--brass-soft);
+    color: var(--brass);
+  }
+  .pill.grey {
+    background: var(--surface-2);
+    color: var(--muted);
+  }
+  .mono {
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  pre {
+    background: var(--rail);
+    color: var(--rail-ink);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font: 12.5px/1.55 var(--mono);
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+  .tree {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font: 12.5px/1.6 var(--mono);
+    color: var(--ink-2);
+    overflow-x: auto;
+  }
+  .tree b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .tree i {
+    color: var(--muted);
+    font-style: normal;
+  }
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .flow > div {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }
+  .flow > div b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--brass);
+    margin-bottom: 2px;
+  }
+  .flow > div strong {
+    display: block;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  @media (max-width: 900px) {
+    .flow {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: 44px 1fr 200px;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .steps li::before {
+    content: attr(data-id);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+    padding-top: 2px;
+  }
+  .steps b {
+    display: block;
+    font-weight: 600;
+  }
+  .steps span {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .steps .out {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  @media (max-width: 720px) {
+    .steps li {
+      grid-template-columns: 44px 1fr;
+    }
+    .steps .out {
+      grid-column: 2;
+    }
+  }
+  .decisions {
+    counter-reset: d;
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+  .decisions li {
+    counter-increment: d;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .decisions li::before {
+    content: 'Q' counter(d);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+    padding-top: 2px;
+  }
+  .decisions b {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .decisions span {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .decisions .rec {
+    display: block;
+    margin-top: 4px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .warnbox {
+    border-left: 3px solid var(--crit);
+    background: var(--crit-soft);
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 16px 0;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+    max-width: 72ch;
+  }
+</style>
+
+<div class="page">
+  <nav class="toc" aria-label="Contents">
+    <div class="brand">RM Workbench Plugin</div>
+    <div class="sub">Agent design · v0.1 · for the 1by0ai marketplace</div>
+    <ol>
+      <li><a href="#thesis">1 · The idea</a></li>
+      <li><a href="#faces">2 · Two faces, one brain</a></li>
+      <li><a href="#shape">3 · Shape of the plugin</a></li>
+      <li><a href="#mcp">4 · The tool server</a></li>
+      <li><a href="#handshake">5 · Proposals, not actions</a></li>
+      <li><a href="#agents">6 · The agents</a></li>
+      <li><a href="#skills">7 · Skills and commands</a></li>
+      <li><a href="#hooks">8 · Hooks and guardrails</a></li>
+      <li><a href="#trace">9 · Traces and evals</a></li>
+      <li><a href="#lessons">10 · Lessons from ai-dlc</a></li>
+      <li><a href="#plan">11 · Build plan</a></li>
+      <li><a href="#questions">12 · Decisions for you</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="eyebrow">Agentic RM Workbench · plugin and agent design</div>
+    <h1>RM Workbench Plugin</h1>
+    <p class="lede">
+      The workbench now has a spine: Today, the journey, the call plan, the rooms. This design gives
+      it a voice that can be installed: a Claude plugin whose agents read the same engines through
+      one tool server, propose the same tasks through one handshake, and log to the same audit
+      trail. The same plugin serves the RM at the terminal today and the drawer in the app in
+      iteration 9, so there is never a second brain.
+    </p>
+
+    <!-- 1 -->
+    <h2 id="thesis"><span class="num">01</span>The idea</h2>
+    <div class="thesis">
+      <p>
+        Every agent in this plugin is a chief of staff with a badge: it may read anything the API
+        exposes, it may propose any task the workbench already offers, and it may execute nothing
+        until a person confirms. The badge is enforced by the tool server, not by the prompt.
+      </p>
+      <small
+        >If a rule only lives in a system prompt, it is a suggestion. Rules here live in the MCP
+        server's handshake, in hooks, and in the API's own permissions.</small
+      >
+    </div>
+    <p>
+      Two things make the platform ready for this. First, everything an agent needs is already an
+      endpoint with a Zod contract, so tools are generated rather than hand-written and never drift
+      from the API. Second, every write already produces an audit event, so an agent's proposals
+      land in the same log as the RM's clicks. The plugin adds no new capability to the platform. It
+      adds a way to ask for what the platform can do in plain language, from anywhere Claude runs.
+    </p>
+
+    <!-- 2 -->
+    <h2 id="faces"><span class="num">02</span>Two faces, one brain</h2>
+    <p class="intro">The plugin has two audiences with different needs and the same core.</p>
+    <div class="grid2">
+      <div class="card">
+        <b>The RM's face</b>
+        <p>
+          Agents that walk the six moments: the brief, the prep, the companion, the follow-through,
+          the idea desk, the manager's Monday. At the terminal they run as slash commands and
+          subagents. In iteration 9 the same agents run behind the drawer, because the drawer's
+          intent router will call the same tool catalog.
+        </p>
+      </div>
+      <div class="card">
+        <b>The builder's face</b>
+        <p>
+          Agents and skills for whoever extends the platform: the repo's conventions (contract →
+          repository → service → route → hook), the engines' formulas, the dataset-agnosticism rule,
+          the review chain, the verification gates. They stop the next iteration from forgetting
+          what the last one learned.
+        </p>
+      </div>
+    </div>
+    <div class="flow">
+      <div>
+        <b>1</b><strong>Language</strong>RM at the terminal or in the drawer: “log the call, he
+        agreed to top up collateral by Friday”.
+      </div>
+      <div>
+        <b>2</b><strong>Agent</strong>A persona with a mandate and a whitelist of tools. Plans tool
+        calls; never invents a number.
+      </div>
+      <div>
+        <b>3</b><strong>Tool server</strong>MCP server generated from the API contracts. Read tools
+        answer; propose tools return a card and a token.
+      </div>
+      <div>
+        <b>4</b><strong>Handshake</strong>Nothing is written until the RM confirms the card; the
+        token is single-use and expires.
+      </div>
+      <div>
+        <b>5</b><strong>Audit</strong>The same POST the screens use, the same audit event, plus the
+        tool trace as L3.
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <h2 id="shape"><span class="num">03</span>Shape of the plugin</h2>
+    <p class="intro">
+      One plugin, <span class="mono">rm-workbench</span>, added to the existing 1by0ai marketplace
+      beside <span class="mono">ai-dlc</span>. The tool server lives in the platform repo so it is
+      versioned with the API it wraps; the plugin pins its version.
+    </p>
+    <div class="tree">
+      <b>claude-plugins/plugins/rm-workbench/</b> ├── .claude-plugin/plugin.json
+      <i>name, version, description, author</i> ├── .mcp.json
+      <i>starts the tool server: node apps/mcp (stdio) against RMW_API_URL</i> ├── agents/
+      <i>personas; tools listed by their real names</i> │ ├── rm-chief-of-staff.md
+      <i>orchestrates the day; delegates to the others</i> │ ├── client-prep.md
+      <i>the five chapters as narrative, sources named</i> │ ├── call-companion.md
+      <i>cue → number, rule, suitability, what the client said</i> │ ├── follow-through-clerk.md
+      <i>call note → promises → task proposals</i> │ ├── idea-desk-analyst.md
+      <i>idea → clients, gated, one draft each</i> │ ├── team-head-analyst.md
+      <i>the five manager panels, by RM</i> │ ├── shadow-grader.md
+      <i>what an agent would have said, graded (iteration 10)</i> │ ├──
+      dataset-agnosticism-reviewer.md <i>builder: no client ids, dates, names in code</i> │ ├──
+      explainability-auditor.md <i>builder: every recommendation carries L2 and L3</i> │ └──
+      rmw-developer.md <i>builder: TDD in the repo's conventions</i> ├── skills/ │ ├──
+      rmw-guardrails/SKILL.md
+      <i>facts from tools only; delimiters; pseudonyms; no send, no trade</i> │ ├──
+      rmw-domain/SKILL.md <i>the engines and their formulas, in one place</i> │ ├──
+      rmw-conventions/SKILL.md
+      <i>how to add an endpoint, a page, a reference file, a migration</i> │ ├──
+      rmw-playbooks/SKILL.md <i>KYC refresh, cash-need check-in, market update, scheduling</i> │ ├──
+      rmw-verify/SKILL.md <i>gates: typecheck, lint, tests, py:check, browser smoke</i> │ └──
+      rmw-demo/SKILL.md <i>the demo around six moments and the Monday</i> ├── commands/
+      <i
+        >/rmw:brief · /rmw:who-to-call · /rmw:prep · /rmw:ask · /rmw:log-call · /rmw:idea ·
+        /rmw:team · /rmw:verify · /rmw:agnostic-check</i
+      >
+      ├── hooks/hooks.json
+      <i>PreToolUse card printing; PostToolUse trace; Stop-time agnosticism grep</i> └──
+      reference/tool-catalog.md <i>tool → endpoint → L3 evidence, generated</i>
+
+      <b>juliusbaer/apps/mcp/</b> <i>the tool server, in the platform repo</i> ├── src/catalog.ts
+      <i>tool definitions generated from @jb/contracts</i> ├── src/handshake.ts
+      <i>proposal cards, tokens, expiry</i> ├── src/pseudonyms.ts
+      <i>name ↔ token map per session</i> └── src/server.ts
+      <i>MCP over stdio; HTTP later for the drawer</i>
+    </div>
+
+    <!-- 4 -->
+    <h2 id="mcp"><span class="num">04</span>The tool server</h2>
+    <p class="intro">
+      One MCP server wraps the API. Tools are generated from the Zod contracts in
+      <span class="mono">@jb/contracts</span>, so a new endpoint becomes a tool by adding one line
+      to the catalog, and the tool's schema is the contract's schema.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Endpoint</th>
+            <th>Kind</th>
+            <th>L3 evidence it carries</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">rmw_meta</td>
+            <td>GET /meta</td>
+            <td>read</td>
+            <td>snapshots, today, RM, reference flags</td>
+          </tr>
+          <tr>
+            <td class="mono">rmw_book</td>
+            <td>GET /book</td>
+            <td>read</td>
+            <td>lanes, urgency, method</td>
+          </tr>
+          <tr>
+            <td class="mono">rmw_call_plan</td>
+            <td>GET /book/call-plan</td>
+            <td>read</td>
+            <td>five terms per client, due-by reasons, policy</td>
+          </tr>
+          <tr>
+            <td class="mono">rmw_client</td>
+            <td>GET /clients/:id/overview · /cashflows · /notes · /change · /exposure</td>
+            <td>read</td>
+            <td>rows behind chapter 1 and 2</td>
+          </tr>
+          <tr>
+            <td class="mono">rmw_signals</td>
+            <td>GET /signals?clientId</td>
+            <td>read</td>
+            <td>events, transmission, confidence parts</td>
+          </tr>
+          <tr>
+            <td class="mono">rmw_impact</td>
+            <td>POST /clients/:id/impact (save=false)</td>
+            <td>read-only computation</td>
+            <td>lines, collateral, liquidity, assumptions</td>
+          </tr>
+          <tr>
+            <td class="mono">rmw_rubric · rmw_risk · rmw_workflow · rmw_audit</td>
+            <td>the corresponding GETs</td>
+            <td>read</td>
+            <td>assessor contributions, matrix, checks, events</td>
+          </tr>
+          <tr>
+            <td class="mono">rmw_find_clients</td>
+            <td>
+              composed over /risk per client until the idea desk endpoint exists (iteration 9d)
+            </td>
+            <td>read</td>
+            <td>rule, suitability gate per client</td>
+          </tr>
+          <tr>
+            <td class="mono">
+              rmw_propose_triage · _decision · _override · _lock · _draft · _defer · _done ·
+              _scenario_save
+            </td>
+            <td>the existing POSTs</td>
+            <td>propose → confirm</td>
+            <td>the exact body that will be posted</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      There is deliberately no <span class="mono">rmw_send</span>. Sending stays a click on the
+      reviewed draft in the workflow, per decision Q2 of the RM Spine. There is also no tool that
+      trades, because the platform has none.
+    </p>
+    <h3>Composite tools are allowed, thin ones are preferred</h3>
+    <p>
+      Agents reason better over a few well-named tools than over twenty endpoints.
+      <span class="mono">rmw_client</span> bundles the reads chapter 1 and 2 need;
+      <span class="mono">rmw_find_clients</span> hides a loop. Each composite still returns the
+      underlying rows so the trace can show them. The catalog file documents which endpoint produced
+      which field.
+    </p>
+
+    <!-- 5 -->
+    <h2 id="handshake"><span class="num">05</span>Proposals, not actions</h2>
+    <p class="intro">The contract that makes language safe, enforced in the server.</p>
+    <pre>
+→ rmw_propose_decision { clientId: "CL-…", actionId: "act-…", decision: "approved" }
+← { proposal: "p_8f3a", expiresInSeconds: 300,
+    card: { title: "Approve action: Discuss collateral", effect: "POST /clients/CL-…/actions/act-…/decide",
+            body: { decision: "approved", entityType: "action" }, requires: "RM-Level 2 and a checker",
+            audit: "ACTION_APPROVED for CL-…" } }
+
+→ rmw_confirm { proposal: "p_8f3a" }        ← only after the person says yes
+← { posted: true, status: 204, auditEventId: "…" }</pre>
+    <ul style="font-size: 14px; color: var(--ink-2)">
+      <li>
+        A proposal is a typed object that already exists as an endpoint. The card states the exact
+        effect. Ambiguity produces two cards, and the RM keeps the one she meant.
+      </li>
+      <li>
+        Tokens are single-use, expire in five minutes, and are bound to the session.
+        <span class="mono">rmw_confirm</span> is the only tool that writes, and Claude Code's own
+        permission prompt guards it as well.
+      </li>
+      <li>
+        The confirmation is recorded in the audit payload as
+        <span class="mono">origin: "language"</span> with the sentence that produced it, so the
+        trail says a task came from words, and which.
+      </li>
+      <li>
+        Maker-checker is untouched: a proposal for a money-moving action still needs the checker in
+        the workflow.
+      </li>
+    </ul>
+
+    <!-- 6 -->
+    <h2 id="agents"><span class="num">06</span>The agents</h2>
+    <p class="intro">
+      Each is a Markdown persona with a mandate, a whitelist of real tool names, prohibitions, and a
+      definition of done. The RM-facing six follow the six moments; the builder-facing three protect
+      the platform's rules.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Moment</th>
+            <th>Mandate</th>
+            <th>Tools</th>
+            <th>Never</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>rm-chief-of-staff</b></td>
+            <td>Wake · Reflect</td>
+            <td>
+              Write the four-sentence brief and the call sheet from the book, the signals and the
+              plan; at day end, what was decided and what slipped. Delegates client depth to
+              client-prep.
+            </td>
+            <td class="mono">rmw_meta, rmw_book, rmw_call_plan, rmw_signals, rmw_audit, Agent</td>
+            <td>state a number not in a tool result</td>
+          </tr>
+          <tr>
+            <td><b>client-prep</b></td>
+            <td>Prepare</td>
+            <td>
+              Narrate the five chapters for one client with every figure sourced, sensitivities
+              quoted from notes with dates, the relevance-picked scenario explained.
+            </td>
+            <td class="mono">
+              rmw_client, rmw_signals, rmw_impact, rmw_rubric, rmw_risk, rmw_workflow
+            </td>
+            <td>paraphrase a note; infer a preference</td>
+          </tr>
+          <tr>
+            <td><b>call-companion</b></td>
+            <td>Converse</td>
+            <td>
+              Answer a cue in one paragraph: the number, the rule, suitability, what the client said
+              before, what may not be said (cross-border policy, iteration 9). Offer a proposal when
+              the cue implies a task.
+            </td>
+            <td class="mono">rmw_client, rmw_impact, rmw_risk, rmw_rubric, rmw_propose_*</td>
+            <td>confirm; advise beyond the data</td>
+          </tr>
+          <tr>
+            <td><b>follow-through-clerk</b></td>
+            <td>Follow through</td>
+            <td>
+              From a call note in words, extract promises with the quoted sentence, propose triage,
+              decisions and drafts as cards, and list what remains for the RM.
+            </td>
+            <td class="mono">
+              rmw_workflow, rmw_risk, rmw_propose_triage, rmw_propose_decision, rmw_propose_draft,
+              rmw_propose_done
+            </td>
+            <td>send; mark done without the RM</td>
+          </tr>
+          <tr>
+            <td><b>idea-desk-analyst</b></td>
+            <td>Grow</td>
+            <td>
+              Turn an idea or signal into the clients it fits, with the rule, the suitability gate
+              and blocked clients shown, and propose one draft per client.
+            </td>
+            <td class="mono">rmw_find_clients, rmw_signals, rmw_risk, rmw_propose_draft</td>
+            <td>broadcast; skip the gate</td>
+          </tr>
+          <tr>
+            <td><b>team-head-analyst</b></td>
+            <td>Manager's Monday</td>
+            <td>
+              Aggregate risk, conduct, coverage, queue and capacity by RM identifier from the same
+              tools; say “needs a feed” where the dataset cannot support a number.
+            </td>
+            <td class="mono">rmw_book, rmw_call_plan, rmw_audit, rmw_rubric, rmw_workflow</td>
+            <td>invent revenue</td>
+          </tr>
+          <tr>
+            <td><b>shadow-grader</b></td>
+            <td>Foundation</td>
+            <td>
+              For a playbook step, draft what an agent would have said, compare with what the RM
+              did, and record agreement. Iteration 10.
+            </td>
+            <td class="mono">rmw_client, rmw_workflow, rmw_audit</td>
+            <td>contact a client</td>
+          </tr>
+          <tr>
+            <td><b>dataset-agnosticism-reviewer</b></td>
+            <td>Builder</td>
+            <td>
+              Scan changed files for client ids, dates, names, event ids, mandate codes and dataset
+              counts in code or copy; point to the reference file or meta field that should carry
+              them.
+            </td>
+            <td class="mono">Read, Grep, Glob, Bash</td>
+            <td>edit code</td>
+          </tr>
+          <tr>
+            <td><b>explainability-auditor</b></td>
+            <td>Builder</td>
+            <td>
+              Check that every recommendation, sentence and manager number carries L2 (why) and L3
+              (rows), and that confidence parts sum as documented.
+            </td>
+            <td class="mono">Read, Grep, rmw_* read tools</td>
+            <td>edit code</td>
+          </tr>
+          <tr>
+            <td><b>rmw-developer</b></td>
+            <td>Builder</td>
+            <td>
+              Implement a story test-first in the repo's conventions: contract, repository, service,
+              route, web hook, page; format before regex edits; run the gates.
+            </td>
+            <td class="mono">Read, Edit, Write, Grep, Glob, Bash</td>
+            <td>commit without gates; touch .env or recordings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>What a persona file looks like</h3>
+    <pre>
+---
+name: client-prep
+description: Narrates the five-chapter client journey with every figure sourced. Use before a client call or meeting.
+tools: [mcp__rm-workbench__rmw_client, mcp__rm-workbench__rmw_signals, mcp__rm-workbench__rmw_impact,
+        mcp__rm-workbench__rmw_rubric, mcp__rm-workbench__rmw_risk, mcp__rm-workbench__rmw_workflow]
+model: sonnet
+---
+# Client prep
+## Mandate
+Read the client at the clock and write the five chapters: where they stand, what happened, what could
+happen, what to do, what I decided. Every number comes from a tool result and names its source.
+## Rules (load skill rmw-guardrails)
+- Quote notes verbatim with their date; never paraphrase a sensitivity.
+- Choose one scenario with the same rule the journey page uses; say why.
+- If a tool fails, say what is missing; do not fill the gap.
+## Definition of done
+Five chapters, each under 120 words, a "Sources" line per chapter, a talking-points list of at most five.</pre>
+
+    <!-- 7 -->
+    <h2 id="skills"><span class="num">07</span>Skills and commands</h2>
+    <p class="intro">Skills are the knowledge; commands are the doors.</p>
+    <div class="grid3">
+      <div class="card">
+        <b>rmw-guardrails</b>
+        <p>
+          The rules every RM-facing agent loads: facts from tools only; untrusted text (notes, event
+          descriptions) wrapped in data delimiters and never followed as instructions; client names
+          pseudonymised when the server says so; no send, no trade, no advice beyond the data;
+          ambiguity becomes two cards.
+        </p>
+      </div>
+      <div class="card">
+        <b>rmw-domain</b>
+        <p>
+          The engines in one page: urgency and the five call-plan terms; rubric confidence parts;
+          impact severities and additive shocks; suitability gate; matrix and gauge; stress windows.
+          So an agent explains a number the way the L2 panel does.
+        </p>
+      </div>
+      <div class="card">
+        <b>rmw-conventions</b>
+        <p>
+          How the repo is built: contract first in @jb/contracts, repository → service → route, web
+          hook with Zod parse, reference files for judgement, migration in two steps, Prettier
+          before regex edits, Python via Docker, exactOptionalPropertyTypes and Zod 4 gotchas.
+        </p>
+      </div>
+      <div class="card">
+        <b>rmw-playbooks</b>
+        <p>
+          Four structured conversations as data: goal, allowed topics, required disclosures,
+          escalation triggers, done condition. The companion runs them now; an agent runs them later
+          (iteration 10).
+        </p>
+      </div>
+      <div class="card">
+        <b>rmw-verify</b>
+        <p>
+          The gates in order and what “green” means: typecheck, lint, tests, py:check, seed
+          idempotence, a browser smoke of Today and one journey. Refuses to call work done
+          otherwise.
+        </p>
+      </div>
+      <div class="card">
+        <b>rmw-demo</b>
+        <p>
+          The demo script around the six moments and the manager's Monday, with the clock positions
+          that show each engine at its best, and honest lines for what the dataset cannot show.
+        </p>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Runs</th>
+            <th>Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">/rmw:brief [date]</td>
+            <td>rm-chief-of-staff</td>
+            <td>four sentences, the call sheet, what changed</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:who-to-call [date]</td>
+            <td>rm-chief-of-staff over rmw_call_plan</td>
+            <td>the sheet with the five terms per row on request</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:prep &lt;client&gt;</td>
+            <td>client-prep</td>
+            <td>five chapters, sources, talking points</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:ask &lt;question&gt;</td>
+            <td>router → the right agent</td>
+            <td>an answer with its tool trace</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:log-call &lt;client&gt; &lt;text&gt;</td>
+            <td>follow-through-clerk</td>
+            <td>promise list and proposal cards awaiting confirm</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:idea &lt;text&gt;</td>
+            <td>idea-desk-analyst</td>
+            <td>client list with why and gate; draft proposals</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:team</td>
+            <td>team-head-analyst</td>
+            <td>the five panels in text</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:verify</td>
+            <td>rmw-verify skill</td>
+            <td>gate results, pass or fail</td>
+          </tr>
+          <tr>
+            <td class="mono">/rmw:agnostic-check</td>
+            <td>dataset-agnosticism-reviewer</td>
+            <td>findings with file and line</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8 -->
+    <h2 id="hooks"><span class="num">08</span>Hooks and guardrails</h2>
+    <div class="grid3">
+      <div class="card">
+        <b>PreToolUse on rmw_confirm</b>
+        <p>
+          Prints the proposal card in full before the permission prompt, so what the RM approves is
+          what will be posted. Blocks if the token is expired or unknown.
+        </p>
+      </div>
+      <div class="card">
+        <b>PostToolUse on rmw_*</b>
+        <p>
+          Appends a JSONL trace line: tool, arguments, row counts, duration, proposal ids. The trace
+          is the L3 of the conversation and is what the drawer will render.
+        </p>
+      </div>
+      <div class="card">
+        <b>Stop, builder mode</b>
+        <p>
+          Runs the agnosticism grep on files changed in the session and the gate summary; the
+          session does not end quietly with a hard-coded client id in the code.
+        </p>
+      </div>
+    </div>
+    <h3>Pseudonymisation</h3>
+    <p>
+      The tool server can replace client names with stable tokens per session before results reach
+      the model and restore them in the rendered answer. In the drawer this is on, because the model
+      call leaves the bank's boundary. At the developer's terminal, where the synthetic dataset is
+      on the same machine, it is a switch. The mechanism is in the server so both faces share it.
+    </p>
+
+    <!-- 9 -->
+    <h2 id="trace"><span class="num">09</span>Traces and evals</h2>
+    <p class="intro">
+      An agent that cannot be measured cannot be trusted with the autonomy ladder.
+    </p>
+    <div class="grid2">
+      <div class="card">
+        <b>Traces</b>
+        <p>
+          Every agent run writes to the platform's
+          <span class="mono">derived.llm_traces</span> through the gateway when it runs behind the
+          API, and to the JSONL trace at the terminal. Both carry prompt version, tool calls and the
+          proposals produced, so the manager's machine panel can count guardrail hits and agreement.
+        </p>
+      </div>
+      <div class="card">
+        <b>Evals</b>
+        <p>
+          A small eval set ships with the plugin: forty RM questions at fixed clock positions with
+          the expected tools and the expected figures (from the engines, not from a person). It runs
+          with the plugin eval tooling and in CI, and it is what says a new prompt version may
+          replace the old.
+        </p>
+      </div>
+      <div class="card">
+        <b>Recorded mode</b>
+        <p>
+          Without an API key the agents cannot run, and the plugin says so plainly. Commands that
+          need no model (who-to-call, verify, agnostic-check) still work because they call the
+          deterministic engines.
+        </p>
+      </div>
+      <div class="card">
+        <b>Model choice</b>
+        <p>
+          Analysis agents on Sonnet 5, routing and cue classification on Haiku 4.5, per decision D3.
+          Adaptive thinking on the analysis agents.
+        </p>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <h2 id="lessons"><span class="num">10</span>Lessons from ai-dlc</h2>
+    <div class="warnbox">
+      The ai-dlc agents could not be spawned in this session: their frontmatter lists tools that do
+      not exist (<span class="mono">read-file, grep-pattern, run-scanner</span>), so they resolved
+      to zero tools. Every agent in this plugin lists real tool names: Claude Code's built-ins
+      (<span class="mono">Read, Grep, Glob, Bash, Edit, Write, Agent</span>) and the MCP tools as
+      they will be registered (<span class="mono">mcp__rm-workbench__rmw_*</span>). The eval set
+      includes a smoke test that each agent starts with at least one tool.
+    </div>
+    <ul style="font-size: 14px; color: var(--ink-2)">
+      <li>
+        Keep the prompt-defence block ai-dlc uses; it is good. Add the data-delimiter rule for notes
+        and event text, which is the injection surface here.
+      </li>
+      <li>
+        Personas stay short. Knowledge goes in skills, which load on demand, so an agent's context
+        is its mandate plus what it needs.
+      </li>
+      <li>Fix the ai-dlc frontmatter in the same pass so the review chain runs again.</li>
+    </ul>
+
+    <!-- 11 -->
+    <h2 id="plan"><span class="num">11</span>Build plan</h2>
+    <p class="intro">
+      Four parts. The tool server comes first because everything rides on it, and because iteration
+      9's drawer needs the same catalog.
+    </p>
+    <ol class="steps">
+      <li data-id="P1">
+        <div>
+          <b>Tool server and read agents</b
+          ><span
+            >apps/mcp with the catalog generated from contracts, read tools, pseudonym switch, stdio
+            transport; plugin skeleton in the marketplace; rmw-guardrails and rmw-domain skills;
+            agents rm-chief-of-staff, client-prep, call-companion; commands brief, who-to-call,
+            prep, ask.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> <span class="mono">/rmw:prep CL-0014</span> narrating Lau with sources at
+          the terminal.
+        </div>
+      </li>
+      <li data-id="P2">
+        <div>
+          <b>Proposals and follow-through</b
+          ><span
+            >Handshake with cards and tokens, rmw_confirm, propose tools for every existing POST
+            except send; follow-through-clerk and idea-desk-analyst; hooks for card printing and
+            traces; log-call and idea commands.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> a sentence becoming three cards and three audit events after three
+          confirms.
+        </div>
+      </li>
+      <li data-id="P3">
+        <div>
+          <b>Builder agents and skills</b
+          ><span
+            >rmw-conventions, rmw-verify, rmw-demo; dataset-agnosticism-reviewer,
+            explainability-auditor, rmw-developer; Stop hook; fix ai-dlc frontmatter; eval set and
+            smoke tests.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> the next iteration built by an agent that knows the rules.
+        </div>
+      </li>
+      <li data-id="P4">
+        <div>
+          <b>Manager, playbooks, shadow mode</b
+          ><span
+            >team-head-analyst over the iteration 10 endpoints; rmw-playbooks as data; shadow-grader
+            writing agreement to traces; HTTP transport so the drawer and the plugin share one
+            server.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> the number that earns autonomy, produced by the plugin.
+        </div>
+      </li>
+    </ol>
+
+    <!-- 12 -->
+    <h2 id="questions"><span class="num">12</span>Decisions for you</h2>
+    <ol class="decisions">
+      <li>
+        <div>
+          <b>Where does the tool server live?</b
+          ><span
+            >In the platform repo (versioned with the API) or in the plugin (installable
+            alone).</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> the platform repo, <span class="mono">apps/mcp</span>,
+            generated from the contracts; the plugin pins a version and points at it.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Pseudonymisation at the terminal</b
+          ><span class="rec"
+            ><strong>Recommended:</strong> off by default for the local synthetic dataset, on by
+            default in the drawer; one switch in the server.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Which proposal tools ship first?</b
+          ><span class="rec"
+            ><strong>Recommended:</strong> triage, decision, draft, defer, done in P2; override and
+            lock in P3 because they change the suitability record.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>One plugin or two?</b><span>RM-facing and builder-facing in one plugin, or split.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> one plugin, two agent groups; the guardrails skill is
+            shared and that is the point.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Repair ai-dlc in the same pass?</b
+          ><span class="rec"
+            ><strong>Recommended:</strong> yes; replace the fictional tool names with real ones so
+            the review chain can run.</span
+          >
+        </div>
+      </li>
+    </ol>
+
+    <footer>
+      Agent and plugin design v0.1 for the agentic RM workbench, 6 Sep 2026. Companion to the RM
+      Spine (docs/rm-experience-design.html). Nothing here has been built; iteration 8 (context,
+      journey, call plan, Today) is committed and is the platform this plugin wraps.
+    </footer>
+  </main>
+</div>
