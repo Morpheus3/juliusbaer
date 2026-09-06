@@ -2,6 +2,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { repoRoot } from '../../env.js';
 import { readDataset } from '../dataset.js';
+import { exclusionBoundMandates } from './checks.js';
 import { runQualityChecks } from './index.js';
 
 /**
@@ -67,5 +68,22 @@ describe('quality checks on the shipped dataset', async () => {
     expect(byCode('LTV_RECOMPUTE')).toHaveLength(0);
     expect(byCode('COMMITMENT_ARITHMETIC')).toHaveLength(0);
     expect(byCode('ORPHAN_REFERENCE')).toHaveLength(0);
+  });
+});
+
+describe('exclusionBoundMandates', () => {
+  it('recognises exclusion-bound mandates from their notes, whatever the code', () => {
+    const mandates = [
+      {
+        mandate_code: 'GREEN',
+        mandate_notes: 'Balanced allocation with binding exclusions: thermal coal.',
+      },
+      { mandate_code: 'BAL', mandate_notes: 'Balanced growth and income.' },
+      {
+        mandate_code: 'GREEN',
+        mandate_notes: 'Balanced allocation with binding exclusions: thermal coal.',
+      },
+    ];
+    expect(exclusionBoundMandates(mandates)).toEqual(['GREEN']);
   });
 });

@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { alertTriage, auditEvents, outreach, type Db } from '@jb/db';
 
 export type TriageRow = typeof alertTriage.$inferSelect;
@@ -86,10 +86,13 @@ export class WorkflowRepository {
       const [row] = await tx
         .update(outreach)
         .set({ subject, body, status: 'sent', sentAt: new Date() })
-        .where(eq(outreach.id, id))
+        .where(and(eq(outreach.id, id), eq(outreach.status, 'draft')))
         .returning();
+      if (!row) {
+        return null;
+      }
       await tx.insert(auditEvents).values(audit);
-      return row ?? null;
+      return row;
     });
   }
 }

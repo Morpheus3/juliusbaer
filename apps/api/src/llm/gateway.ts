@@ -52,7 +52,28 @@ export class KeyValidationError extends Error {
   }
 }
 
+/** At most this many Claude calls in flight per API process. */
+const MAX_CONCURRENT_CALLS = 3;
+const CALL_TIMEOUT_MS = 90_000;
+
+class Semaphore {
+  private active = 0;
+  private readonly queue: (() => void)[] = [];
+  constructor(private readonly limit: number) {}
+  async acquire(): Promise<() => void> {
+    if (this.active >= this.limit) {
+      await new Promise<void>((resolve) => this.queue.push(resolve));
+    }
+    this.active += 1;
+    return () => {
+      this.active -= 1;
+      this.queue.shift()?.();
+    };
+  }
+}
+
 export class ClaudeGateway {
+  private readonly semaphore = new Semaphore(MAX_CONCURRENT_CALLS);
   private client: Anthropic | null;
   private apiKey: string | undefined;
   private source: GatewayStatus['source'];
@@ -181,15 +202,21 @@ export class ClaudeGateway {
         : { status: 'invalid', traceId, note: 'Recorded response no longer matches the schema.' };
     }
 
+    const release = await this.semaphore.acquire();
     try {
-      const response = await this.client.messages.parse({
-        model,
-        max_tokens: 16000,
-        thinking: { type: 'adaptive' },
-        system: [{ type: 'text', text: call.prompt.system, cache_control: { type: 'ephemeral' } }],
-        messages: [{ role: 'user', content: inputJson }],
-        output_config: { format: zodOutputFormat(call.schema) },
-      });
+      const response = await this.client.messages.parse(
+        {
+          model,
+          max_tokens: 16000,
+          thinking: { type: 'adaptive' },
+          system: [
+            { type: 'text', text: call.prompt.system, cache_control: { type: 'ephemeral' } },
+          ],
+          messages: [{ role: 'user', content: inputJson }],
+          output_config: { format: zodOutputFormat(call.schema) },
+        },
+        { timeout: CALL_TIMEOUT_MS },
+      );
       const usage: Record<string, unknown> = { ...response.usage };
       const parsed = response.parsed_output;
       const [t] = await this.db
@@ -231,6 +258,8 @@ export class ClaudeGateway {
         traceId: t?.id ?? null,
         note: `Claude call failed: ${message}`,
       };
+    } finally {
+      release();
     }
   }
 

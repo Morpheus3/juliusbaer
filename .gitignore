@@ -25,3 +25,6 @@ coverage/
 # database dumps and local volumes
 pgdata/
 *.egg-info/
+
+# recorded LLM responses can contain client narratives; never commit them
+apps/api/recordings/*.json

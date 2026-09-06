@@ -17,13 +17,21 @@ const fmtUsd = (n: number): string =>
  * Alerts computable from data alone. They feed the Client 360 banner today and become the
  * evidence layer for signal-driven insights in iteration 3.
  */
+export interface AlertDates {
+  /** The replay clock: drives KYC and cash-need distances. */
+  clock: string;
+  /** The positions snapshot in use: drives valuation staleness. */
+  snapshot: string;
+}
+
 export function deriveAlerts(
   bundle: ClientBundle,
   mandate: MandateStatusResponse,
   exposure: ExposureResponse,
   cf: Cashflows,
-  today: string,
+  dates: AlertDates,
 ): ClientAlert[] {
+  const today = dates.clock;
   const out: ClientAlert[] = [];
 
   for (const f of cf.facilities) {
@@ -152,7 +160,7 @@ export function deriveAlerts(
   }
 
   const stale = bundle.holdings.filter(
-    (h) => h.snapshotDate === today && h.valuationDate !== h.snapshotDate,
+    (h) => h.snapshotDate === dates.snapshot && h.valuationDate !== h.snapshotDate,
   );
   for (const h of stale) {
     out.push({
@@ -160,7 +168,7 @@ export function deriveAlerts(
       kind: 'STALE_VALUATION',
       severity: 'low',
       title: `${h.instrumentName} valued as of ${h.valuationDate}`,
-      detail: `${fmtUsd(h.marketValueUsd)} carried at a mark ${daysBetween(h.valuationDate, today)} days old.`,
+      detail: `${fmtUsd(h.marketValueUsd)} carried at a mark ${daysBetween(h.valuationDate, dates.snapshot)} days old at the snapshot.`,
       evidence: { portfolioId: h.portfolioId, instrumentId: h.instrumentId },
     });
   }

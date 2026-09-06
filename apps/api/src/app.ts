@@ -1,4 +1,5 @@
 import cors from '@fastify/cors';
+import rateLimit from '@fastify/rate-limit';
 import sensible from '@fastify/sensible';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { Config } from './config.js';
@@ -53,6 +54,8 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
 
   await app.register(sensible);
   await app.register(cors, { origin: config.CORS_ORIGIN });
+  // Global ceiling; LLM-backed and heavy routes set a stricter per-route limit via config.rateLimit.
+  await app.register(rateLimit, { max: 600, timeWindow: '1 minute' });
   await app.register(dbPlugin, { connectionString: config.DATABASE_URL });
 
   const ctx = new DatasetContext(app.db, config.DATASET_TODAY, config.DATASET_NAME);

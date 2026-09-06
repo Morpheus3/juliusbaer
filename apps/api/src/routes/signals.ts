@@ -13,6 +13,9 @@ const FeedQuery = z.object({
 const ClockQuery = z.object({ clock: IsoDate.optional() });
 const Params = z.object({ clientId: z.string().min(1).max(64) });
 
+/** Per-route ceiling for heavy compute routes. */
+const HEAVY_LIMIT = { max: 60, timeWindow: '1 minute' };
+
 export const signalRoutes =
   (service: SignalService): FastifyPluginCallback =>
   (app, _opts, done) => {
@@ -42,33 +45,37 @@ export const signalRoutes =
       }
     });
 
-    app.post('/clients/:clientId/impact', async (req, reply) => {
-      const p = Params.safeParse(req.params);
-      const q = ClockQuery.safeParse(req.query);
-      const body = ImpactRequest.safeParse(req.body ?? {});
-      if (!p.success || !q.success) {
-        return reply.badRequest('clientId is required; clock must be YYYY-MM-DD');
-      }
-      if (!body.success) {
-        return reply.badRequest(
-          body.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
-        );
-      }
-      try {
-        return await service.impact(p.data.clientId, body.data, q.data.clock);
-      } catch (err) {
-        if (err instanceof ClientNotFoundError) {
-          return reply.notFound(err.message);
+    app.post(
+      '/clients/:clientId/impact',
+      { config: { rateLimit: HEAVY_LIMIT } },
+      async (req, reply) => {
+        const p = Params.safeParse(req.params);
+        const q = ClockQuery.safeParse(req.query);
+        const body = ImpactRequest.safeParse(req.body ?? {});
+        if (!p.success || !q.success) {
+          return reply.badRequest('clientId is required; clock must be YYYY-MM-DD');
         }
-        if (err instanceof UnknownSignalError) {
-          return reply.badRequest(err.message);
+        if (!body.success) {
+          return reply.badRequest(
+            body.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
+          );
         }
-        if (err instanceof AnalyticsUnavailableError) {
-          return reply.badGateway(err.message);
+        try {
+          return await service.impact(p.data.clientId, body.data, q.data.clock);
+        } catch (err) {
+          if (err instanceof ClientNotFoundError) {
+            return reply.notFound(err.message);
+          }
+          if (err instanceof UnknownSignalError) {
+            return reply.badRequest(err.message);
+          }
+          if (err instanceof AnalyticsUnavailableError) {
+            return reply.badGateway(err.message);
+          }
+          throw err;
         }
-        throw err;
-      }
-    });
+      },
+    );
 
     app.get('/clients/:clientId/impact/runs', async (req, reply) => {
       const p = Params.safeParse(req.params);

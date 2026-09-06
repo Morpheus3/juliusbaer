@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { chmod, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { ClaudeSettings } from '@jb/contracts';
 import { repoRoot } from '@jb/db';
@@ -44,6 +44,11 @@ export class SettingsService {
     const line = `${key}=${value}`;
     const re = new RegExp(`^${key}=.*$`, 'm');
     const next = re.test(text) ? text.replace(re, line) : `${text.replace(/\s*$/, '')}\n${line}\n`;
-    await writeFile(file, next, { mode: 0o600 });
+    // Atomic replace; `mode` only applies on create, so the chmod is explicit.
+    const tmp = `${file}.tmp`;
+    await writeFile(tmp, next, { mode: 0o600 });
+    await chmod(tmp, 0o600);
+    await rename(tmp, file);
+    await chmod(file, 0o600);
   }
 }

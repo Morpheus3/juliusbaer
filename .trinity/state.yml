@@ -41,7 +41,11 @@ iterations:
     name: Workflow and outreach
     status: done
     completed: 2026-09-05
-  - { id: 8, name: Assistant and polish, status: next }
+  - id: 7.6
+    name: Hardening pass from the 2026-09-05 review
+    status: done
+    completed: 2026-09-06
+  - { id: 8, name: Assistant and RM experience stitching, status: next }
 decisions:
   D1: { where: ~/Desktop/juliusbaer, branch: feat/rm-workbench, status: confirmed }
   D2: { claude_access: recorded mode until ANTHROPIC_API_KEY provided, status: confirmed }

@@ -17,6 +17,8 @@ import { ClientNotFoundError } from './vectorService.js';
 
 /** Feed older than this (in dataset days) shows the stale-data warning. */
 export const STALE_AFTER_DAYS = 30;
+/** Analytics calls are bounded so a stalled engine cannot hang an API request. */
+const ANALYTICS_TIMEOUT_MS = 15_000;
 
 export class SignalService {
   constructor(
@@ -148,11 +150,12 @@ export class SignalService {
       res = await this.fetchImpl(
         `${this.analyticsUrl}${path}`,
         body === undefined
-          ? undefined
+          ? { signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS) }
           : {
               method: 'POST',
               headers: { 'content-type': 'application/json' },
               body: JSON.stringify(body),
+              signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
             },
       );
     } catch (err) {

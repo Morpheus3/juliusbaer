@@ -79,7 +79,7 @@ export class ClientDetailService {
     const mandate = mandateStatus(b, CURRENT);
     const exp = exposure(b, CURRENT);
     const cf = cashflows(b, today, CURRENT);
-    const alerts = deriveAlerts(b, mandate, exp, cf, today).filter(
+    const alerts = deriveAlerts(b, mandate, exp, cf, { clock: today, snapshot: CURRENT }).filter(
       (a) => triage.get(a.id)?.decision !== 'dismissed',
     );
     const lastNote = b.notes.at(-1);

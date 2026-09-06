@@ -26,6 +26,7 @@ import type { DecisionRepository } from '../repositories/decisionRepository.js';
 import type { RubricRepository } from '../repositories/rubricRepository.js';
 import type { SignalRepository } from '../repositories/signalRepository.js';
 import type { VectorRepository } from '../repositories/vectorRepository.js';
+import { AnalyticsUnavailableError } from './analyticsClient.js';
 import type { DatasetContext } from './datasetContext.js';
 import type { SignalService } from './signalService.js';
 import { ClientNotFoundError } from './vectorService.js';
@@ -72,7 +73,7 @@ export class RiskService {
     const mandate = mandateStatus(bundle, snapshot);
     const exp = exposure(bundle, snapshot);
     const cf = cashflows(bundle, at, snapshot);
-    const alerts = deriveAlerts(bundle, mandate, exp, cf, at);
+    const alerts = deriveAlerts(bundle, mandate, exp, cf, { clock: at, snapshot });
     const all = buildSignals(inputs, at, bundle);
     const recent = all.filter(
       (s) => daysBetween(s.date, at) <= LOOKBACK_DAYS && (s.client?.exposedPct ?? 0) > 0,
@@ -86,33 +87,29 @@ export class RiskService {
     let stressUsd: number | null = null;
     let severeStressPct: number | null = null;
     if (forStress.length > 0) {
+      const ids = forStress.map((s) => s.id);
       try {
-        const base = await this.signalService.impact(
-          clientId,
-          {
-            signalIds: forStress.map((s) => s.id),
-            severity: 'base',
-            save: false,
-            snapshotDate: snapshot,
-          },
-          at,
-        );
+        const [base, severe] = await Promise.all([
+          this.signalService.impact(
+            clientId,
+            { signalIds: ids, severity: 'base', save: false, snapshotDate: snapshot },
+            at,
+          ),
+          this.signalService.impact(
+            clientId,
+            { signalIds: ids, severity: 'severe', save: false, snapshotDate: snapshot },
+            at,
+          ),
+        ]);
         stressPct = base.total_pct;
         stressUsd = base.total_usd;
-        const severe = await this.signalService.impact(
-          clientId,
-          {
-            signalIds: forStress.map((s) => s.id),
-            severity: 'severe',
-            save: false,
-            snapshotDate: snapshot,
-          },
-          at,
-        );
         severeStressPct = severe.total_pct;
       } catch (err) {
+        if (!(err instanceof AnalyticsUnavailableError)) {
+          throw err;
+        }
         notes.push(
-          `Impact engine unavailable, signal risk read from severity and exposure only (${err instanceof Error ? err.message : String(err)}).`,
+          `Impact engine unavailable, signal risk read from severity and exposure only (${err.message}).`,
         );
       }
     } else {
@@ -216,11 +213,20 @@ export class RiskService {
     };
   }
 
-  async decide(clientId: string, actionId: string, req: DecideRequest): Promise<{ ok: true }> {
+  async decide(
+    clientId: string,
+    actionId: string,
+    req: DecideRequest,
+    clock: string | undefined,
+  ): Promise<{ ok: true }> {
     const actor = await this.ctx.rmId();
-    const bundle = await this.clients.bundle(clientId);
-    if (!bundle) {
-      throw new ClientNotFoundError(clientId);
+    const current = await this.combined(clientId, clock);
+    const known =
+      req.entityType === 'action'
+        ? current.actions.some((a) => a.id === actionId)
+        : current.tradeIdeas.some((i) => i.id === actionId);
+    if (!known) {
+      throw new UnknownActionError(actionId);
     }
     await this.decisions.record(
       {
@@ -307,4 +313,11 @@ function facts(
       detail: 'Asset classes outside their bands across managed portfolios.',
     },
   ];
+}
+
+export class UnknownActionError extends Error {
+  constructor(actionId: string) {
+    super(`${actionId} is not a current action or trade idea for this client at this clock.`);
+    this.name = 'UnknownActionError';
+  }
 }

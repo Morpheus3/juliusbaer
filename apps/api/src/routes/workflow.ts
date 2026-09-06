@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { CheckRequest, DraftRequest, SendRequest, TriageRequest } from '@jb/contracts';
 import { AnalyticsUnavailableError } from '../services/analyticsClient.js';
 import { ClientNotFoundError } from '../services/vectorService.js';
-import type { WorkflowService } from '../services/workflowService.js';
+import { AlreadySentError, type WorkflowService } from '../services/workflowService.js';
 
 const Params = z.object({ clientId: z.string().min(1).max(64) });
 const ClockQuery = z.object({
@@ -12,6 +12,9 @@ const ClockQuery = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
 });
+
+/** Per-route ceiling for routes that spend the model key or heavy compute. */
+const LLM_LIMIT = { max: 20, timeWindow: '1 minute' };
 
 export const workflowRoutes =
   (service: WorkflowService): FastifyPluginCallback =>
@@ -22,6 +25,7 @@ export const workflowRoutes =
         badRequest: (m: string) => unknown;
         notFound: (m: string) => unknown;
         badGateway: (m: string) => unknown;
+        conflict: (m: string) => unknown;
       },
       run: (clientId: string) => Promise<T>,
     ) => {
@@ -37,6 +41,9 @@ export const workflowRoutes =
         }
         if (err instanceof AnalyticsUnavailableError) {
           return reply.badGateway(err.message);
+        }
+        if (err instanceof AlreadySentError) {
+          return reply.conflict(err.message);
         }
         throw err;
       }
@@ -82,14 +89,17 @@ export const workflowRoutes =
         return { ok: true };
       }),
     );
-    app.post('/clients/:clientId/outreach/draft', (req, reply) =>
-      guard(req.params, reply, (id) => {
-        const b = body(DraftRequest, req.body, reply);
-        const q = ClockQuery.safeParse(req.query);
-        return b
-          ? service.draft(id, b, q.success ? q.data.clock : undefined)
-          : Promise.resolve(undefined);
-      }),
+    app.post(
+      '/clients/:clientId/outreach/draft',
+      { config: { rateLimit: LLM_LIMIT } },
+      (req, reply) =>
+        guard(req.params, reply, (id) => {
+          const b = body(DraftRequest, req.body, reply);
+          const q = ClockQuery.safeParse(req.query);
+          return b
+            ? service.draft(id, b, q.success ? q.data.clock : undefined)
+            : Promise.resolve(undefined);
+        }),
     );
     app.post('/clients/:clientId/outreach/:outreachId/send', (req, reply) =>
       guard(req.params, reply, (id) => {

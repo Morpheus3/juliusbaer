@@ -308,8 +308,9 @@ export const sustainabilityExclusionHeld: Check = ({ data }) => {
   const excluded = new Set(
     data.instruments.filter((i) => i.sustainability_excluded).map((i) => i.instrument_id),
   );
+  const exclusionMandates = new Set(exclusionBoundMandates(data.mandates));
   const sustainable = new Set(
-    data.portfolios.filter((p) => p.mandate_code === 'SUSBAL').map((p) => p.portfolio_id),
+    data.portfolios.filter((p) => exclusionMandates.has(p.mandate_code)).map((p) => p.portfolio_id),
   );
   return data.holdings
     .filter(

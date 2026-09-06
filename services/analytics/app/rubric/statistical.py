@@ -5,6 +5,7 @@ calibrated probability on the answer. Seeded and disclosed."""
 
 from __future__ import annotations
 
+import threading
 from functools import lru_cache
 
 import numpy as np
@@ -184,8 +185,11 @@ def _simulate(dimension: Dimension, rng: np.random.Generator) -> tuple[np.ndarra
     return np.asarray(rows, dtype=np.float64), np.asarray(labels)
 
 
+_TRAIN_LOCK = threading.Lock()
+
+
 @lru_cache(maxsize=3)
-def _train(dimension: Dimension) -> _Trained:
+def _train_uncached(dimension: Dimension) -> _Trained:
     rng = np.random.default_rng(SEED)
     x, y = _simulate(dimension, rng)
     x_tr, x_te, y_tr, y_te = train_test_split(x, y, test_size=0.25, random_state=SEED, stratify=y)
@@ -204,6 +208,17 @@ def _train(dimension: Dimension) -> _Trained:
         importances=[float(v) for v in plain.feature_importances_],
         holdout_accuracy=round(acc, 3),
     )
+
+
+def _train(dimension: Dimension) -> _Trained:
+    """Serialised so two concurrent first requests do not train twice."""
+    with _TRAIN_LOCK:
+        return _train_uncached(dimension)
+
+
+def warm_up() -> dict[str, float]:
+    """Train every dimension's model. Called at service start so no request pays for training."""
+    return {d: _train(d).holdout_accuracy for d in ARCHETYPES}
 
 
 def assess_statistical(dimension: Dimension, features: dict[str, float | None]) -> StatResult:
@@ -226,7 +241,7 @@ def assess_statistical(dimension: Dimension, features: dict[str, float | None]) 
         probabilities=probs,
         calibrated_confidence=round(float(np.max(proba)), 4),
         top_features=[{"feature": n, "importance": round(i, 4)} for n, i in top],
-        model="GradientBoosting(150, depth 3) + isotonic calibration",
+        model="GradientBoosting(150, depth 3) + isotonic calibration (cv=3)",
         training={
             "archetype_samples": SAMPLES,
             "seed": SEED,

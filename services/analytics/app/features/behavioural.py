@@ -93,7 +93,7 @@ def compute_client_vector(frames: Frames, fx: Fx, client_id: str, today: str) ->
     horizon_end = (pd.Timestamp(today) + pd.DateOffset(months=12)).date().isoformat()
     needs_12m_usd = 0.0
     for n in needs.itertuples(index=False):
-        if n.certainty not in NEED_CERTAINTIES or n.due_from > horizon_end:
+        if n.certainty not in NEED_CERTAINTIES or n.due_from > horizon_end or n.due_to < today:
             continue
         amount_usd = fx.to_usd(float(n.amount), n.currency, current)
         recurrence = str(n.recurrence).lower()

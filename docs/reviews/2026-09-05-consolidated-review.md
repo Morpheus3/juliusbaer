@@ -88,3 +88,21 @@ Suggested budgets: cockpit endpoints p50 under 50 ms single and p95 under 200 ms
 ## Things that are already right
 
 Zod on every route boundary and on every response the web app consumes; Drizzle everywhere in TypeScript and fully parameterised psycopg in Python; no `dangerouslySetInnerHTML`, `innerHTML` or `eval`; frozen, versioned, hashed system prompts with schema-validated output and a recorded mode that never fabricates; the LLM treated as one optional assessor among three; pino redaction correct and request bodies never logged; lockfile present and `npm ci` in CI; all hot queries are index hits under 0.05 ms.
+
+## Hardening pass applied on 2026-09-06
+
+Items 1 to 8 and 12 of the blocker list, plus the timeout and rate-limit parts of item 14, were fixed
+in commit "hardening pass from the review" on `feat/rm-workbench`:
+
+- Analytics trains the three rubric models in a FastAPI lifespan hook (13 s at container start, logged), serialised behind a lock, with cv=3 and no duplicate fit; the first rubric request now takes about 40 ms. All analytics calls from the API carry a 15 s timeout; Anthropic calls carry a 90 s timeout and at most three run concurrently per API process.
+- The data-quality register uses `exclusionBoundMandates()`; a test covers a non-`SUSBAL` exclusion mandate.
+- The Python cash-need rule skips needs whose window ended before today and the impact engine uses a calendar 12-month horizon; `tests/test_needs_parity.py` mirrors the TypeScript test.
+- `deriveAlerts` takes an explicit `{ clock, snapshot }`; stale-valuation alerts fire at any replay date, with a regression test.
+- Docker publishes Postgres and the analytics service on `127.0.0.1` only.
+- `apps/api/recordings/*.json` is gitignored.
+- The `.env` write is atomic and explicitly `chmod 0600`; the key must match `sk-ant-…`.
+- Re-sending a sent outreach returns 409; deciding on an action or trade idea the client does not currently have returns 400.
+- `riskService.combined` rethrows anything that is not an analytics-unavailable error and runs the base and severe impact calls in parallel.
+- `@fastify/rate-limit` at 600 requests a minute globally, 20 a minute on rubric assess and outreach draft, 60 a minute on vector rebuild and impact runs.
+
+Still open from the list: the N+1 bundle loading in the book cockpit (item 9), replay-clock refetching (item 10), test coverage of the recommendation engines beyond alerts (item 11), CSRF header and Host checks (item 13), and everything under "before any deployment inside a bank".

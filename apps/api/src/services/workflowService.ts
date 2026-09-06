@@ -383,7 +383,7 @@ export class WorkflowService {
       payload: { edited: req.body !== existing.body || req.subject !== existing.subject },
     });
     if (!row) {
-      throw new Error('outreach not found after update');
+      throw new AlreadySentError();
     }
     return toDraft(row);
   }
@@ -470,5 +470,12 @@ function stepLink(key: WorkflowStepKey, clientId: string): string {
       return `${base}/workflow`;
     default:
       return base;
+  }
+}
+
+export class AlreadySentError extends Error {
+  constructor() {
+    super('This outreach has already been logged as sent; draft a new one to send again.');
+    this.name = 'AlreadySentError';
   }
 }

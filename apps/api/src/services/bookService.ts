@@ -335,7 +335,7 @@ function laneInputs(
   const mandate = mandateStatus(b, snapshot);
   const exp = exposure(b, snapshot);
   const cf = cashflows(b, clock, snapshot);
-  const alerts = deriveAlerts(b, mandate, exp, cf, clock);
+  const alerts = deriveAlerts(b, mandate, exp, cf, { clock, snapshot });
   const signals = buildSignals(inputs, clock, b).filter((s) => (s.client?.exposedPct ?? 0) > 0);
   const prevMandate = prevSnapshot ? mandateStatus(b, prevSnapshot) : null;
   const ltvTrend = b.facilities.map((f) => {

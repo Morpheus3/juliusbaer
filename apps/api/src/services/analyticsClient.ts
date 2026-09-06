@@ -24,7 +24,10 @@ export class AnalyticsClient {
   async buildVectors(): Promise<z.infer<typeof BuildResponse>> {
     let res: Response;
     try {
-      res = await this.fetchImpl(`${this.baseUrl}/vectors/build`, { method: 'POST' });
+      res = await this.fetchImpl(`${this.baseUrl}/vectors/build`, {
+        method: 'POST',
+        signal: AbortSignal.timeout(120_000),
+      });
     } catch (err) {
       throw new AnalyticsUnavailableError(err instanceof Error ? err.message : String(err));
     }

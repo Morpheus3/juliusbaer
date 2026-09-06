@@ -110,6 +110,9 @@ interface StoredResult {
   features: Record<string, number | null>;
 }
 
+/** Analytics calls are bounded so a stalled engine cannot hang an API request. */
+const ANALYTICS_TIMEOUT_MS = 15_000;
+
 export class RubricService {
   constructor(
     private readonly repo: RubricRepository,
@@ -436,7 +439,9 @@ export class RubricService {
   private async callAnalytics(path: string): Promise<unknown> {
     let res: Response;
     try {
-      res = await this.fetchImpl(`${this.analyticsUrl}${path}`);
+      res = await this.fetchImpl(`${this.analyticsUrl}${path}`, {
+        signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
+      });
     } catch (err) {
       throw new AnalyticsUnavailableError(err instanceof Error ? err.message : String(err));
     }

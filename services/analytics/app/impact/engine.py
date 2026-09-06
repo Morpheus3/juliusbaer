@@ -340,11 +340,18 @@ def _fx_frame(rows: list[dict[str, Any]]) -> Any:
     )
 
 
-def _needs_12m(needs: list[dict[str, Any]], fx: Fx, snapshot: str, today: str) -> float:
-    from datetime import timedelta
+def _add_months(d: date, months: int) -> date:
+    """Calendar-month offset matching the API's addMonths (day clamped to month end)."""
+    import calendar
 
+    y, m = divmod(d.month - 1 + months, 12)
+    year, month = d.year + y, m + 1
+    return d.replace(year=year, month=month, day=min(d.day, calendar.monthrange(year, month)[1]))
+
+
+def _needs_12m(needs: list[dict[str, Any]], fx: Fx, snapshot: str, today: str) -> float:
     t = date.fromisoformat(today)
-    horizon_end = t + timedelta(days=365)
+    horizon_end = _add_months(t, 12)
     total = 0.0
     for n in needs:
         if n["certainty"] not in NEED_CERTAINTIES:

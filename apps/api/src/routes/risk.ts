@@ -2,11 +2,11 @@ import type { FastifyPluginCallback } from 'fastify';
 import { z } from 'zod';
 import { DecideRequest } from '@jb/contracts';
 import { AnalyticsUnavailableError } from '../services/analyticsClient.js';
-import type { RiskService } from '../services/riskService.js';
+import { UnknownActionError, type RiskService } from '../services/riskService.js';
 import { ClientNotFoundError } from '../services/vectorService.js';
 
-const Params = z.object({ clientId: z.string().min(1) });
-const DecideParams = Params.extend({ actionId: z.string().min(1) });
+const Params = z.object({ clientId: z.string().min(1).max(64) });
+const DecideParams = Params.extend({ actionId: z.string().min(1).max(128) });
 const ClockQuery = z.object({
   clock: z
     .string()
@@ -47,11 +47,23 @@ export const riskRoutes =
           body.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
         );
       }
+      const q = ClockQuery.safeParse(req.query);
       try {
-        return await service.decide(p.data.clientId, p.data.actionId, body.data);
+        return await service.decide(
+          p.data.clientId,
+          p.data.actionId,
+          body.data,
+          q.success ? q.data.clock : undefined,
+        );
       } catch (err) {
         if (err instanceof ClientNotFoundError) {
           return reply.notFound(err.message);
+        }
+        if (err instanceof UnknownActionError) {
+          return reply.badRequest(err.message);
+        }
+        if (err instanceof AnalyticsUnavailableError) {
+          return reply.badGateway(err.message);
         }
         throw err;
       }

@@ -16,6 +16,9 @@ const AuditQuery = z.object({
   clientId: z.string().min(1).max(64).optional(),
 });
 
+/** Per-route ceiling for routes that spend the model key or heavy compute. */
+const LLM_LIMIT = { max: 20, timeWindow: '1 minute' };
+
 export const rubricRoutes =
   (service: RubricService): FastifyPluginCallback =>
   (app, _opts, done) => {
@@ -69,11 +72,14 @@ export const rubricRoutes =
         );
       }),
     );
-    app.post('/clients/:clientId/rubric/assess', (req, reply) =>
-      withClient(req.params, reply, (id) => {
-        const q = ClockQuery.safeParse(req.query);
-        return service.assess(id, q.success ? q.data.clock : undefined);
-      }),
+    app.post(
+      '/clients/:clientId/rubric/assess',
+      { config: { rateLimit: LLM_LIMIT } },
+      (req, reply) =>
+        withClient(req.params, reply, (id) => {
+          const q = ClockQuery.safeParse(req.query);
+          return service.assess(id, q.success ? q.data.clock : undefined);
+        }),
     );
     app.post('/clients/:clientId/rubric/override', (req, reply) =>
       withClient(req.params, reply, (id) => {

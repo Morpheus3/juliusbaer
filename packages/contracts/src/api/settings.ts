@@ -14,7 +14,9 @@ export const ClaudeSettings = z.object({
 export type ClaudeSettings = z.infer<typeof ClaudeSettings>;
 
 export const SetClaudeKeyRequest = z.object({
-  apiKey: z.string().min(20).max(400),
+  apiKey: z
+    .string()
+    .regex(/^sk-ant-[A-Za-z0-9_-]{20,}$/, 'expected an Anthropic API key starting with sk-ant-'),
   /** Also write the key to the repository's local .env so it survives a restart. */
   persist: z.boolean().default(false),
 });

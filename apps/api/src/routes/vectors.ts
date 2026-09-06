@@ -9,6 +9,9 @@ import {
 
 const Params = z.object({ clientId: z.string().min(1).max(64) });
 
+/** Per-route ceiling for heavy compute routes. */
+const HEAVY_LIMIT = { max: 60, timeWindow: '1 minute' };
+
 export const vectorRoutes =
   (service: VectorService): FastifyPluginCallback =>
   (app, _opts, done) => {
@@ -23,7 +26,7 @@ export const vectorRoutes =
       }
     });
 
-    app.post('/vectors/rebuild', async (_req, reply) => {
+    app.post('/vectors/rebuild', { config: { rateLimit: HEAVY_LIMIT } }, async (_req, reply) => {
       try {
         return await service.rebuild();
       } catch (err) {
