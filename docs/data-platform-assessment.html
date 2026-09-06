@@ -1,0 +1,1208 @@
+<title>Data Platform Assessment</title>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface-2: #edf1f6;
+    --ink: #16202e;
+    --ink-2: #3c4858;
+    --muted: #66728a;
+    --line: #d9dfe8;
+    --line-2: #c3ccd9;
+    --accent: #1f4e79;
+    --accent-soft: #e3ecf5;
+    --brass: #8f6f3a;
+    --brass-soft: #f3ebdd;
+    --crit: #b3261e;
+    --crit-soft: #f9e5e3;
+    --warn: #9a6a00;
+    --warn-soft: #fbf0d2;
+    --ok: #1f7a4d;
+    --ok-soft: #dff2e6;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #0f141c;
+      --surface: #161d28;
+      --surface-2: #1d2634;
+      --ink: #e7ebf1;
+      --ink-2: #c4ccd8;
+      --muted: #95a1b4;
+      --line: #273241;
+      --line-2: #344256;
+      --accent: #7fb0e0;
+      --accent-soft: #1b2c40;
+      --brass: #d2b27c;
+      --brass-soft: #2a2418;
+      --crit: #f28b82;
+      --crit-soft: #3a1f1d;
+      --warn: #e6be5a;
+      --warn-soft: #332a14;
+      --ok: #7ccb9a;
+      --ok-soft: #173224;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0f141c;
+    --surface: #161d28;
+    --surface-2: #1d2634;
+    --ink: #e7ebf1;
+    --ink-2: #c4ccd8;
+    --muted: #95a1b4;
+    --line: #273241;
+    --line-2: #344256;
+    --accent: #7fb0e0;
+    --accent-soft: #1b2c40;
+    --brass: #d2b27c;
+    --brass-soft: #2a2418;
+    --crit: #f28b82;
+    --crit-soft: #3a1f1d;
+    --warn: #e6be5a;
+    --warn-soft: #332a14;
+    --ok: #7ccb9a;
+    --ok-soft: #173224;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: var(--accent);
+  }
+  .page {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 40px 32px 96px;
+  }
+  @media (max-width: 960px) {
+    .page {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding: 24px 18px 64px;
+    }
+    .toc {
+      position: static !important;
+    }
+  }
+  .toc {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    font-size: 13px;
+  }
+  .toc .brand {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .toc .sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-left: 1px solid var(--line);
+  }
+  .toc li a {
+    display: block;
+    padding: 4px 0 4px 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+  }
+  .toc li a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  main {
+    min-width: 0;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(30px, 4vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin: 8px 0 14px;
+    text-wrap: balance;
+    max-width: 24ch;
+  }
+  .lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 64ch;
+    margin: 0 0 20px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin: 64px 0 6px;
+    text-wrap: balance;
+  }
+  h2 + p.intro {
+    color: var(--ink-2);
+    margin: 0 0 22px;
+    max-width: 66ch;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 28px 0 8px;
+  }
+  p {
+    max-width: 68ch;
+  }
+  .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: -2px;
+  }
+  .answer {
+    border-left: 3px solid var(--brass);
+    background: var(--brass-soft);
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+    margin: 20px 0;
+    max-width: 74ch;
+  }
+  .answer p {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .answer p:last-child {
+    margin: 0;
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 720px) {
+    .grid2,
+    .grid3 {
+      grid-template-columns: 1fr;
+    }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .card b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card p,
+  .card li {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .card p {
+    margin: 0;
+  }
+  .card ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+  }
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    margin: 14px 0 6px;
+  }
+  th {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tr:last-child td {
+    border-bottom: 0;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .pill.crit {
+    background: var(--crit-soft);
+    color: var(--crit);
+  }
+  .pill.warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+  .pill.ok {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+  .pill.info {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .pill.brass {
+    background: var(--brass-soft);
+    color: var(--brass);
+  }
+  .pill.grey {
+    background: var(--surface-2);
+    color: var(--muted);
+  }
+  .mono {
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  pre.mermaid {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+  pre.code {
+    background: #14213d;
+    color: #dfe6f2;
+    border-radius: 6px;
+    padding: 14px 16px;
+    font: 12.5px/1.55 var(--mono);
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .flow > div {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }
+  .flow > div b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--brass);
+    margin-bottom: 2px;
+  }
+  .flow > div strong {
+    display: block;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  @media (max-width: 900px) {
+    .flow {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: 44px 1fr 210px;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .steps li::before {
+    content: attr(data-id);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+    padding-top: 2px;
+  }
+  .steps b {
+    display: block;
+    font-weight: 600;
+  }
+  .steps span {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .steps .out {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  @media (max-width: 720px) {
+    .steps li {
+      grid-template-columns: 44px 1fr;
+    }
+    .steps .out {
+      grid-column: 2;
+    }
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+    max-width: 72ch;
+  }
+</style>
+
+<div class="page">
+  <nav class="toc" aria-label="Contents">
+    <div class="brand">Data Platform Assessment</div>
+    <div class="sub">RM workbench · pipeline, ERD, gaps · 6 Sep 2026</div>
+    <ol>
+      <li><a href="#answer">1 · Short answer</a></li>
+      <li><a href="#today">2 · The pipeline as it stands</a></li>
+      <li><a href="#erd-raw">3 · ERD: raw schema</a></li>
+      <li><a href="#erd-derived">4 · ERD: derived schema</a></li>
+      <li><a href="#gaps">5 · What is missing</a></li>
+      <li><a href="#target">6 · Target design</a></li>
+      <li><a href="#isolation">7 · RM isolation in depth</a></li>
+      <li><a href="#code">8 · What changes in the code</a></li>
+      <li><a href="#plan">9 · Build plan</a></li>
+      <li><a href="#questions">10 · Decisions for you</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="eyebrow">Agentic RM Workbench · data platform</div>
+    <h1>Data Platform Assessment</h1>
+    <p class="lede">
+      You asked whether the project has a data pipeline, what the database looks like, and what is
+      missing to ingest from Kafka or batch, onboard new customers and new RMs, and keep one RM's
+      clients invisible to another. This is the honest state and the design for the rest.
+    </p>
+
+    <!-- 1 -->
+    <h2 id="answer"><span class="num">01</span>Short answer</h2>
+    <div class="answer">
+      <p>
+        <b>There is a batch pipeline, not a streaming one.</b> A seed command reads one dataset
+        folder of CSV and JSON, validates every row against Zod contracts, truncates and reloads the
+        raw schema, runs thirteen data-quality checks, loads the reference files, and records the
+        run. The customer vector is built by the Python analytics service on demand from Postgres
+        and persisted with a run id. Every engine reads from Postgres, never from files.
+      </p>
+      <p>
+        <b
+          >There is no Kafka consumer, no incremental upsert, no per-client rebuild, no identity, no
+          RM entitlement.</b
+        >
+        The RM is inferred as "the RM covering most clients" because the dataset has one. The API
+        has no login; every request sees every client.
+      </p>
+      <p>
+        <b>The schema is ready for the change.</b> Every client-owned table already carries a client
+        id, clients already carry an RM id, and the derived tables already record which run produced
+        what. Adding RMs, assignments, identity and row-level security is additive; the engines do
+        not change.
+      </p>
+    </div>
+
+    <!-- 2 -->
+    <h2 id="today"><span class="num">02</span>The pipeline as it stands</h2>
+    <div class="flow">
+      <div>
+        <b>1</b><strong>Source</strong>One folder: 11 CSV files (clients, portfolios, holdings by
+        snapshot, transactions, facilities…), notes as JSON, and reference/*.json. Path from
+        DATA_DIR.
+      </div>
+      <div>
+        <b>2</b><strong>Validate</strong>Row schemas in @jb/contracts (Zod); wide snapshot columns
+        discovered by regex. Bad rows stop the load.
+      </div>
+      <div>
+        <b>3</b><strong>Load</strong>raw.* truncated and repopulated in one transaction. A load_runs
+        row records counts, status and "today" (latest snapshot).
+      </div>
+      <div>
+        <b>4</b><strong>Quality</strong>13 checks (orphans, weights, stale marks, exclusions held,
+        needs parity…) → data_quality_issues, visible in the Audit room.
+      </div>
+      <div>
+        <b>5</b><strong>Reference</strong>look-through legs, signal rules, scenarios, call policy,
+        cross-border doc → derived.*; missing files degrade gracefully.
+      </div>
+      <div>
+        <b>6</b><strong>Vector</strong>POST /vectors/build on the analytics service reads Postgres,
+        computes 32 features, percentiles, peers, note embedding; writes vector_runs,
+        client_factual, client_vectors.
+      </div>
+    </div>
+    <p style="margin-top: 14px">
+      Everything after step 6 is computed at request time from raw and derived tables: alerts,
+      lanes, signals, impact, rubric, actions, ideas, call plan, promises. That is why the engines
+      are dataset-agnostic and why a new pipeline only has to land correct rows.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Today</th>
+            <th>Consequence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ingestion mode</td>
+            <td>Batch, whole dataset, truncate-and-reload</td>
+            <td>
+              Correct and idempotent for a demo; a live feed would wipe and rewrite everything per
+              event.
+            </td>
+          </tr>
+          <tr>
+            <td>Change detection</td>
+            <td>None; "today" = latest snapshot in the file</td>
+            <td>Vectors and rubric are rebuilt for all clients or none.</td>
+          </tr>
+          <tr>
+            <td>RM model</td>
+            <td>rm_id, rm_name, rm_desk as columns on clients and notes; no RM table</td>
+            <td>
+              Cannot add an RM without a client; no history of reassignment; the API picks one RM by
+              majority.
+            </td>
+          </tr>
+          <tr>
+            <td>Identity</td>
+            <td>None. RM_LEVEL and CHECKER_ID are environment variables</td>
+            <td>Any browser sees any client; maker-checker is honour-based.</td>
+          </tr>
+          <tr>
+            <td>Isolation</td>
+            <td>None</td>
+            <td>Book, call plan, idea desk and assistant are book-wide by construction.</td>
+          </tr>
+          <tr>
+            <td>Audit</td>
+            <td>Append-only in practice; every write logs an actor</td>
+            <td>Good foundation; actor is a config string, not an authenticated user.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3 -->
+    <h2 id="erd-raw"><span class="num">03</span>ERD: raw schema</h2>
+    <p class="intro">
+      What the bank's systems supply. Snapshot-dated tables are the time axis; everything a client
+      owns hangs off clients.
+    </p>
+    <pre class="mermaid">
+erDiagram
+  snapshots ||--o{ holdings : "as of"
+  snapshots ||--o{ portfolio_aum : "as of"
+  snapshots ||--o{ instrument_prices : "as of"
+  snapshots ||--o{ credit_facility_snapshots : "as of"
+  snapshots ||--o{ market_context : "as of"
+  clients ||--o{ portfolios : owns
+  clients ||--o{ holdings : owns
+  clients ||--o{ transactions : books
+  clients ||--o{ credit_facilities : borrows
+  clients ||--o{ commitments : commits
+  clients ||--o{ planned_cash_needs : plans
+  clients ||--o{ rm_notes : "discussed in"
+  portfolios ||--o{ holdings : contains
+  portfolios ||--o{ transactions : records
+  portfolios ||--o{ portfolio_aum : valued
+  portfolios ||--o{ commitments : holds
+  portfolios ||--o| credit_facilities : "collateral for"
+  mandates ||--o{ portfolios : governs
+  instruments ||--o{ holdings : "position in"
+  instruments ||--o{ transactions : "traded"
+  instruments ||--o{ instrument_prices : priced
+  credit_facilities ||--o{ credit_facility_snapshots : "LTV over time"
+  snapshots { date snapshot_date PK
+    int ordinal
+    text label }
+  clients { text client_id PK
+    text client_name
+    text rm_id "no FK today"
+    text rm_name
+    text rm_desk
+    text booking_centre
+    text country_of_residence
+    text wealth_band
+    text risk_profile
+    int risk_tolerance_score
+    int investment_horizon_years
+    date client_since
+    date kyc_review_due
+    text reporting_language }
+  portfolios { text portfolio_id PK
+    text client_id FK
+    text mandate_code FK
+    text service_model
+    text base_currency }
+  mandates { text mandate_code PK
+    text asset_class
+    numeric min_pct
+    numeric target_pct
+    numeric max_pct
+    numeric max_single_position_pct
+    text mandate_notes }
+  holdings { text holding_id PK
+    date snapshot_date FK
+    text portfolio_id FK
+    text client_id FK
+    text instrument_id FK
+    numeric quantity
+    numeric market_value_usd
+    numeric weight_pct
+    numeric lending_value_base
+    date valuation_date }
+  instruments { text instrument_id PK
+    text asset_class
+    text sector
+    text region
+    text liquidity_tier
+    bool sustainability_excluded }
+  transactions { text transaction_id PK
+    date trade_date
+    text portfolio_id FK
+    text client_id FK
+    text transaction_type
+    numeric amount }
+  credit_facilities { text facility_id PK
+    text client_id FK
+    text collateral_portfolio_id FK
+    numeric credit_limit
+    numeric margin_call_ltv_pct }
+  credit_facility_snapshots { text facility_id FK
+    date snapshot_date FK
+    numeric drawn
+    numeric ltv_pct
+    numeric headroom }
+  commitments { text commitment_id PK
+    text client_id FK
+    numeric uncalled }
+  planned_cash_needs { text need_id PK
+    text client_id FK
+    numeric amount
+    date due_from
+    text certainty }
+  rm_notes { text note_id PK
+    text client_id FK
+    date note_date
+    text rm_id
+    text channel
+    text note }
+  market_context { date snapshot_date FK
+    text series_id
+    numeric value }
+  event_log { text event_id PK
+    date event_date
+    text severity
+    text primary_transmission }
+  portfolio_aum { text portfolio_id FK
+    date snapshot_date FK
+    numeric aum_base }
+  instrument_prices { text instrument_id FK
+    date snapshot_date FK
+    numeric price_local }
+</pre>
+
+    <!-- 4 -->
+    <h2 id="erd-derived"><span class="num">04</span>ERD: derived schema</h2>
+    <p class="intro">
+      What the platform computes and what the RM decides. Every row that a person caused carries an
+      actor; every model output carries a run or a trace.
+    </p>
+    <pre class="mermaid">
+erDiagram
+  load_runs ||--o{ data_quality_issues : found
+  vector_runs ||--o{ client_vectors : produced
+  vector_runs ||--o{ client_factual : produced
+  vector_runs ||--o{ rubric_assessments : "based on"
+  rubric_assessments ||--o{ rubric_overrides : overridden
+  llm_traces ||--o{ outreach : drafted
+  load_runs { uuid id PK
+    timestamp started_at
+    text status
+    text dataset_today
+    jsonb row_counts }
+  data_quality_issues { uuid id PK
+    uuid load_run_id FK
+    text code
+    text severity
+    text client_id }
+  vector_runs { uuid id PK
+    text dataset_today
+    text engine_version
+    jsonb manifest }
+  client_vectors { text client_id PK
+    uuid run_id FK
+    jsonb features
+    jsonb percentiles
+    jsonb peers
+    vector note_embedding }
+  client_factual { text client_id PK
+    uuid run_id FK
+    jsonb facts }
+  rubric_assessments { uuid id PK
+    text client_id
+    uuid vector_run_id FK
+    text clock
+    text status
+    jsonb result }
+  rubric_overrides { uuid id PK
+    uuid assessment_id FK
+    text dimension
+    int override_score
+    text reason
+    text rm_id }
+  impact_runs { uuid id PK
+    text client_id
+    text snapshot_date
+    jsonb request
+    jsonb result }
+  action_decisions { uuid id PK
+    text action_id
+    text client_id
+    text decision
+    text actor }
+  alert_triage { uuid id PK
+    text alert_id
+    text client_id
+    text decision
+    text actor }
+  outreach { uuid id PK
+    text client_id
+    text language
+    text status
+    uuid llm_trace_id FK
+    text actor }
+  promises { uuid id PK
+    text client_id
+    text party
+    text kind
+    text quote
+    text due_date
+    text status
+    text fingerprint UK }
+  audit_events { uuid id PK
+    text kind
+    text actor
+    text client_id
+    jsonb payload }
+  llm_traces { uuid id PK
+    text prompt_id
+    text model
+    text mode
+    text client_id }
+  lookthrough_legs { uuid id PK
+    text instrument_id
+    text exposure_name
+    numeric weight }
+  signal_rules { text event_id PK
+    jsonb match
+    jsonb shock }
+  scenarios { text id PK
+    jsonb shock }
+  call_policy { text id PK
+    jsonb policy }
+  reference_docs { text id PK
+    jsonb doc }
+</pre>
+    <p>
+      Two things to notice. The derived tables reference clients by id but without a foreign key,
+      deliberately: a client can be reassigned or offboarded without breaking the audit trail. And
+      nothing in the derived schema names an RM except overrides and actors, so entitlement has to
+      come from the raw side.
+    </p>
+
+    <!-- 5 -->
+    <h2 id="gaps"><span class="num">05</span>What is missing</h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Capability you asked for</th>
+            <th>Gap</th>
+            <th>Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Ingest from Kafka or a batch drop</b></td>
+            <td>
+              No consumer, no landing zone, no message contracts, no idempotency keys, no
+              dead-letter. The loader only knows a folder.
+            </td>
+            <td><span class="pill warn">new module</span></td>
+          </tr>
+          <tr>
+            <td><b>Incremental load</b></td>
+            <td>
+              Truncate-and-reload. Needs upsert by natural key, snapshot append, soft delete, and
+              change tracking so downstream knows which clients moved.
+            </td>
+            <td><span class="pill warn">loader rewrite</span></td>
+          </tr>
+          <tr>
+            <td><b>Customer vector per change</b></td>
+            <td>
+              Vector build is book-wide on demand. Needs a per-client build triggered by change
+              events, plus a nightly full rebuild for percentiles and peers.
+            </td>
+            <td><span class="pill info">analytics endpoint</span></td>
+          </tr>
+          <tr>
+            <td><b>New customers and new RMs</b></td>
+            <td>
+              No RM entity, no assignment history, no team or desk. RM facts are denormalised
+              columns on clients and notes.
+            </td>
+            <td><span class="pill info">three tables</span></td>
+          </tr>
+          <tr>
+            <td><b>RM to customer relationship with isolation</b></td>
+            <td>
+              No identity on requests, no entitlement table, no row filter. The API resolves one RM
+              from data and serves everything.
+            </td>
+            <td><span class="pill crit">identity + RLS</span></td>
+          </tr>
+          <tr>
+            <td><b>Manager sees the team, RM sees the book</b></td>
+            <td>
+              Same as above plus a role and a team hierarchy; the team page in iteration 10 depends
+              on it.
+            </td>
+            <td><span class="pill info">roles</span></td>
+          </tr>
+          <tr>
+            <td><b>Operability</b></td>
+            <td>
+              No reconciliation counts against the source, no replay of a failed batch, no schema
+              evolution policy for messages.
+            </td>
+            <td><span class="pill info">runbook</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6 -->
+    <h2 id="target"><span class="num">06</span>Target design</h2>
+    <p class="intro">
+      One ingestion module with two front doors, a landing schema, incremental loads into the same
+      raw tables, and change events that drive the vector and the alerts. The engines stay as they
+      are.
+    </p>
+    <div class="flow">
+      <div>
+        <b>A</b><strong>Front doors</strong>Kafka consumer (one topic per entity: clients,
+        rm-assignments, holdings-snapshot, transactions, facilities, notes, prices, events) and a
+        batch drop (the current folder format, or files on an object store). Both produce the same
+        typed messages.
+      </div>
+      <div>
+        <b>B</b><strong>Contracts</strong>Message schemas in @jb/contracts beside the row schemas,
+        versioned; each message carries entity id, event time, source system, and an idempotency key
+        (source + sequence).
+      </div>
+      <div>
+        <b>C</b><strong>Landing</strong>staging.* tables: raw message, key, received_at, status. Bad
+        messages stay here with the validation error and go to a dead-letter view; nothing bad
+        reaches raw.
+      </div>
+      <div>
+        <b>D</b><strong>Apply</strong>Upsert by natural key into raw.*; snapshot tables append by
+        (id, snapshot_date); deletes become valid_to timestamps. One transaction per batch or per
+        message group; a load_runs row per apply.
+      </div>
+      <div>
+        <b>E</b><strong>Change events</strong>A change_log table (client_id, entity, kind,
+        applied_at). The analytics service subscribes (poll or NOTIFY) and rebuilds the vector for
+        changed clients; a nightly job rebuilds all so percentiles and peers stay consistent.
+      </div>
+      <div>
+        <b>F</b><strong>Quality</strong>The thirteen checks run per batch scoped to changed clients,
+        plus reconciliation counts against the source manifest; failures do not block the apply,
+        they surface in the register and on the manager's page.
+      </div>
+    </div>
+    <h3>New tables</h3>
+    <pre class="mermaid">
+erDiagram
+  rms ||--o{ rm_assignments : covers
+  clients ||--o{ rm_assignments : "assigned to"
+  teams ||--o{ rms : "member of"
+  users ||--o| rms : "acts as"
+  users }o--o{ roles : holds
+  rms { text rm_id PK
+    text name
+    text desk
+    text team_id FK
+    text email
+    text status }
+  rm_assignments { uuid id PK
+    text client_id FK
+    text rm_id FK
+    text role "primary | secondary | checker"
+    date valid_from
+    date valid_to
+    text source
+    text reason }
+  teams { text team_id PK
+    text name
+    text head_rm_id }
+  users { uuid user_id PK
+    text subject "OIDC sub"
+    text rm_id FK
+    text display_name }
+  roles { text role PK
+    text scope "own_book | team | desk | admin" }
+  staging_messages { uuid id PK
+    text topic
+    text idempotency_key UK
+    jsonb payload
+    text status
+    text error
+    timestamp received_at }
+  change_log { uuid id PK
+    text client_id
+    text entity
+    text kind
+    uuid load_run_id
+    timestamp applied_at }
+</pre>
+    <p>
+      <b>Why an assignment table and not a column.</b> Clients move between RMs; a checker is a
+      second RM on the same client; a team head covers by team, not by client. A dated assignment
+      row answers "who may see this client today" and "who saw it in March", which the audit trail
+      needs. The rm_id column on clients stays as a denormalised current primary for the engines
+      that read it, kept in step by the apply step.
+    </p>
+
+    <!-- 7 -->
+    <h2 id="isolation"><span class="num">07</span>RM isolation in depth</h2>
+    <p class="intro">
+      Isolation must be enforced where the data lives, not only in the queries an engineer
+      remembered to filter.
+    </p>
+    <div class="grid2">
+      <div class="card">
+        <b>1 · Identity on every request</b>
+        <p>
+          The API takes a bearer token (the bank's OIDC), verifies it, and resolves user → rm_id and
+          roles. DatasetContext stops guessing the RM; the meta endpoint returns the caller's RM and
+          scope. RM_LEVEL and CHECKER_ID leave the environment and become roles and assignments.
+        </p>
+      </div>
+      <div class="card">
+        <b>2 · Row-level security in Postgres</b>
+        <p>
+          Every client-owned table in raw and derived gets an RLS policy: a row is visible when its
+          client_id is in the caller's entitled set. The API sets
+          <span class="mono">set_config('app.rm_id', …)</span> and
+          <span class="mono">app.scope</span> per transaction; a SQL function computes the entitled
+          set from rm_assignments (own book), teams (team head) or all (admin). A query that forgets
+          a filter still returns only what the caller may see.
+        </p>
+      </div>
+      <div class="card">
+        <b>3 · Repositories filter too</b>
+        <p>
+          Belt and braces: ClientRepository.listAll becomes listEntitled(ctx), and every per-client
+          repository call checks entitlement before reading, returning 404 rather than 403 so client
+          ids cannot be probed.
+        </p>
+      </div>
+      <div class="card">
+        <b>4 · Derived data follows the client</b>
+        <p>
+          Vectors, rubric, promises, decisions and audit events carry client_id, so the same policy
+          covers them. Percentiles and peers are computed across the whole book by the analytics
+          service under a service role; what the RM sees is her clients' percentile against the
+          book, not other clients' rows.
+        </p>
+      </div>
+      <div class="card">
+        <b>5 · The assistant respects scope</b>
+        <p>
+          findClients, compareClients, the call plan and the idea desk run over the entitled set
+          only; the tool catalog receives ctx, not a book. The team head's scope is the team; "who
+          should hear about the Fed hold" then answers for the team.
+        </p>
+      </div>
+      <div class="card">
+        <b>6 · Audit and traces</b>
+        <p>
+          actor becomes the authenticated user; LLM traces record the entitled scope used. A manager
+          sampling explainability sees traces for the team only.
+        </p>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <h2 id="code"><span class="num">08</span>What changes in the code</h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>packages/contracts</td>
+            <td>
+              Message schemas (<span class="mono">messages/*.ts</span>) with versions; RM,
+              assignment, team, user contracts; meta gains <span class="mono">scope</span>.
+            </td>
+          </tr>
+          <tr>
+            <td>db</td>
+            <td>
+              Tables rms, teams, rm_assignments, users, roles, staging_messages, change_log; RLS
+              policies and the entitlement function in a migration; loader split into
+              <span class="mono">ingest/</span> (consumer, batch reader, validate, stage) and
+              <span class="mono">apply/</span> (upsert, snapshot append, soft delete, change_log,
+              load_runs). The current seed becomes one batch adapter.
+            </td>
+          </tr>
+          <tr>
+            <td>apps/ingest (new)</td>
+            <td>
+              A small Node service: Kafka consumer (kafkajs) with consumer groups per topic, batch
+              poller for the drop folder, retries and dead-letter, metrics. Same apply module as the
+              seed.
+            </td>
+          </tr>
+          <tr>
+            <td>services/analytics</td>
+            <td>
+              <span class="mono">POST /vectors/build?clientIds=</span> for incremental builds; a
+              nightly full build; a listener on change_log.
+            </td>
+          </tr>
+          <tr>
+            <td>apps/api</td>
+            <td>
+              Auth plugin (JWT verify, user → rm and roles), per-request
+              <span class="mono">set_config</span> in the db plugin, DatasetContext takes the
+              caller; ClientRepository and BookService take the entitled set; RM_LEVEL/CHECKER_ID
+              replaced by roles and assignment role checker.
+            </td>
+          </tr>
+          <tr>
+            <td>apps/web</td>
+            <td>
+              Login redirect, the caller's name in the top bar from meta, team scope switch for
+              heads; nothing else, since screens already read from meta and the endpoints.
+            </td>
+          </tr>
+          <tr>
+            <td>Docs</td>
+            <td>
+              DATASET_CONTRACT.md gains the message contracts and the assignment model; ADR-014
+              ingestion, ADR-015 identity and isolation.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>An example message</h3>
+    <pre class="code">
+{ "type": "rm.assignment.v1", "key": "core:assign:88213",
+  "eventTime": "2026-09-06T02:15:00Z", "source": "core-banking",
+  "payload": { "clientId": "C-00912", "rmId": "RM-SG-021", "role": "primary",
+               "validFrom": "2026-09-06", "reason": "new client onboarding" } }</pre>
+    <p>
+      Applying it upserts the RM if new, closes the previous primary assignment with valid_to,
+      inserts the new one, updates the denormalised rm columns on the client, writes change_log,
+      and, because the client is new, the analytics listener builds the vector and the next request
+      from that RM shows the client in her book with alerts already derived.
+    </p>
+
+    <!-- 9 -->
+    <h2 id="plan"><span class="num">09</span>Build plan</h2>
+    <ol class="steps">
+      <li data-id="D1">
+        <div>
+          <b>RM model and identity</b
+          ><span
+            >rms, teams, rm_assignments, users, roles; backfill from the current dataset (one RM,
+            twenty primary assignments); auth plugin with a development identity provider; meta
+            returns the caller's scope.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> two RMs in a test dataset, each logging in and seeing only their book.
+        </div>
+      </li>
+      <li data-id="D2">
+        <div>
+          <b>Row-level security</b
+          ><span
+            >Entitlement function and policies on every client-owned table; per-request set_config;
+            repositories take the entitled set; 404 on out-of-scope ids; tests that prove a
+            forgotten filter still returns nothing.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> a query with no WHERE clause returning only the caller's clients.
+        </div>
+      </li>
+      <li data-id="D3">
+        <div>
+          <b>Incremental loader</b
+          ><span
+            >Message contracts; staging and change_log; apply by upsert and snapshot append; the
+            seed rewritten as the batch adapter over the same apply; reconciliation counts.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> a second holdings snapshot arriving as a file and the lanes moving without
+          a reload.
+        </div>
+      </li>
+      <li data-id="D4">
+        <div>
+          <b>Kafka front door</b
+          ><span
+            >apps/ingest with consumer groups per topic, idempotency, dead-letter view in the Audit
+            room, replay by key range; local Redpanda in docker-compose for development.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> an rm.assignment message adding a client to an RM's book in seconds.
+        </div>
+      </li>
+      <li data-id="D5">
+        <div>
+          <b>Per-client vector and alerts</b
+          ><span
+            >Analytics listener on change_log; incremental build endpoint; nightly full rebuild;
+            rubric marked stale when its vector run is superseded.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> a new client's vector and rubric ready before the RM opens the journey.
+        </div>
+      </li>
+    </ol>
+
+    <!-- 10 -->
+    <h2 id="questions"><span class="num">10</span>Decisions for you</h2>
+    <div class="grid2">
+      <div class="card">
+        <b>Q1 · Where does identity come from?</b>
+        <p>
+          The bank's OIDC in production; for the hackathon, a development provider with a login page
+          and two or three seeded RMs. Recommended: build against OIDC claims from day one, with the
+          dev provider issuing the same claims.
+        </p>
+      </div>
+      <div class="card">
+        <b>Q2 · Kafka or batch first?</b>
+        <p>
+          Batch incremental (D3) delivers most of the value and is testable without infrastructure;
+          Kafka (D4) is the same apply module behind a consumer. Recommended: D3 then D4, with
+          Redpanda locally.
+        </p>
+      </div>
+      <div class="card">
+        <b>Q3 · Isolation strictness</b>
+        <p>
+          Own book only, or own book plus team for heads, plus a "cover" assignment for holidays.
+          Recommended: all three roles in rm_assignments from the start; they are rows, not code.
+        </p>
+      </div>
+      <div class="card">
+        <b>Q4 · Percentiles across whose book?</b>
+        <p>
+          Peers and percentiles across the whole bank give better signal but leak nothing if only
+          the client's own percentile is shown. Recommended: compute bank-wide under a service role,
+          show per client.
+        </p>
+      </div>
+    </div>
+
+    <footer>
+      Assessment of the RM workbench data platform on 6 Sep 2026, after iteration 9b. Facts from
+      db/src/schema, db/src/seed, services/analytics and apps/api as committed on branch
+      feat/rm-workbench. Nothing described in sections 6 to 9 is built yet.
+    </footer>
+  </main>
+</div>
