@@ -2,13 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { SignalsResponse, type Signal } from '@jb/contracts';
 import { useMemo, useState, type JSX, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { PageHeader } from '@/components/PageHeader';
 import { Pill } from '@/components/Pill';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
 import { useMeta } from '@/lib/meta';
 import { useClockDate } from '@/state/clock';
+import { useClientContext } from '@/state/clientContext';
 import { SEVERITY_SHORT, SEVERITY_TONE, ageLabel } from './signalFormat';
 
 type SeverityFilter = 'all' | 'high' | 'medium';
@@ -17,8 +17,9 @@ type SeverityFilter = 'all' | 'high' | 'medium';
 export function SignalsPage(): JSX.Element {
   const clock = useClockDate();
   const meta = useMeta();
-  const [sp, setSp] = useSearchParams();
-  const clientId = sp.get('client') ?? meta.data?.defaultClientId ?? '';
+  const [sp] = useSearchParams();
+  const last = useClientContext((s) => s.lastClientId);
+  const clientId = sp.get('client') ?? last ?? meta.data?.defaultClientId ?? '';
   const [selected, setSelected] = useState<string | null>(null);
   const [severity, setSeverity] = useState<SeverityFilter>('all');
   const [kind, setKind] = useState<'all' | 'event' | 'derived'>('all');
@@ -58,15 +59,6 @@ export function SignalsPage(): JSX.Element {
         title="Real-time market signals"
         right={
           <>
-            <ClientPicker
-              value={clientId}
-              to={(id) => {
-                const next = new URLSearchParams(sp);
-                next.set('client', id);
-                setSp(next, { replace: true });
-                return `/signals?${next.toString()}`;
-              }}
-            />
             <Link
               to={`/clients/${clientId}/impact?signals=${picked.join(',')}`}
               className={`rounded px-3 py-1.5 text-[12.5px] font-medium no-underline ${picked.length > 0 ? 'bg-accent text-white hover:bg-accent/90' : 'pointer-events-none bg-surface-2 text-muted'}`}

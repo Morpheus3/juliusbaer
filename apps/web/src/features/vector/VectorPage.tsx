@@ -8,7 +8,6 @@ import {
 } from '@jb/contracts';
 import { useState, type JSX, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { Pill } from '@/components/Pill';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
@@ -34,7 +33,6 @@ export function VectorPage(): JSX.Element {
           </div>
           <h1 className="font-serif text-[26px] font-semibold text-ink">Customer vector</h1>
         </div>
-        <ClientPicker value={clientId} to={(id) => `/clients/${id}/vector`} />
       </div>
 
       {q.isPending && <p className="text-muted">Computing…</p>}

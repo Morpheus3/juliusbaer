@@ -14,7 +14,7 @@ export function useHealth(): UseQueryResult<Health> {
   });
 }
 
-export function TopBar(): JSX.Element {
+export function TopBar({ onSwitch }: { onSwitch: () => void }): JSX.Element {
   const health = useHealth();
   const meta = useMeta();
   const data = health.data;
@@ -39,6 +39,13 @@ export function TopBar(): JSX.Element {
         <span className="font-mono text-[12px]">{meta.data?.rm.id ?? ''}</span>
       </div>
       <div className="ml-auto flex items-center gap-5 text-[12.5px] text-muted">
+        <button
+          type="button"
+          onClick={onSwitch}
+          className="rounded border border-line bg-surface px-2.5 py-1 text-[12px] text-ink-2 hover:bg-surface-2"
+        >
+          Switch client <span className="ml-1 font-mono text-[11px] text-muted">⌘K</span>
+        </button>
         <ClockControl />
         {data && (
           <div>

@@ -7,7 +7,6 @@ import {
 } from '@jb/contracts';
 import type { JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { CHART, EChart, usdCompact } from '@/components/EChart';
 import { Kpi } from '@/components/Kpi';
 import { PageHeader } from '@/components/PageHeader';
@@ -42,11 +41,7 @@ export function Client360Page(): JSX.Element {
 
   return (
     <div className="max-w-[1400px]">
-      <PageHeader
-        eyebrow="Customer view · L1"
-        title={q.data ? q.data.client.name : 'Client 360'}
-        right={<ClientPicker value={clientId} to={(id) => `/clients/${id}`} />}
-      >
+      <PageHeader eyebrow="Customer view · L1" title={q.data ? q.data.client.name : 'Client 360'}>
         {q.data && (
           <div className="mt-1 flex flex-wrap items-center gap-2 text-[12.5px] text-muted">
             <span className="font-mono">{q.data.client.clientId}</span>

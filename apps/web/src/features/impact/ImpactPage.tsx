@@ -9,7 +9,6 @@ import {
 } from '@jb/contracts';
 import { useEffect, useMemo, useState, type JSX } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { CHART, EChart, usdCompact } from '@/components/EChart';
 import { Kpi } from '@/components/Kpi';
 import { PageHeader } from '@/components/PageHeader';
@@ -120,9 +119,6 @@ export function ImpactPage(): JSX.Element {
             </Link>
             <span className="mx-2 text-line-2">/</span>Signal impact analysis
           </>
-        }
-        right={
-          <ClientPicker value={clientId} to={(id) => `/clients/${id}/impact?${sp.toString()}`} />
         }
       >
         <div className="mt-1 text-[12px] text-muted">

@@ -1,7 +1,6 @@
 import type { TradeIdea } from '@jb/contracts';
 import { useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { PageHeader } from '@/components/PageHeader';
 import { Pill } from '@/components/Pill';
 import { fmtUsdCompact } from '@/lib/format';
@@ -51,7 +50,6 @@ export function TradeIdeasPage(): JSX.Element {
               />
               show blocked
             </label>
-            <ClientPicker value={clientId} to={(id) => `/clients/${id}/trade-ideas`} />
             <Link
               to={`/clients/${clientId}/actions`}
               className="rounded border border-line bg-surface px-3 py-1.5 text-[12.5px] text-ink-2 no-underline hover:bg-surface-2"

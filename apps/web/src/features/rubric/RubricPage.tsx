@@ -9,7 +9,6 @@ import {
 } from '@jb/contracts';
 import { useState, type JSX, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
@@ -100,7 +99,6 @@ export function RubricPage(): JSX.Element {
         }
         right={
           <>
-            <ClientPicker value={clientId} to={(id) => `/clients/${id}/rubric`} />
             <button
               type="button"
               onClick={() => {

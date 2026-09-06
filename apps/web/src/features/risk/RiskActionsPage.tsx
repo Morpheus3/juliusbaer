@@ -1,7 +1,6 @@
 import type { CombinedRiskResponse, Level, RankedAction } from '@jb/contracts';
 import type { JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { CHART, EChart } from '@/components/EChart';
 import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
@@ -41,7 +40,6 @@ export function RiskActionsPage(): JSX.Element {
         }
         right={
           <>
-            <ClientPicker value={clientId} to={(id) => `/clients/${id}/actions`} />
             <Link
               to={`/clients/${clientId}/trade-ideas`}
               className="rounded border border-line bg-surface px-3 py-1.5 text-[12.5px] text-ink-2 no-underline hover:bg-surface-2"

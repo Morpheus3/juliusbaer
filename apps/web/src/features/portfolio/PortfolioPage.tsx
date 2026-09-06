@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ClientOverviewResponse, type SnapshotDate } from '@jb/contracts';
 import type { JSX } from 'react';
 import { Link, NavLink, Outlet, useParams, useSearchParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { PageHeader } from '@/components/PageHeader';
 import { getJson } from '@/lib/api';
 import { useMeta } from '@/lib/meta';
@@ -81,7 +80,6 @@ export function PortfolioPage(): JSX.Element {
             <span className="mx-2 text-line-2">/</span>Portfolio deep dive
           </>
         }
-        right={<ClientPicker value={clientId} to={(id) => `/clients/${id}/portfolio`} />}
       />
       <nav className="mb-4 flex gap-1 border-b border-line" aria-label="Portfolio sections">
         {TABS.map((t) => (

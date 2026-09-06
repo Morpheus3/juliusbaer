@@ -1,0 +1,2542 @@
+<title>The RM Spine</title>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface-2: #edf1f6;
+    --ink: #16202e;
+    --ink-2: #3c4858;
+    --muted: #66728a;
+    --line: #d9dfe8;
+    --line-2: #c3ccd9;
+    --accent: #1f4e79;
+    --accent-soft: #e3ecf5;
+    --brass: #8f6f3a;
+    --brass-soft: #f3ebdd;
+    --crit: #b3261e;
+    --crit-soft: #f9e5e3;
+    --warn: #9a6a00;
+    --warn-soft: #fbf0d2;
+    --ok: #1f7a4d;
+    --ok-soft: #dff2e6;
+    --rail: #14213d;
+    --rail-ink: #dfe6f2;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #0f141c;
+      --surface: #161d28;
+      --surface-2: #1d2634;
+      --ink: #e7ebf1;
+      --ink-2: #c4ccd8;
+      --muted: #95a1b4;
+      --line: #273241;
+      --line-2: #344256;
+      --accent: #7fb0e0;
+      --accent-soft: #1b2c40;
+      --brass: #d2b27c;
+      --brass-soft: #2a2418;
+      --crit: #f28b82;
+      --crit-soft: #3a1f1d;
+      --warn: #e6be5a;
+      --warn-soft: #332a14;
+      --ok: #7ccb9a;
+      --ok-soft: #173224;
+      --rail: #0b1220;
+      --rail-ink: #dfe6f2;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0f141c;
+    --surface: #161d28;
+    --surface-2: #1d2634;
+    --ink: #e7ebf1;
+    --ink-2: #c4ccd8;
+    --muted: #95a1b4;
+    --line: #273241;
+    --line-2: #344256;
+    --accent: #7fb0e0;
+    --accent-soft: #1b2c40;
+    --brass: #d2b27c;
+    --brass-soft: #2a2418;
+    --crit: #f28b82;
+    --crit-soft: #3a1f1d;
+    --warn: #e6be5a;
+    --warn-soft: #332a14;
+    --ok: #7ccb9a;
+    --ok-soft: #173224;
+    --rail: #0b1220;
+    --rail-ink: #dfe6f2;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: var(--accent);
+  }
+  .page {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 40px 32px 96px;
+  }
+  @media (max-width: 960px) {
+    .page {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding: 24px 18px 64px;
+    }
+    .toc {
+      position: static !important;
+    }
+  }
+  .toc {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    font-size: 13px;
+  }
+  .toc .brand {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .toc .sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-left: 1px solid var(--line);
+  }
+  .toc li a {
+    display: block;
+    padding: 4px 0 4px 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+  }
+  .toc li a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  .toc li.part {
+    padding: 10px 0 2px 14px;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  main {
+    min-width: 0;
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin: 8px 0 14px;
+    text-wrap: balance;
+    max-width: 20ch;
+  }
+  .lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0 0 20px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin: 64px 0 6px;
+    text-wrap: balance;
+  }
+  h2 + p.intro {
+    color: var(--ink-2);
+    margin: 0 0 22px;
+    max-width: 66ch;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 28px 0 8px;
+  }
+  p {
+    max-width: 68ch;
+  }
+  .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: -2px;
+  }
+  .part-head {
+    margin: 80px 0 -40px;
+    padding-top: 18px;
+    border-top: 2px solid var(--brass);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass);
+    font-weight: 600;
+  }
+  .thesis {
+    border-left: 3px solid var(--brass);
+    background: var(--brass-soft);
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+    margin: 20px 0;
+    max-width: 72ch;
+  }
+  .thesis p {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .thesis small {
+    display: block;
+    margin-top: 8px;
+    color: var(--ink-2);
+    font-family: var(--sans);
+    font-size: 13.5px;
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 720px) {
+    .grid2,
+    .grid3 {
+      grid-template-columns: 1fr;
+    }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .card b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .card p,
+  .card li {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .card p {
+    margin: 0;
+  }
+  .card ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+  }
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    margin: 14px 0 6px;
+  }
+  th {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tr:last-child td {
+    border-bottom: 0;
+  }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .pill.crit {
+    background: var(--crit-soft);
+    color: var(--crit);
+  }
+  .pill.warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+  .pill.ok {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+  .pill.info {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .pill.brass {
+    background: var(--brass-soft);
+    color: var(--brass);
+  }
+  .pill.grey {
+    background: var(--surface-2);
+    color: var(--muted);
+  }
+  .mono {
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  .wf {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 16px 0;
+    font-size: 11.5px;
+    color: var(--ink-2);
+  }
+  .wf .cap {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .wf .strip {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    background: var(--rail);
+    color: var(--rail-ink);
+    border-radius: 5px;
+    padding: 8px 12px;
+    align-items: center;
+  }
+  .wf .strip .name {
+    font-family: var(--serif);
+    font-size: 14px;
+    color: #fff;
+  }
+  .wf .strip .meta {
+    font-size: 10.5px;
+    opacity: 0.8;
+  }
+  .wf .strip .next {
+    background: var(--brass);
+    color: #fff;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-weight: 600;
+  }
+  .wf .journey {
+    display: grid;
+    grid-template-columns: 150px 1fr 220px;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .wf .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .wf .chapters {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .wf .ch {
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface-2);
+  }
+  .wf .ch.active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .wf .ch.done {
+    color: var(--ok);
+  }
+  .wf .body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .wf .block {
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 8px 10px;
+    background: var(--surface);
+  }
+  .wf .block b {
+    display: block;
+    color: var(--ink);
+    font-size: 12px;
+  }
+  .wf .block .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .wf .side {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .wf .drawer {
+    border: 1px dashed var(--line-2);
+    border-radius: 5px;
+    padding: 8px 10px;
+    background: var(--surface-2);
+  }
+  .wf .drawer .q {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 6px 0;
+    font-style: italic;
+  }
+  .wf .btn {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    font-size: 10.5px;
+  }
+  .wf .btn.ghost {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .wf .muted {
+    color: var(--muted);
+  }
+  .moments {
+    display: grid;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .moment {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+  .moment .when {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+  }
+  .moment .when b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .moment h4 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .moment p {
+    margin: 0 0 8px;
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .moment .wow {
+    border-left: 3px solid var(--brass);
+    padding: 4px 10px;
+    margin: 8px 0;
+    font-family: var(--serif);
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .moment .draws {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  @media (max-width: 720px) {
+    .moment {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ladder {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .ladder > div {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }
+  .ladder > div b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+    margin-bottom: 2px;
+  }
+  .ladder > div strong {
+    display: block;
+    color: var(--ink);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .ladder > div.now {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  @media (max-width: 900px) {
+    .ladder {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .remove {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .remove .card:first-child {
+    border-color: var(--crit);
+  }
+  .remove .card:last-child {
+    border-color: var(--ok);
+  }
+  .steps {
+    counter-reset: s;
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+  .steps li {
+    counter-increment: s;
+    display: grid;
+    grid-template-columns: 44px 1fr 190px;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .steps li::before {
+    content: attr(data-id);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+    padding-top: 2px;
+  }
+  .steps b {
+    display: block;
+    font-weight: 600;
+  }
+  .steps span {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .steps .out {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  @media (max-width: 720px) {
+    .steps li {
+      grid-template-columns: 44px 1fr;
+    }
+    .steps .out {
+      grid-column: 2;
+    }
+    .wf .journey,
+    .wf .two {
+      grid-template-columns: 1fr;
+    }
+  }
+  .decisions {
+    counter-reset: d;
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+  .decisions li {
+    counter-increment: d;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .decisions li::before {
+    content: 'Q' counter(d);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--brass);
+    padding-top: 2px;
+  }
+  .decisions b {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .decisions span {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .decisions .rec {
+    display: block;
+    margin-top: 4px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .legend {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+  footer {
+    margin-top: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+    max-width: 72ch;
+  }
+</style>
+
+<div class="page">
+  <nav class="toc" aria-label="Contents">
+    <div class="brand">The RM Spine</div>
+    <div class="sub">Experience design · v0.3 · iterations 8 to 10</div>
+    <ol>
+      <li><a href="#thesis">1 · The thesis</a></li>
+      <li><a href="#needs">2 · What a pro RM and her manager need</a></li>
+      <li><a href="#principles">3 · Principles</a></li>
+      <li class="part">The journey</li>
+      <li><a href="#moments">4 · Six moments of the day</a></li>
+      <li><a href="#context">5 · Client context</a></li>
+      <li><a href="#journey">6 · Prepare: the client journey</a></li>
+      <li><a href="#callplan">7 · Whom to call, and when</a></li>
+      <li><a href="#companion">8 · Converse: the companion</a></li>
+      <li><a href="#promises">9 · Follow through: the promise ledger</a></li>
+      <li><a href="#ideas">10 · Grow: the idea desk</a></li>
+      <li><a href="#talk">11 · Talking to the workbench</a></li>
+      <li class="part">The manager</li>
+      <li><a href="#manager">12 · The team head's Monday</a></li>
+      <li class="part">The future</li>
+      <li><a href="#agents">13 · Toward agents that speak to clients</a></li>
+      <li class="part">Delivery</li>
+      <li><a href="#share">14 · Sharing the load</a></li>
+      <li><a href="#remove">15 · What we remove</a></li>
+      <li><a href="#measure">16 · How we know it worked</a></li>
+      <li><a href="#plan">17 · Build plan</a></li>
+      <li><a href="#questions">18 · Decisions for you</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="eyebrow">Agentic RM Workbench · design before code · v0.3</div>
+    <h1>The RM Spine</h1>
+    <p class="lede">
+      Seven iterations gave the relationship manager fourteen good rooms. This design gives her one
+      day that runs through them: a morning that is already read, a client that is already
+      understood, a conversation where the numbers arrive as she speaks, promises that keep
+      themselves, ideas that find their own clients, and a manager who sees the whole team's risk
+      and conduct at a glance. It ends with the foundation for the day when the same brain speaks to
+      clients directly.
+    </p>
+
+    <!-- 1 -->
+    <h2 id="thesis"><span class="num">01</span>The thesis</h2>
+    <div class="thesis">
+      <p>
+        Today the workbench is a chief of staff: it has read everything, it knows what the day is
+        about, it prepares the paperwork, and it never acts in her name. Tomorrow the same brain,
+        with the same memory and the same guardrails, will speak to clients through voice and chat.
+        Everything we build now must be the same system in both states.
+      </p>
+      <small
+        >The test of every feature: does it remove a moment where the RM reconstructs a client in
+        her head, and would it still be correct if an agent were doing it for her?</small
+      >
+    </div>
+    <p>
+      What changes from the first two drafts of this document is scope. The client context, the
+      journey, the call plan and the conversational drawer stay. Around them we add what a
+      professional RM reaches for a dozen times a day and has nowhere to put: a companion during the
+      call, a ledger of promises after it, a desk that maps an idea to the clients it fits, and a
+      page for the person who runs the team. And we add one thing that is not for the RM at all: a
+      communication gateway and an autonomy ladder, so that when agents speak to clients they do it
+      through the same checks, memory and audit that the RM does today.
+    </p>
+
+    <!-- 2 -->
+    <h2 id="needs"><span class="num">02</span>What a pro RM and her manager need</h2>
+    <p class="intro">
+      Asked as the RM and then as her team head, and answered honestly about what this dataset can
+      carry.
+    </p>
+    <h3>As the RM</h3>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Need</th>
+            <th>Why it matters in the conversation</th>
+            <th>What we build</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Know what the client said last time, in their words</td>
+            <td>
+              Clients notice when you remember. The note that says "did not want to discuss the
+              legacy shareholding" is the difference between trust and a wasted call.
+            </td>
+            <td>Client memory: recall of notes by meaning, sensitivities quoted, open threads</td>
+            <td><span class="pill ok">dataset</span> notes, embeddings</td>
+          </tr>
+          <tr>
+            <td>Numbers on demand while talking</td>
+            <td>
+              "If I sell the perpetual, do I clear the limit?" answered in the moment is
+              credibility; answered tomorrow is homework.
+            </td>
+            <td>Companion: cue-driven answers from the impact and exposure engines</td>
+            <td><span class="pill ok">dataset</span></td>
+          </tr>
+          <tr>
+            <td>Know what I cannot say to this client</td>
+            <td>
+              A Thai resident booked in Singapore, a German-speaking client in Zurich hours, a
+              product not registered for a jurisdiction. Mistakes here are career-ending.
+            </td>
+            <td>
+              Cross-border and suitability guardrails in the companion, from a policy file keyed by
+              residence and booking centre
+            </td>
+            <td>
+              <span class="pill ok">dataset</span> residence, booking
+              <span class="pill brass">policy</span> rules
+            </td>
+          </tr>
+          <tr>
+            <td>Never lose a promise</td>
+            <td>
+              "I will send you yield ideas" is a liability until it is done. RMs keep these in their
+              heads and in sticky notes.
+            </td>
+            <td>Promise ledger: commitments extracted from notes and calls, tracked to done</td>
+            <td><span class="pill ok">dataset</span> notes</td>
+          </tr>
+          <tr>
+            <td>Know the client's moments ahead</td>
+            <td>
+              University fees in 2027, a secondary sale in Q4, retirement to Japan in 2030. Each is
+              a conversation with a date.
+            </td>
+            <td>
+              Moments timeline from planned cash needs, objectives and notes; feeds the call plan
+            </td>
+            <td><span class="pill ok">dataset</span></td>
+          </tr>
+          <tr>
+            <td>The client's story since we last spoke, in their language</td>
+            <td>
+              Performance explained in plain words, with the reasons, is what the client actually
+              wants from a call.
+            </td>
+            <td>
+              "Since we last spoke" pack: attribution as prose plus charts, in the reporting
+              language, ready to share
+            </td>
+            <td><span class="pill ok">dataset</span></td>
+          </tr>
+          <tr>
+            <td>Which of my clients does this idea fit</td>
+            <td>
+              Ideas arrive book-wide; suitability is per client. Today the RM does the matching by
+              memory.
+            </td>
+            <td>
+              Idea desk: reverse search from idea or signal to clients, each with a why and a
+              suitability gate
+            </td>
+            <td><span class="pill ok">dataset</span></td>
+          </tr>
+          <tr>
+            <td>Where the next mandate, loan or referral is</td>
+            <td>
+              Concentration is a discretionary-mandate conversation; a cash need is a lending
+              conversation; a next-generation client is a referral.
+            </td>
+            <td>Opportunities lane in the idea desk, rule-driven with the reason shown</td>
+            <td>
+              <span class="pill ok">dataset</span>
+              <span class="pill grey">revenue: fee proxy only</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Decisions the client agreed to and never executed</td>
+            <td>
+              "Agreed the allocation in October 2024 and again in June 2025 but has not executed."
+              Decision debt is where advice dies.
+            </td>
+            <td>Decision debt items in the journey and the promise ledger</td>
+            <td><span class="pill ok">dataset</span> notes</td>
+          </tr>
+          <tr>
+            <td>The note writes itself</td>
+            <td>Documentation is the most hated hour of the day and the most audited.</td>
+            <td>
+              Companion drafts the call note, the suitability record and the follow-ups from the
+              RM's cues
+            </td>
+            <td>
+              <span class="pill ok">dataset</span> <span class="pill grey">transcripts: later</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Peers as context</td>
+            <td>"Clients like you held through June" is reassurance with evidence.</td>
+            <td>Peer context from the customer vector, already built, surfaced in the companion</td>
+            <td><span class="pill ok">dataset</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>As the team head</h3>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Need</th>
+            <th>Why</th>
+            <th>What we build</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Where is the team's risk this morning</td>
+            <td>
+              Twenty RMs, four hundred clients; the head cannot read lanes. She needs a heat map by
+              RM and theme and the ten worst households.
+            </td>
+            <td>Team risk board: matrix cells and urgency aggregated by RM, drill to journey</td>
+            <td>
+              <span class="pill ok">dataset</span> rm_id
+              <span class="pill grey">one RM in this dataset</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Where is the conduct risk</td>
+            <td>
+              Overrides without reasons, client-directed breaches, exclusions breached, KYC overdue,
+              unanswered messages ageing.
+            </td>
+            <td>
+              Conduct panel: override rate and reasons per RM, breach types, ageing, sampled
+              explainability
+            </td>
+            <td><span class="pill ok">dataset</span> audit log</td>
+          </tr>
+          <tr>
+            <td>Is the book being covered</td>
+            <td>
+              Cadence adherence, clients uncontacted for 90 days, reviews documented, suitability
+              records complete.
+            </td>
+            <td>Coverage panel from notes and the call plan's relationship-debt term</td>
+            <td><span class="pill ok">dataset</span></td>
+          </tr>
+          <tr>
+            <td>What needs my signature</td>
+            <td>Maker-checker items wait; delay is risk.</td>
+            <td>Approval queue with SLA ageing and one-click review of the evidence</td>
+            <td><span class="pill ok">dataset</span> decisions</td>
+          </tr>
+          <tr>
+            <td>Is the team busy or drowning</td>
+            <td>Deferral patterns and backlog tell her who needs help before the client does.</td>
+            <td>Capacity panel: call-sheet load, deferrals with reasons, overflow days per RM</td>
+            <td><span class="pill ok">dataset</span> call plan log</td>
+          </tr>
+          <tr>
+            <td>Are ideas landing</td>
+            <td>
+              An idea sent to seven clients and acted on by three is a fact about the idea and about
+              the RM.
+            </td>
+            <td>Idea uptake: contacted, discussed, acted, per idea and per RM</td>
+            <td><span class="pill ok">dataset</span> workflow log</td>
+          </tr>
+          <tr>
+            <td>Commercial pulse</td>
+            <td>Flows, fee revenue, pipeline.</td>
+            <td>
+              Fees from management-fee transactions as a proxy; flows from attribution; pipeline
+              from opportunities
+            </td>
+            <td><span class="pill grey">needs a feed</span> for real revenue</td>
+          </tr>
+          <tr>
+            <td>Is the machine behaving</td>
+            <td>Before any agent talks to a client, someone must own its behaviour.</td>
+            <td>
+              Model and agent governance: LLM traces, confidence distribution, guardrail hits,
+              shadow-mode agreement, kill switch
+            </td>
+            <td><span class="pill ok">dataset</span> traces</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="legend">
+      <span class="pill ok">dataset</span> computable from the CSVs and notes today ·
+      <span class="pill brass">policy</span> rules in a reference file, not code ·
+      <span class="pill grey">needs a feed</span> designed for, shown as an honest placeholder until
+      connected.
+    </p>
+
+    <!-- 3 -->
+    <h2 id="principles"><span class="num">03</span>Principles</h2>
+    <p class="intro">Written so they can be used to say no.</p>
+    <div class="grid3">
+      <div class="card">
+        <b>Start from the morning, not the schema</b>
+        <p>
+          Every screen earns its place by answering a question the RM has at a specific hour. If we
+          cannot name the hour, we do not build the screen.
+        </p>
+      </div>
+      <div class="card">
+        <b>Conclusion first, proof on demand</b>
+        <p>
+          L1 says what, L2 says why, L3 shows the rows. The spine applies this to sentences and to
+          the manager's numbers, not just to cards.
+        </p>
+      </div>
+      <div class="card">
+        <b>The system chooses, the RM confirms</b>
+        <p>
+          No empty states asking her to pick. The call sheet orders, the journey opens on the top
+          client, the drawer proposes. She overrides; she never starts from nothing.
+        </p>
+      </div>
+      <div class="card">
+        <b>One client at a time</b>
+        <p>
+          Once a client is in context, everything is about that client until she leaves. Switching
+          is deliberate, never a side effect.
+        </p>
+      </div>
+      <div class="card">
+        <b>Same brain, every channel</b>
+        <p>
+          What the companion tells the RM, what the drawer tells the RM, and what an agent will one
+          day tell a client come from the same tools, memory, guardrails and audit. No second system
+          for clients.
+        </p>
+      </div>
+      <div class="card">
+        <b>Autonomy is earned, measured, and revocable</b>
+        <p>
+          Agents move up the ladder only when shadow-mode agreement says they are ready, one
+          playbook at a time, and a manager can send them back down with one switch.
+        </p>
+      </div>
+      <div class="card">
+        <b>Language is an input</b>
+        <p>
+          Typing or saying a sentence is the fastest way to express intent. Language becomes an
+          insight or a proposed task with the same evidence contract as every card.
+        </p>
+      </div>
+      <div class="card">
+        <b>Nothing acts, everything logs</b>
+        <p>
+          The workbench prepares and proposes. Approval is a human click; the audit trail records
+          who, what and why.
+        </p>
+      </div>
+      <div class="card">
+        <b>Honest about data</b>
+        <p>
+          Where the dataset cannot support a number, the screen says so and shows the shape of the
+          answer, never a fabricated figure.
+        </p>
+      </div>
+    </div>
+
+    <div class="part-head">Part one · The journey</div>
+
+    <!-- 4 -->
+    <h2 id="moments"><span class="num">04</span>Six moments of the day</h2>
+    <p class="intro">
+      The journey is not a set of screens. It is six moments, each with one thing it must make feel
+      effortless. Priscilla Ong covers twenty clients across two booking centres; this is her
+      Tuesday.
+    </p>
+    <div class="moments">
+      <div class="moment">
+        <div class="when">08:30<b>Wake</b></div>
+        <div>
+          <h4>Today</h4>
+          <p>
+            She opens the app. No dashboard. A note from her chief of staff: four sentences on the
+            book, what moved since the last snapshot, and the call sheet with the order, the hour
+            and the reason for each conversation. Below, the three lanes for when she wants the
+            detail, and "decided yesterday" so the day has a beginning.
+          </p>
+          <div class="wow">
+            "Good morning. Lau's collateral will breach at the next snapshot; call him before ten
+            Hong Kong time. Zhang and Voss-Brenner can wait until Wednesday. One review to
+            schedule."
+          </div>
+          <div class="draws">
+            Draws on: book cockpit, call plan (section 7), signals, audit log. Brief via Claude when
+            live, template otherwise.
+          </div>
+        </div>
+      </div>
+      <div class="moment">
+        <div class="when">08:45<b>Prepare</b></div>
+        <div>
+          <h4>The client journey</h4>
+          <p>
+            She taps Lau. One page in five chapters, read top to bottom: where he stands, what
+            happened, what could happen, what to do, what she decided. Every number links to its
+            rows. The talking points, the sensitivities from his notes, and the moments ahead sit at
+            the top of chapter 4. Eight minutes, one screen, and she knows him again.
+          </p>
+          <div class="wow">
+            Prose that knows its sources: hover any figure and the rows that produced it appear.
+            Explainability is the text, not a panel.
+          </div>
+          <div class="draws">
+            Draws on: every existing client endpoint, notes, moments timeline, call plan. Section 6.
+          </div>
+        </div>
+      </div>
+      <div class="moment">
+        <div class="when">09:00<b>Converse</b></div>
+        <div>
+          <h4>The companion</h4>
+          <p>
+            She calls Lau with the companion open beside the journey. As he talks she types
+            three-word cues, or dictates them: "asking about selling perpetual". The companion
+            answers in a second with the number, the rule, the suitability status and what she may
+            and may not say to a Hong Kong resident. When he mentions the November project, the
+            cash-need card is already there. When the call ends, the note is drafted, the two
+            promises she made are listed, and the suitability record is pre-filled.
+          </p>
+          <div class="wow">
+            Say it, and the note writes itself. Ask it, and the number is there before the client
+            finishes the sentence.
+          </div>
+          <div class="draws">
+            Draws on: impact, exposure, actions, rubric, notes memory, cross-border policy, peers.
+            Section 8.
+          </div>
+        </div>
+      </div>
+      <div class="moment">
+        <div class="when">09:40<b>Follow through</b></div>
+        <div>
+          <h4>The promise ledger</h4>
+          <p>
+            Two promises from the call appear as tasks with drafts attached: the confirmation email
+            in Traditional Chinese, and the yield ideas he asked for, already screened for
+            suitability. She edits one line, sends, and the log writes itself. The collateral action
+            goes to her checker with the evidence attached. Nothing is on a sticky note.
+          </p>
+          <div class="wow">
+            A promise made in a call is a task before she puts the phone down, with the first draft
+            done.
+          </div>
+          <div class="draws">
+            Draws on: outreach drafter, workflow, audit, promise extraction. Section 9.
+          </div>
+        </div>
+      </div>
+      <div class="moment">
+        <div class="when">11:00<b>Grow</b></div>
+        <div>
+          <h4>The idea desk</h4>
+          <p>
+            The house view says short-duration credit. She asks: who should hear this? The desk
+            answers with six clients, each with a one-line why, the suitability gate, and the
+            cross-border check, and offers six personalised drafts in six languages. Beneath, the
+            opportunities lane: Lau's cash need is a lending conversation; Zhang's concentration is
+            a discretionary-mandate conversation; Hartono's father is a succession conversation.
+          </p>
+          <div class="wow">
+            Ideas find their own clients. One sentence becomes a campaign with the compliance
+            already done.
+          </div>
+          <div class="draws">
+            Draws on: trade ideas engine inverted, customer vectors, suitability, policy. Section
+            10.
+          </div>
+        </div>
+      </div>
+      <div class="moment">
+        <div class="when">17:30<b>Reflect</b></div>
+        <div>
+          <h4>My week</h4>
+          <p>
+            Before she leaves: what she decided, what slipped and why, which promises are due
+            tomorrow, which clients are drifting past their cadence, and what the machine did on her
+            behalf today. Tomorrow's call sheet is already drafted.
+          </p>
+          <div class="wow">
+            The day has a shape and an ending. Nothing is carried in her head overnight.
+          </div>
+          <div class="draws">Draws on: audit log, promise ledger, call plan, deferrals.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <h2 id="context"><span class="num">05</span>Client context</h2>
+    <p class="intro">
+      The mechanism that makes the rest possible. Small, and more important than any screen.
+    </p>
+    <div class="wf">
+      <p class="cap">Context strip · appears on every client screen under the top bar</p>
+      <div class="strip">
+        <div>
+          <span class="name">Lau Chi Ming</span>
+          <span class="meta">· CL-0014 · Hong Kong · Balanced 5/10 · AUM $26.5M</span><br /><span
+            class="meta"
+            ><span class="pill crit">Act Now</span> &nbsp;LTV 69.4% vs 70% trigger, 0.6 pts headroom
+            and falling &nbsp;·&nbsp; Call by today · morning HKT · call · zh-Hant &nbsp;·&nbsp; 2
+            open promises</span
+          >
+        </div>
+        <div>
+          <span class="next">Next step: triage 9 alerts →</span> &nbsp;<span style="opacity: 0.8"
+            >Switch ⌘K</span
+          >
+        </div>
+      </div>
+    </div>
+    <ul style="font-size: 14px; color: var(--ink-2)">
+      <li>
+        <b>The client.</b> Source of truth is the URL; a small store mirrors it so the rail, the
+        drawer, the companion and the strip agree. Leaving the client screens keeps the last client
+        as current.
+      </li>
+      <li>
+        <b>The clock.</b> Already global; shown in brass only when it is not today, so a replay is
+        never mistaken for the present.
+      </li>
+      <li>
+        <b>The position.</b> Matrix cell, urgency rank, the single most important open item, and the
+        call plan's line for this client.
+      </li>
+      <li>
+        <b>The step and the promises.</b> The next incomplete workflow step as the button; the count
+        of open promises as a fact.
+      </li>
+    </ul>
+    <p>
+      Command-K switches client while keeping the room, so comparing two clients in Exposure is one
+      keystroke. The strip is a strip and not a sidebar because it reads as a fact about the page,
+      not a second navigation.
+    </p>
+
+    <!-- 6 -->
+    <h2 id="journey"><span class="num">06</span>Prepare: the client journey</h2>
+    <p class="intro">
+      One page, five chapters, read top to bottom. The product's answer to "go deep on two or three
+      clients rather than shallow across twenty".
+    </p>
+    <div class="wf">
+      <p class="cap">Client journey · /clients/:id/journey · composed from existing endpoints</p>
+      <div class="strip">
+        <div>
+          <span class="name">Lau Chi Ming</span>
+          <span class="meta">· Act Now · Call by today · Step 3 of 9</span>
+        </div>
+        <div><span class="next">Next: triage alerts →</span></div>
+      </div>
+      <div class="journey">
+        <div class="chapters">
+          <div class="ch done">1 · Where he stands</div>
+          <div class="ch active">2 · What happened</div>
+          <div class="ch">3 · What could happen</div>
+          <div class="ch">4 · What to do</div>
+          <div class="ch">5 · What I decided</div>
+          <div style="margin-top: 8px; font-size: 10.5px; color: var(--muted)">
+            Rooms: 360 · Portfolio · Signals · Impact · Rubric · Risk · Ideas · Workflow · Vector
+          </div>
+        </div>
+        <div class="body">
+          <div class="block">
+            <b>In one paragraph</b>Sixty-three, Hong Kong property developer, Balanced mandate at
+            5/10. Household USD 26.5m, down 6.0% since December. Lombard facility at 69.4% LTV
+            against a 70% trigger, headroom falling since June. Needs HKD 60m for the Mid-Levels
+            project from November; daily-liquid assets cover 1.5x of the next twelve months.
+            <span class="pill brass">facts · 6 sources</span>
+          </div>
+          <div class="block">
+            <b>Moments ahead</b>Nov 2026 · HKD 60m project drawdown &nbsp;·&nbsp; Jan 2027 · KYC
+            refresh &nbsp;·&nbsp; from notes: "wants to keep the perpetuals for income" (Jun)
+            <span class="pill grey">sensitivity</span>
+          </div>
+          <div class="block">
+            <b>What happened since December</b>−$1.7m: price −$1.6m (Golden Harbour perpetual −31%,
+            Pacific Rim perpetual −13%), FX −$0.1m, flows nil.
+            <span class="btn ghost">Show waterfall</span>
+            <span class="btn ghost">Open Portfolio room</span>
+          </div>
+          <div class="block" style="opacity: 0.6">
+            <b>3 · What could happen</b>Hong Kong property leg down: −7.3%, LTV to 73.4%, margin
+            call. Base-case stress of recent signals −1.1%.
+          </div>
+          <div class="block" style="opacity: 0.6">
+            <b>4 · What to do</b>Talking points · Avoid · 1. Discuss collateral
+            <span class="pill ok">Suitability OK</span>
+            <span class="btn">Approve and log</span> &nbsp; 2. Fed impact &nbsp; 3. Trim Golden
+            Harbour to 12%
+          </div>
+        </div>
+        <div class="side">
+          <div class="block">
+            <b>Rubric</b>
+            <div class="row"><span>Capacity</span><span class="mono">1</span></div>
+            <div class="row"><span>Appetite</span><span class="mono">2</span></div>
+            <div class="row"><span>Horizon</span><span class="mono">2</span></div>
+            <div class="row"><span class="muted">confidence 50–58% · 2 assessors</span></div>
+          </div>
+          <div class="block">
+            <b>Promises</b>Send yield ideas (from 14 Apr) <span class="pill warn">open 23d</span>
+          </div>
+          <div class="drawer">
+            <b>Ask</b>
+            <div class="q">does trimming the Pacific Rim perpetual clear the limit?</div>
+            <span class="btn">Ask</span> <span class="btn ghost">Start call</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Chapter</th>
+            <th>Question it answers</th>
+            <th>Composed from</th>
+            <th>Room it opens</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>1 · Where they stand</b></td>
+            <td>
+              Who is this person, what do they hold and owe, what do they say they want, what is
+              coming.
+            </td>
+            <td>
+              Overview, factual record, cash flows, rubric summary, <b>moments timeline</b>, last
+              three notes with sensitivities quoted.
+            </td>
+            <td>Client 360, Portfolio, Vector</td>
+          </tr>
+          <tr>
+            <td><b>2 · What happened</b></td>
+            <td>How did we get here since the baseline, and which events did it.</td>
+            <td>
+              Attribution by asset class and top movers; signals that reached the household; notes
+              in the period; peers' behaviour in the same window.
+            </td>
+            <td>Portfolio, Signals</td>
+          </tr>
+          <tr>
+            <td><b>3 · What could happen</b></td>
+            <td>What recent signals imply and what the named scenarios do to this household.</td>
+            <td>
+              Combined risk, impact at base and severe, one scenario chosen by relevance to the
+              client's largest exposure.
+            </td>
+            <td>Impact, Risk</td>
+          </tr>
+          <tr>
+            <td><b>4 · What to do</b></td>
+            <td>What to say, what to avoid, which conversations and trades, in what order.</td>
+            <td>
+              <b>Talking points and avoid lines</b>, ranked actions with inline approve and reject,
+              trade ideas with the suitability gate, <b>decision debt</b>, the outreach draft,
+              cross-border notes.
+            </td>
+            <td>Risk, Trade ideas, Workflow</td>
+          </tr>
+          <tr>
+            <td><b>5 · What I decided</b></td>
+            <td>What is logged, what is promised, what is still open.</td>
+            <td>
+              Audit events, <b>promise ledger</b> for the client, deferral history, sent outreach.
+            </td>
+            <td>Workflow, Audit</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid2" style="margin-top: 14px">
+      <div class="card">
+        <b>Chapters, not tabs</b>
+        <p>
+          Tabs hide. A scroll reveals the order of reasoning; the chapter rail shows where she is.
+        </p>
+      </div>
+      <div class="card">
+        <b>Prose with numbers, then charts</b>
+        <p>
+          Chapter openers are sentences composed from computed facts, each carrying its source
+          count. Claude rewrites them when live and is marked as such; it never adds a fact.
+        </p>
+      </div>
+      <div class="card">
+        <b>Decisions inline</b>
+        <p>
+          Approve, reject, triage and send live in chapters 4 and 5. The Workflow room remains for
+          review detail and maker-checker.
+        </p>
+      </div>
+      <div class="card">
+        <b>Reading budgets</b>
+        <p>
+          Chapter 1 in ninety seconds; the page in eight minutes. If a chapter grows past a screen,
+          we cut.
+        </p>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <h2 id="callplan"><span class="num">07</span>Whom to call, and when</h2>
+    <p class="intro">
+      Given twenty clients, a finite day and each client's own deadlines: who gets the first call,
+      by when, at what hour, through which channel, and what to say. A deterministic algorithm,
+      fully explainable, with every weight in a reference file.
+    </p>
+    <div class="wf">
+      <p class="cap">Call sheet · lives on Today · one row per conversation, not per alert</p>
+      <div class="block">
+        <b>Today · 4 calls, 1 to schedule · 2 h 10 min</b>
+        <div class="row">
+          <span
+            >1 &nbsp;<b style="display: inline">Lau Chi Ming</b> ·
+            <span class="pill crit">by today</span> · morning HKT · call · zh-Hant &nbsp;<span
+              class="pill brass"
+              >priority 61</span
+            ></span
+          ><span><span class="btn">Open journey</span> <span class="btn ghost">Defer</span></span>
+        </div>
+        <div class="muted" style="margin: 2px 0 6px 18px">
+          Collateral headroom 0.6 pts, projected to breach at the next snapshot · one call also
+          covers 3 concentration items and the November cash need · last spoken 24 days ago · 1 open
+          promise
+        </div>
+        <div class="row">
+          <span
+            >2 &nbsp;<b style="display: inline">Zhang Meiling</b> ·
+            <span class="pill warn">by Wed</span> · afternoon SGT · call · zh-Hans &nbsp;<span
+              class="pill brass"
+              >priority 38</span
+            ></span
+          ><span><span class="btn">Open journey</span> <span class="btn ghost">Defer</span></span>
+        </div>
+        <div class="muted" style="margin: 2px 0 6px 18px">
+          Look-through 22.5% vs 15% limit through Helios, widened since June · Fed hold reaches 41%
+          · not contacted in 47 days against a monthly cadence
+        </div>
+        <div class="row">
+          <span
+            >3 &nbsp;<b style="display: inline">Voss-Brenner</b> ·
+            <span class="pill warn">by Fri</span> · 15:00–17:00 SGT (morning CET) · email first · de
+            &nbsp;<span class="pill brass">priority 29</span></span
+          ><span><span class="btn">Open journey</span> <span class="btn ghost">Defer</span></span>
+        </div>
+        <div class="row" style="margin-top: 8px">
+          <span class="muted"
+            >Schedule, not call: Hartono Wijaya Kusuma, annual review due (last review 8 Jan) ·
+            Deferred by you: Cheung to Mon, "travelling this week"</span
+          >
+        </div>
+      </div>
+    </div>
+    <h3>Whom: the priority score</h3>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>What it captures</th>
+            <th>How it is computed</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>1 · Harm</b></td>
+            <td>What is at stake if nothing is said.</td>
+            <td>
+              The existing urgency: Σ over open items of lane rank (Now 3, week 2, month 1) ×
+              severity (high 3, medium 2, low 1) + 1 per new or escalated item.
+            </td>
+            <td>Horizon engine</td>
+          </tr>
+          <tr>
+            <td><b>2 · Clock</b></td>
+            <td>How soon each item bites.</td>
+            <td>
+              Each item multiplied by τ = 1 + max(0, 1 − days-to-deadline / 30). Deadlines from KYC
+              due, cash-need start less a lead time, <b>moments</b> from notes; a facility with
+              falling headroom gets a projected breach date (headroom ÷ fall per snapshot ×
+              interval); a severe signal gets a three-business-day freshness window.
+            </td>
+            <td>Alerts, LTV trend, moments, policy</td>
+          </tr>
+          <tr>
+            <td><b>3 · Convergence</b></td>
+            <td>One conversation, several outcomes.</td>
+            <td>+2 per distinct theme beyond the first among Now and week items.</td>
+            <td>Horizon themes</td>
+          </tr>
+          <tr>
+            <td><b>4 · Relationship debt</b></td>
+            <td>Overdue for contact regardless of alerts.</td>
+            <td>
+              Days since last note versus cadence for the wealth band (policy: UHNW 30, HNW 60). +1
+              per 30 days overdue, capped at +4. <b>Open promises past due add +1 each</b>, capped
+              at +3.
+            </td>
+            <td>Notes, promise ledger, policy</td>
+          </tr>
+          <tr>
+            <td><b>5 · Recency damper</b></td>
+            <td>Do not call twice about the same thing.</td>
+            <td>
+              An item whose theme appears in a note from the last seven days is halved, unless it
+              escalated since.
+            </td>
+            <td>Notes, momentum</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Priority = Σ<sub>items</sub> harm × clock × damper + convergence + relationship debt. Ties
+      break by money at stake, then AUM. Every term is a row in L2 with its inputs, in the style of
+      the rubric's rule contributions.
+    </p>
+    <h3>When: deadline and slot</h3>
+    <div class="grid2">
+      <div class="card">
+        <b>Due by</b>
+        <p>
+          Earliest hard date among the client's items and moments; if none, the lane decides: Now
+          today, week within five business days, month within twenty. Shown as a day, not a score.
+        </p>
+      </div>
+      <div class="card">
+        <b>Slot</b>
+        <p>
+          Business hours in the client's local time from a country-to-timezone table in the
+          reference data, intersected with the RM's hours. Weekends skipped; holidays when a
+          calendar is supplied.
+        </p>
+      </div>
+      <div class="card">
+        <b>Channel and language</b>
+        <p>
+          The client's most frequent channel in the notes, forced to a call for margin calls and
+          unanswered messages, to a meeting for reviews. Language from the reporting language.
+        </p>
+      </div>
+      <div class="card">
+        <b>Call or schedule</b>
+        <p>
+          Annual reviews and KYC refreshes are meetings to schedule, shown on their own line so they
+          do not compete with today's collateral call.
+        </p>
+      </div>
+    </div>
+    <h3>Packing the day</h3>
+    <p>
+      Sort by due-by then priority; pack into the RM's capacity from the policy file (six
+      conversations of thirty minutes by default, longer for meetings). Overflow moves to the next
+      business day with the reason visible. Deferrals carry a reason, are logged, and hold the
+      client out until the chosen day; an escalation brings the client back marked "returned early".
+      Done comes from the workflow's send or log step; the RM never ticks a box the system already
+      knows about.
+    </p>
+    <h3>Why deterministic</h3>
+    <p>
+      A ranking the RM must argue with cannot be a learned score. Five terms with visible inputs can
+      be argued with. Deferral logs are kept from day one so the weights can be calibrated later,
+      per RM, if you choose. Weights, cadences, lead times, capacity, hours and the timezone table
+      live in a reference file beside the signal rules: another bank, another book, change the file,
+      not the code.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Client (illustrative)</th>
+            <th>Harm × clock × damper</th>
+            <th>Convergence</th>
+            <th>Relationship debt</th>
+            <th>Priority</th>
+            <th>Due by</th>
+            <th>Slot</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Lau Chi Ming</td>
+            <td>
+              Collateral Now/high 9 × 1.9 = 17.1; three concentration week items 18; liquidity 4 ×
+              1.5 = 6; Fed-hold signal 4 × 1.3 = 5.2; others 7.7
+            </td>
+            <td>+4</td>
+            <td>+1 (one promise past due)</td>
+            <td class="mono">61</td>
+            <td>today</td>
+            <td>09:00–12:00 HKT · call</td>
+          </tr>
+          <tr>
+            <td>Zhang Meiling</td>
+            <td>
+              Look-through week/high 6 + 1 escalated; Fed hold 5.2; mandate drift 6; others 11.8
+            </td>
+            <td>+6</td>
+            <td>+1 (47 days vs 30)</td>
+            <td class="mono">38</td>
+            <td>Wed</td>
+            <td>14:00–17:00 SGT · call</td>
+          </tr>
+          <tr>
+            <td>Voss-Brenner</td>
+            <td>Week items 12; sustainability exclusion 4</td>
+            <td>+4</td>
+            <td>+2 (71 days vs 30)</td>
+            <td class="mono">29</td>
+            <td>Fri</td>
+            <td>15:00–17:00 SGT · email first</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size: 13px; color: var(--muted)">
+      Worked by hand from the current alerts to show the shape; the implementation computes from the
+      same inputs and L2 shows the real rows.
+    </p>
+
+    <!-- 8 -->
+    <h2 id="companion"><span class="num">08</span>Converse: the companion</h2>
+    <p class="intro">
+      The moment that decides whether the client trusts her. The companion sits beside the journey
+      during a call and does three things: answers cues instantly with evidence, keeps her inside
+      the lines, and writes the record.
+    </p>
+    <div class="wf">
+      <p class="cap">
+        Companion · opens from "Start call" on the journey · right-hand column, journey stays
+        visible
+      </p>
+      <div class="two">
+        <div class="body">
+          <div class="block">
+            <b
+              >On the call with Lau Chi Ming · 00:06:12 · zh-Hant · Hong Kong resident, HK
+              booking</b
+            >
+            <div class="row"><span class="muted">Cue (type or dictate):</span></div>
+            <div class="drawer"><div class="q">asking about selling the perpetual</div></div>
+            <div class="row">
+              <span
+                ><b style="display: inline">Selling Pacific Rim perpetual (USD 2.4m)</b> takes
+                issuer concentration from 22.5% to 13.9%, inside the 15% limit. LTV headroom
+                improves 1.1 pts if proceeds stay as collateral. Suitability:
+                <span class="pill ok">OK</span>. Tax: none in HK. He said in June he wants to keep
+                the perpetuals for income; alternative is trimming Golden Harbour first (−31%
+                YTD).</span
+              >
+            </div>
+            <div class="row">
+              <span class="muted">tools: exposure, impact, suitability, notes · 0.8 s</span
+              ><span
+                ><span class="btn ghost">Add to note</span>
+                <span class="btn ghost">Propose action</span></span
+              >
+            </div>
+          </div>
+          <div class="block">
+            <b>Guardrails for this client</b><span class="pill warn">Cross-border</span> Resident
+            HK, booked HK: no restriction. <span class="pill info">Suitability</span> Balanced 5/10;
+            structured products need horizon check. <span class="pill grey">Not permitted</span> No
+            performance promises; no advice on the Mid-Levels project itself.
+          </div>
+          <div class="block">
+            <b>Ready cards</b> Cash need Nov 2026 HKD 60m · Fed hold impact −1.1% base · Peers: 4 of
+            6 similar clients held perpetuals through June · Open promise: yield ideas (14 Apr)
+          </div>
+        </div>
+        <div class="side">
+          <div class="block">
+            <b>Note, drafting as you go</b>Client asked about selling Pacific Rim perpetual to
+            relieve concentration; discussed Golden Harbour as alternative given his income
+            preference. Agreed to top up collateral by Friday. RM to send yield ideas and a written
+            summary. <span class="pill brass">draft</span>
+          </div>
+          <div class="block">
+            <b>Promises heard</b>
+            <div class="row">
+              <span>Send yield ideas (repeat of 14 Apr)</span><span class="pill warn">confirm</span>
+            </div>
+            <div class="row">
+              <span>Send written summary in zh-Hant</span><span class="pill warn">confirm</span>
+            </div>
+            <div class="row">
+              <span>Client: top up collateral by Fri</span
+              ><span class="pill info">client promise</span>
+            </div>
+          </div>
+          <div class="block">
+            <b>Suitability record</b>Pre-filled: objective, horizon, product, rationale, risks
+            explained. <span class="btn ghost">Review</span>
+          </div>
+          <span class="btn">End call → confirm note and tasks</span>
+        </div>
+      </div>
+    </div>
+    <h3>How it works</h3>
+    <div class="grid2">
+      <div class="card">
+        <b>Cues, not transcripts</b>
+        <p>
+          The RM types or dictates short cues. Dictation uses the browser's speech recognition,
+          which needs no server and no recording of the client. Full call transcription is a later
+          step that needs telephony, consent and recording policy; the design accepts it as another
+          cue source without change.
+        </p>
+      </div>
+      <div class="card">
+        <b>Answers from tools only</b>
+        <p>
+          Each cue goes to the same intent router as the drawer with the client fixed. Numbers come
+          from the exposure, impact, actions and rubric services; words from the notes; nothing
+          else. The tool trace is one click away. Without an API key, a command grammar covers "sell
+          X", "impact of Y", "cash need", "peers".
+        </p>
+      </div>
+      <div class="card">
+        <b>Guardrails are data</b>
+        <p>
+          A cross-border policy file keyed by residence and booking centre says what may be
+          discussed, offered or sent, with the rule text. Suitability comes from the existing gate.
+          The companion shows the guardrails before the call and flags a cue that crosses one.
+        </p>
+      </div>
+      <div class="card">
+        <b>Memory that quotes</b>
+        <p>
+          Sensitivities and preferences are quoted from notes with their date, never inferred. "He
+          said in June he wants to keep the perpetuals for income" is a citation.
+        </p>
+      </div>
+      <div class="card">
+        <b>The record writes itself</b>
+        <p>
+          The note drafts from the cues and the answers; promises are extracted as candidate tasks
+          the RM confirms; the suitability record pre-fills from the discussed idea. Ending the call
+          produces one confirm screen and then the audit events.
+        </p>
+      </div>
+      <div class="card">
+        <b>Nothing is sent from the companion</b>
+        <p>
+          It drafts and proposes. Sending, approving and booking happen in the follow-through step
+          with the usual clicks.
+        </p>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <h2 id="promises"><span class="num">09</span>Follow through: the promise ledger</h2>
+    <p class="intro">
+      Advice dies in the gap between the call and the follow-up. The ledger closes it.
+    </p>
+    <div class="grid3">
+      <div class="card">
+        <b>What a promise is</b>
+        <p>
+          A commitment with a party, a thing, and a due date. RM promises ("send yield ideas"),
+          client promises ("top up collateral by Friday"), and <b>decision debt</b>: an allocation
+          agreed and not executed, found in the notes.
+        </p>
+      </div>
+      <div class="card">
+        <b>Where they come from</b>
+        <p>
+          Extracted from historical notes by Claude with the sentence quoted, from the companion's
+          cues at call end, and from the RM directly. Every promise carries its source sentence.
+        </p>
+      </div>
+      <div class="card">
+        <b>What the ledger does</b>
+        <p>
+          Attaches a first draft to every RM promise (outreach, idea list, summary pack), tracks
+          client promises against the data (a collateral top-up shows in the facility snapshot),
+          raises decision debt in the journey and the call plan, and marks done from the send or log
+          event.
+        </p>
+      </div>
+    </div>
+    <h3>The "Since we last spoke" pack</h3>
+    <p>
+      One click produces a client-facing summary in the reporting language: what changed and why in
+      three sentences, the attribution chart, the positions discussed, the actions agreed, and the
+      standard caveats. It is the most common promise an RM makes and the most tedious to fulfil. It
+      is generated from the journey's chapters 2 and 4, so it never disagrees with what the RM saw.
+    </p>
+
+    <!-- 10 -->
+    <h2 id="ideas"><span class="num">10</span>Grow: the idea desk</h2>
+    <p class="intro">
+      Today the trade-ideas engine answers "what fits this client". The desk turns it around: "which
+      clients does this fit", then makes the campaign.
+    </p>
+    <div class="wf">
+      <p class="cap">Idea desk · /ideas · book-scoped</p>
+      <div class="block">
+        <b>Ask the book</b>
+        <div class="drawer">
+          <div class="q">who should hear about short-duration credit after the Fed hold?</div>
+        </div>
+        <div class="row">
+          <span
+            ><b style="display: inline">6 clients</b> · rule: rate-sensitive income holdings ≥ 20%
+            and appetite ≥ 2 and horizon ≤ 2 · 2 blocked by suitability, shown greyed</span
+          ><span
+            ><span class="btn">Draft 6 messages</span>
+            <span class="btn ghost">Show rule</span></span
+          >
+        </div>
+        <div class="row">
+          <span
+            >Lau Chi Ming · perpetuals 44% of household · zh-Hant ·
+            <span class="pill ok">OK</span></span
+          ><span class="muted">why: income mandate, duration 6.2</span>
+        </div>
+        <div class="row">
+          <span>Zhang Meiling · 31% · zh-Hans · <span class="pill ok">OK</span></span
+          ><span class="muted">why: concentration relief and duration</span>
+        </div>
+        <div class="row">
+          <span class="muted"
+            >Tanaka · 28% · ja · <span class="pill crit">Blocked</span> horizon 3, yen retirement
+            2030</span
+          ><span class="muted">shown so the RM knows why not</span>
+        </div>
+      </div>
+      <div class="block" style="margin-top: 8px">
+        <b>Opportunities</b> Lending: Lau, HKD 60m need in Nov against liquid assets 1.5×
+        <span class="pill grey">rule</span> · Discretionary mandate: Zhang, concentration breached
+        twice in a year <span class="pill grey">rule</span> · Succession: Wong, four children, no
+        structure, fourth attempt <span class="pill grey">from notes</span> · Next generation:
+        Hartono, treasury handover underway <span class="pill grey">from notes</span>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top: 14px">
+      <div class="card">
+        <b>Reverse search</b>
+        <p>
+          Idea rules already exist as data. Running them across the book with the suitability gate
+          and cross-border check gives the client list; the customer vector gives "clients like the
+          ones who took this idea before".
+        </p>
+      </div>
+      <div class="card">
+        <b>Campaign, not broadcast</b>
+        <p>
+          One draft per client, in their language, from their facts, each reviewed and sent
+          individually. Uptake is tracked: contacted, discussed, acted. The manager sees it in
+          section 12.
+        </p>
+      </div>
+      <div class="card">
+        <b>Opportunities are rules with reasons</b>
+        <p>
+          A lending opportunity is a cash need against liquid coverage; a mandate opportunity is
+          repeated breaches; succession and next generation come from notes. Each shows its rule or
+          its quoted sentence. No scoring theatre.
+        </p>
+      </div>
+      <div class="card">
+        <b>Revenue, honestly</b>
+        <p>
+          Management-fee transactions give a fee proxy per client. Real revenue, RoA and pipeline
+          value need a feed; the desk shows the shape with a "needs a feed" mark rather than a
+          made-up number.
+        </p>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <h2 id="talk"><span class="num">11</span>Talking to the workbench</h2>
+    <p class="intro">
+      Language is the third input, alongside click and clock. The drawer, the companion and one day
+      the client-facing agent all run on the same router. Four intents.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Intent</th>
+            <th>Examples</th>
+            <th>What happens</th>
+            <th>Without an API key</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Ask</b> (insight)</td>
+            <td>
+              "why is Lau first", "what did the Fed hold do to Cheung", "does trimming the perpetual
+              clear the limit"
+            </td>
+            <td>
+              Claude plans read-only tool calls over the services, writes an answer whose every
+              number comes from a tool result; tool trace as L3.
+            </td>
+            <td>Unavailable, with the honest notice.</td>
+          </tr>
+          <tr>
+            <td><b>Find</b> (across the book)</td>
+            <td>
+              "who should hear about short-duration credit", "who has not been contacted in 60
+              days", "who has excluded holdings"
+            </td>
+            <td>
+              Maps to the idea desk and book queries; returns a client list with a why per row.
+            </td>
+            <td>Common queries via grammar.</td>
+          </tr>
+          <tr>
+            <td><b>Do</b> (task)</td>
+            <td>
+              "log the call: …", "approve the collateral action", "override appetite to 1 because
+              …", "defer Lau to Monday", "draft the summary in Chinese"
+            </td>
+            <td>
+              Claude maps the sentence to <b>task proposals</b>: typed objects that already exist as
+              endpoints, shown as confirm cards with the exact effect. Nothing is written until the
+              click; each confirm is the same POST and audit event the screens use.
+            </td>
+            <td>
+              Deterministic grammar for triage, approve, reject, override, run, draft, defer, open.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Go</b> (navigate)</td>
+            <td>"show me Lau's cash flows", "switch to Zhang"</td>
+            <td>Resolves to a route.</td>
+            <td>Works fully.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Grounding and guardrails</h3>
+    <ul style="font-size: 14px; color: var(--ink-2)">
+      <li>
+        Tools are the only source of facts; the event log is the only world knowledge; cited figures
+        are validated against tool results or the answer carries a warning.
+      </li>
+      <li>
+        Untrusted text (notes, event descriptions) is wrapped in data delimiters. This is the
+        prompt-injection control the security review asked for, applied here first.
+      </li>
+      <li>Client names are pseudonymised on the way to the model and restored on the way back.</li>
+      <li>
+        Trading instructions are answered with the proposal for the desk and the reminder that
+        nothing executes here.
+      </li>
+      <li>
+        Rate-limited and concurrency-capped through the existing gateway; every exchange traced.
+      </li>
+    </ul>
+
+    <div class="part-head">Part two · The manager</div>
+
+    <!-- 12 -->
+    <h2 id="manager"><span class="num">12</span>The team head's Monday</h2>
+    <p class="intro">
+      One page, five panels, each answering a question she asks on Monday morning and cannot answer
+      today without asking her RMs. Built by RM identifier, so it works for one RM in this dataset
+      and for forty in a bank.
+    </p>
+    <div class="wf">
+      <p class="cap">Team · /team · aggregated by RM, drill to any client's journey</p>
+      <div class="two">
+        <div class="body">
+          <div class="block">
+            <b>Risk this morning</b>Heat by RM × theme (collateral, concentration, liquidity,
+            mandate, compliance, signal). Ten worst households across the team with cell and
+            one-line reason. Escalations since Friday. <span class="btn ghost">Drill</span>
+          </div>
+          <div class="block">
+            <b>Conduct</b>Overrides this month with reasons; override rate per RM against the team;
+            client-directed breaches; exclusions breached; KYC overdue; unanswered messages ageing
+            over two days; three assessments sampled for explainability review.
+          </div>
+          <div class="block">
+            <b>Coverage</b>Cadence adherence per RM; clients past 90 days without contact; reviews
+            documented in the last 12 months; suitability records complete; promises past due.
+          </div>
+        </div>
+        <div class="side">
+          <div class="block">
+            <b>Needs my signature</b>
+            <div class="row">
+              <span>Lau · Discuss collateral · RM-Level 2</span
+              ><span class="pill warn">2 days</span>
+            </div>
+            <div class="row">
+              <span>Zhang · Rebalance to mandate</span><span class="pill ok">today</span>
+            </div>
+            <span class="btn">Review evidence</span>
+          </div>
+          <div class="block">
+            <b>Capacity</b>Call-sheet load per RM; deferrals by reason; overflow days; who is
+            drowning.
+          </div>
+          <div class="block">
+            <b>Ideas landing</b>Short-duration credit: 6 contacted, 3 discussed, 1 acted. Fed-hold
+            outreach: 9 / 4 / 2.
+          </div>
+          <div class="block">
+            <b>The machine</b>LLM calls today, confidence distribution, guardrail hits, shadow-mode
+            agreement 0.81 on KYC reminders, agents: L1 ·
+            <span class="pill crit">Pause all agents</span>
+          </div>
+          <div class="block muted">
+            <b>Commercial</b>Fee proxy from management-fee transactions; flows from attribution.
+            Revenue and pipeline <span class="pill grey">needs a feed</span>.
+          </div>
+        </div>
+      </div>
+    </div>
+    <h3>Why these five and not a dashboard</h3>
+    <p>
+      Each panel is a question with an owner and a consequence: risk leads to a call, conduct to a
+      conversation with an RM, coverage to a reassignment, the queue to a signature, capacity to
+      help. A panel that leads to nothing is removed. The machine panel exists because the person
+      who can pause the agents must be the person who sees their behaviour, and that is the team
+      head, not an engineer.
+    </p>
+
+    <div class="part-head">Part three · The future</div>
+
+    <!-- 13 -->
+    <h2 id="agents"><span class="num">13</span>Toward agents that speak to clients</h2>
+    <p class="intro">
+      Not now. But the target state shapes what we build now: one brain, one memory, one set of
+      guardrails, one audit, and a ladder of autonomy that is climbed by evidence and can be
+      descended by a switch.
+    </p>
+    <div class="ladder">
+      <div class="now">
+        <b>L0</b><strong>Drafts only</strong>Everything the machine writes is a draft the RM edits
+        and sends. Where we are.
+      </div>
+      <div class="now">
+        <b>L1</b><strong>Approve to send</strong>Machine proposes finished messages and tasks; RM
+        confirms each. Iteration 8 to 10.
+      </div>
+      <div>
+        <b>L2</b><strong>Informational, notified</strong>Agent sends low-risk playbook messages (KYC
+        reminder, meeting scheduling, statement explanation, "since we last spoke") itself; RM is
+        notified and can recall within a window.
+      </div>
+      <div>
+        <b>L3</b><strong>Converses within a playbook</strong>Chat agent answers client questions
+        from the same tools, in the client's language; escalates to the RM on advice, complaint,
+        distress, or anything outside the playbook. RM sees the transcript live.
+      </div>
+      <div>
+        <b>L4</b><strong>Voice</strong>Same as L3 by voice, with disclosure, consent and recording.
+        Warm handoff to the RM with a context summary.
+      </div>
+    </div>
+    <h3>What we build now so the ladder is real</h3>
+    <div class="grid2" style="margin-top: 14px">
+      <div class="card">
+        <b>Communication gateway</b>
+        <p>
+          Every message to a client, whether the RM wrote it or the machine did, passes one gate:
+          suitability, cross-border, language, disclaimers, tone, pseudonymisation, audit. Today the
+          gate sits behind the send button. Tomorrow an agent calls the same gate.
+        </p>
+      </div>
+      <div class="card">
+        <b>Playbooks as data</b>
+        <p>
+          A playbook is a structured conversation with a goal, allowed topics, required disclosures,
+          escalation triggers and a done condition, stored as JSON. The RM runs playbooks today
+          through the companion; an agent runs the same file later. First four: KYC refresh,
+          cash-need check-in, market update, meeting scheduling.
+        </p>
+      </div>
+      <div class="card">
+        <b>Shadow mode</b>
+        <p>
+          For each playbook, the agent drafts what it would have said at every step of a real RM
+          interaction. The RM grades the draft in one tap. Agreement per playbook is the number that
+          earns L2. The manager sees it. Nothing reaches the client.
+        </p>
+      </div>
+      <div class="card">
+        <b>One memory</b>
+        <p>
+          Notes, promises, sensitivities, decisions and transcripts are one client memory with
+          source and date on every entry, readable by RM and agent alike. There is no second memory
+          for agents.
+        </p>
+      </div>
+      <div class="card">
+        <b>Escalation and handoff</b>
+        <p>
+          Triggers are data: advice requests, complaints, distress language, trade instructions,
+          anything outside the playbook. Handoff produces a summary card the RM reads in ten
+          seconds.
+        </p>
+      </div>
+      <div class="card">
+        <b>Consent, disclosure, kill switch</b>
+        <p>
+          Client opt-in per channel, disclosure that the counterpart is an AI, recording rules per
+          jurisdiction in the policy file. One switch on the manager's page pauses every agent and
+          drops them to L1.
+        </p>
+      </div>
+    </div>
+
+    <div class="part-head">Part four · Delivery</div>
+
+    <!-- 14 -->
+    <h2 id="share"><span class="num">14</span>Sharing the load</h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Work</th>
+            <th>The workbench does</th>
+            <th>The RM does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Knowing where every client stands</td>
+            <td>Ranks the book, holds each client's position, explains the rank in one line.</td>
+            <td>Confirms or overrides the order.</td>
+          </tr>
+          <tr>
+            <td>Deciding whom to call today</td>
+            <td>
+              Scores harm, deadline, bundling and contact debt; packs the day; proposes hour,
+              channel and talking points.
+            </td>
+            <td>Reorders, defers with a reason, makes the calls.</td>
+          </tr>
+          <tr>
+            <td>Reconstructing a client before a call</td>
+            <td>Writes the five chapters, quotes the sensitivities, lists the moments ahead.</td>
+            <td>Reads for eight minutes.</td>
+          </tr>
+          <tr>
+            <td>Answering the client's question on the call</td>
+            <td>
+              Computes the number, checks suitability and cross-border, cites what the client said
+              before.
+            </td>
+            <td>Says it, in her voice.</td>
+          </tr>
+          <tr>
+            <td>Writing the note and the suitability record</td>
+            <td>Drafts both from the cues.</td>
+            <td>Confirms in one screen.</td>
+          </tr>
+          <tr>
+            <td>Remembering promises</td>
+            <td>Extracts, tracks, drafts the fulfilment, marks done from the log.</td>
+            <td>Reviews and sends.</td>
+          </tr>
+          <tr>
+            <td>Matching ideas to clients</td>
+            <td>Runs the rules across the book, gates suitability, drafts per client.</td>
+            <td>Chooses whom to send to.</td>
+          </tr>
+          <tr>
+            <td>Keeping the record</td>
+            <td>Logs every decision, override, message and deferral with evidence.</td>
+            <td>Nothing.</td>
+          </tr>
+          <tr>
+            <td>Seeing the team</td>
+            <td>
+              Aggregates risk, conduct, coverage, capacity, uptake and machine behaviour by RM.
+            </td>
+            <td>Signs, coaches, reassigns, pauses.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 15 -->
+    <h2 id="remove"><span class="num">15</span>What we remove</h2>
+    <div class="remove">
+      <div class="card">
+        <b>Removed or demoted</b>
+        <ul>
+          <li>The module list as primary navigation; it becomes a collapsed "Rooms" group.</li>
+          <li>The client picker in every page header; the strip and ⌘K replace it.</li>
+          <li>Default-client redirects; Today decides the first client.</li>
+          <li>Duplicate headers between Client 360 and the journey's chapter 1.</li>
+          <li>
+            Separate screens for note-taking, suitability record and follow-up; the companion
+            produces all three.
+          </li>
+          <li>The habit of opening six screens to prepare one call.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>Kept, deliberately</b>
+        <ul>
+          <li>All fourteen rooms and their depth; the journey links to them.</li>
+          <li>
+            The replay clock; the journey, call sheet and team page all rewrite themselves at any
+            date. Backtesting the call plan against history is one of the demo's strongest moments.
+          </li>
+          <li>The L1 / L2 / L3 contract on every card, sentence and manager number.</li>
+          <li>
+            Human approval on every action, maker-checker on money-moving ones, the append-only log.
+          </li>
+          <li>
+            Dataset agnosticism: nothing in the spine names a client, a date or an event; policy
+            lives in reference files.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 16 -->
+    <h2 id="measure"><span class="num">16</span>How we know it worked</h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Measure</th>
+            <th>Target</th>
+            <th>How measured</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Time from opening the app to the first logged decision</td>
+            <td>Under 3 minutes</td>
+            <td>First audit event relative to first page view</td>
+          </tr>
+          <tr>
+            <td>Screens opened to prepare one call</td>
+            <td>1 plus at most 2 rooms</td>
+            <td>Route transitions per client session</td>
+          </tr>
+          <tr>
+            <td>Cues answered during calls, and median latency</td>
+            <td>Under 2 seconds</td>
+            <td>Companion log</td>
+          </tr>
+          <tr>
+            <td>Calls with a note and suitability record filed within 10 minutes of ending</td>
+            <td>All</td>
+            <td>Companion end-call event to audit event</td>
+          </tr>
+          <tr>
+            <td>Promises fulfilled before due</td>
+            <td>All</td>
+            <td>Promise ledger</td>
+          </tr>
+          <tr>
+            <td>Deadline items contacted before due-by</td>
+            <td>All KYC, cash-need and collateral items</td>
+            <td>Call-sheet due-by versus first contact</td>
+          </tr>
+          <tr>
+            <td>Decisions logged per active day, with evidence</td>
+            <td>Every approve, reject, triage, send, defer</td>
+            <td>Audit events</td>
+          </tr>
+          <tr>
+            <td>Idea uptake: contacted, discussed, acted</td>
+            <td>Tracked per idea</td>
+            <td>Workflow log</td>
+          </tr>
+          <tr>
+            <td>Shadow-mode agreement per playbook</td>
+            <td>Reported; L2 requires a threshold you set</td>
+            <td>RM grades</td>
+          </tr>
+          <tr>
+            <td>Manager questions answered without asking an RM</td>
+            <td>The five panels</td>
+            <td>Team page usage</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 17 -->
+    <h2 id="plan"><span class="num">17</span>Build plan</h2>
+    <p class="intro">
+      Three iterations. Each part is demonstrable alone; the order puts the spine in place before
+      anything rides on it.
+    </p>
+    <h3>Iteration 8 · The spine</h3>
+    <ol class="steps">
+      <li data-id="8a">
+        <div>
+          <b>Client context</b
+          ><span
+            >URL-mirrored store, strip with position, call line and promise count, ⌘K switcher that
+            keeps the room, rail restructured to Today · Journey · Ideas · Team · Rooms.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> one client stays in context everywhere.</div>
+      </li>
+      <li data-id="8b">
+        <div>
+          <b>Client journey</b
+          ><span
+            >Five chapters from existing endpoints, moments timeline, sensitivities quoted from
+            notes, decision debt, inline decisions, relevance-picked scenario. Client 360 becomes
+            chapter 1.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> Lau in eight minutes with decisions made inline.</div>
+      </li>
+      <li data-id="8c">
+        <div>
+          <b>Call plan</b
+          ><span
+            >Pure module for the five terms, due-by, slot, channel, packing; policy file; endpoint
+            with L2 contributions; defer and done as audit events; tests per term.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> a ranked call sheet whose every number can be argued with.
+        </div>
+      </li>
+      <li data-id="8d">
+        <div>
+          <b>Today</b
+          ><span
+            >Brief, call sheet with talking points, lanes opening journeys at the right chapter,
+            decided today.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> the morning in ninety seconds.</div>
+      </li>
+    </ol>
+    <h3>Iteration 9 · The conversation</h3>
+    <ol class="steps">
+      <li data-id="9a">
+        <div>
+          <b>Intent router and drawer</b
+          ><span
+            >Four intents, read tools, task proposals with confirm cards, grammar for recorded mode,
+            tool trace, pseudonymisation, answer validation.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> "log the call" becoming three confirmed audit events.</div>
+      </li>
+      <li data-id="9b">
+        <div>
+          <b>Companion</b
+          ><span
+            >Call mode beside the journey; typed and dictated cues through the router with client
+            fixed; guardrail panel from the cross-border policy file; ready cards; drafting note;
+            promise extraction; suitability pre-fill; end-call confirm.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> the number before the client finishes the sentence, and the note written.
+        </div>
+      </li>
+      <li data-id="9c">
+        <div>
+          <b>Promise ledger and pack</b
+          ><span
+            >Promise table and extraction from notes; drafts attached; client promises checked
+            against data; "Since we last spoke" pack in the reporting language.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> nothing on a sticky note.</div>
+      </li>
+      <li data-id="9d">
+        <div>
+          <b>Idea desk</b
+          ><span
+            >Reverse search over idea rules with suitability and cross-border gates; per-client
+            drafts; opportunities lane from rules and notes; uptake tracking; fee proxy.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> one sentence becoming a compliant campaign.</div>
+      </li>
+    </ol>
+    <h3>Iteration 10 · The manager and the foundation</h3>
+    <ol class="steps">
+      <li data-id="10a">
+        <div>
+          <b>Team page</b
+          ><span
+            >Five panels aggregated by RM identifier, approval queue with ageing, drill to journey,
+            honest placeholders for revenue.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> Monday answered without asking an RM.</div>
+      </li>
+      <li data-id="10b">
+        <div>
+          <b>Communication gateway and playbooks</b
+          ><span
+            >Single gate behind every send; four playbooks as JSON run by the companion; escalation
+            triggers as data.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> the same gate the agent will use.</div>
+      </li>
+      <li data-id="10c">
+        <div>
+          <b>Shadow mode and governance</b
+          ><span
+            >Agent drafts per playbook step, one-tap grading, agreement per playbook on the team
+            page, machine panel, pause-all switch.</span
+          >
+        </div>
+        <div class="out">
+          <b>You see:</b> the number that earns autonomy, and the switch that revokes it.
+        </div>
+      </li>
+      <li data-id="10d">
+        <div>
+          <b>Measure and polish</b
+          ><span
+            >Interaction log, the measures page, empty and error states, keyboard paths, demo script
+            rewritten around the six moments and the Monday.</span
+          >
+        </div>
+        <div class="out"><b>You see:</b> the numbers behind the efficiency claim.</div>
+      </li>
+    </ol>
+
+    <!-- 18 -->
+    <h2 id="questions"><span class="num">18</span>Decisions for you</h2>
+    <p class="intro">Each with my recommendation. None blocks iteration 8a.</p>
+    <ol class="decisions">
+      <li>
+        <div>
+          <b>Does the journey replace Client 360?</b
+          ><span
+            >Two entry points for the same client is the kind of choice we are trying to
+            remove.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> replace; Client 360 becomes chapter 1.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Which tasks may the drawer and companion propose?</b
+          ><span>Everything that exists as an endpoint, or a smaller set.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> all except send. Sending stays a click on the reviewed
+            draft.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Prose openers: model or template?</b
+          ><span class="rec"
+            ><strong>Recommended:</strong> template first; Claude rewrites the same facts when live,
+            marked, never adding a fact.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Cue input: typed, dictated, or both?</b
+          ><span>Browser speech recognition costs nothing and records nothing server-side.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> both, with dictation as a toggle. Full transcription
+            waits for telephony and consent.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Pseudonymisation before the model</b
+          ><span class="rec"
+            ><strong>Recommended:</strong> yes, in the router from day one, then back-port to rubric
+            and outreach prompts.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Call-plan defaults</b
+          ><span
+            >Cadence UHNW 30 days, HNW 60; cash-need lead 30 days; six conversations of thirty
+            minutes; hours 09:00–18:00 local; three business days for a severe signal.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> ship in the policy file, show read-only in L2, tune after
+            a week of deferral logs.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Should the call plan learn?</b
+          ><span class="rec"
+            ><strong>Recommended:</strong> log now, learn later. A ranking the RM cannot predict is
+            one she will stop trusting.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Team page with one RM in the dataset</b
+          ><span>It will show one row. It proves the shape and the agnosticism, not the scale.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> build it; add a synthetic second RM only if you want the
+            demo to show comparison, and label it.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Which playbooks first, and what agreement earns L2?</b
+          ><span class="rec"
+            ><strong>Recommended:</strong> KYC refresh, cash-need check-in, market update, meeting
+            scheduling; threshold left to you, reported from day one.</span
+          >
+        </div>
+      </li>
+      <li>
+        <div>
+          <b>Cross-border rules</b
+          ><span
+            >Real rules are the bank's; we need a policy file with plausible entries for the
+            residences in the data.</span
+          ><span class="rec"
+            ><strong>Recommended:</strong> ship an illustrative file clearly marked as such,
+            structured so compliance can replace it.</span
+          >
+        </div>
+      </li>
+    </ol>
+
+    <footer>
+      Design document for iterations 8 to 10 of the agentic RM workbench. All data referenced is the
+      synthetic SingHacks 2026 dataset. v0.1 spine and drawer, v0.2 call plan, v0.3 six moments,
+      companion, promise ledger, idea desk, team head, autonomy ladder. 6 Sep 2026.
+    </footer>
+  </main>
+</div>

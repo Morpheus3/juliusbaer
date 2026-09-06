@@ -7,7 +7,6 @@ import {
 } from '@jb/contracts';
 import { useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ClientPicker } from '@/components/ClientPicker';
 import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
@@ -65,7 +64,6 @@ export function WorkflowPage(): JSX.Element {
             )}
           </>
         }
-        right={<ClientPicker value={clientId} to={(id) => `/clients/${id}/workflow`} />}
       >
         <div className="mt-1 text-[12.5px] text-muted">
           No automated trading: human approval required.{' '}

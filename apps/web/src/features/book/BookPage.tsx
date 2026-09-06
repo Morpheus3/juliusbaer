@@ -1,14 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import { BookResponse, type HorizonItem, type Theme, type Urgency } from '@jb/contracts';
+import type { HorizonItem, Theme, Urgency } from '@jb/contracts';
 import { useMemo, useState, type JSX } from 'react';
 import { Link } from 'react-router-dom';
 import { Kpi } from '@/components/Kpi';
 import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
-import { getJson } from '@/lib/api';
+import { useBook } from '@/lib/book';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
-import { useClockDate } from '@/state/clock';
 
 const LANES: { key: Urgency; title: string; sub: string }[] = [
   { key: 'now', title: 'Act now', sub: 'today' },
@@ -28,13 +26,7 @@ const THEME_LABEL: Record<Theme, string> = {
 
 /** The Monday-morning screen: who to call first, and why, across the whole book. Wireframe slide 01 shell. */
 export function BookPage(): JSX.Element {
-  const clock = useClockDate();
-  const q = useQuery({
-    queryKey: ['book', clock],
-    queryFn: () => getJson(`/api/v1/book?clock=${clock}`, BookResponse),
-    enabled: clock !== '',
-    placeholderData: (p) => p,
-  });
+  const q = useBook();
   const [centre, setCentre] = useState('all');
   const [theme, setTheme] = useState<Theme | 'all'>('all');
   const [severity, setSeverity] = useState<'all' | 'high'>('all');
