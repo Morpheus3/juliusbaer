@@ -29,7 +29,10 @@
     "prepare": "husky",
     "py:check": "docker run --rm -v \"$PWD:/w\" -w /w/services/analytics python:3.12-slim sh -c \"pip install -q -e '.[dev]' >/dev/null 2>&1 && ruff format --check . && ruff check . && mypy app && pytest -q\"",
     "py:format": "docker run --rm -v \"$PWD:/w\" -w /w/services/analytics python:3.12-slim sh -c \"pip install -q ruff >/dev/null 2>&1 && ruff format . && ruff check --fix .\"",
-    "vectors:build": "curl -sS -X POST http://localhost:8000/vectors/build"
+    "vectors:build": "curl -sS -X POST http://localhost:8000/vectors/build",
+    "db:ddl": "npm run ddl -w @jb/db",
+    "db:rls-check": "docker exec -i -e PGPASSWORD=rmw_app_dev rmw-postgres psql -U rmw_app -d ${POSTGRES_DB:-rm_workbench} -f - < db/sql/02_rls_check.sql",
+    "db:roles": "docker exec -i rmw-postgres psql -U ${POSTGRES_USER:-rmw} -d ${POSTGRES_DB:-rm_workbench} -v ON_ERROR_STOP=1 -v owner_password=rmw_owner_dev -v app_password=rmw_app_dev -v ingest_password=rmw_ingest_dev -v analytics_password=rmw_analytics_dev -f - < db/sql/00_roles.sql && docker exec -i rmw-postgres psql -U ${POSTGRES_USER:-rmw} -d ${POSTGRES_DB:-rm_workbench} -v ON_ERROR_STOP=1 -f - < db/sql/01_grants.sql"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

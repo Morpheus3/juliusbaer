@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { CallPlanResponse, type DeferCallRequest } from '@jb/contracts';
 import { ApiError, getJson } from '@/lib/api';
+import { apiFetch } from '@/lib/auth';
 import { useClockDate } from '@/state/clock';
 
 /** The call plan at the clock: one row per conversation, ranked and packed. */
@@ -22,7 +23,7 @@ export function useCallPlan(): UseQueryResult<CallPlanResponse> {
 }
 
 async function post(url: string, body: unknown): Promise<void> {
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),

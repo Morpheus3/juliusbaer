@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { CombinedRiskResponse, type DecideRequest } from '@jb/contracts';
 import { ApiError, getJson } from '@/lib/api';
+import { apiFetch } from '@/lib/auth';
 import { useClockDate } from '@/state/clock';
 
 export function useCombinedRisk(clientId: string): UseQueryResult<CombinedRiskResponse> {
@@ -25,7 +26,7 @@ export function useDecide(
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ actionId, ...body }: { actionId: string } & DecideRequest) => {
-      const res = await fetch(`/api/v1/clients/${clientId}/actions/${actionId}/decide`, {
+      const res = await apiFetch(`/api/v1/clients/${clientId}/actions/${actionId}/decide`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),

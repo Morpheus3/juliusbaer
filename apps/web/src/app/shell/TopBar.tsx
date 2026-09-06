@@ -4,6 +4,7 @@ import { HealthResponse, type HealthResponse as Health } from '@jb/contracts';
 import { getJson } from '@/lib/api';
 import { fmtDate, fmtDateTime } from '@/lib/format';
 import { useMeta } from '@/lib/meta';
+import { useAuth } from '@/lib/auth';
 import { useAssistant } from '@/state/assistant';
 import { ClockControl } from './ClockControl';
 
@@ -18,6 +19,7 @@ export function useHealth(): UseQueryResult<Health> {
 export function TopBar({ onSwitch }: { onSwitch: () => void }): JSX.Element {
   const health = useHealth();
   const meta = useMeta();
+  const user = useAuth((s) => s.user);
   const data = health.data;
   const tone =
     health.isError || !data?.database.reachable ? 'crit' : data.status === 'ok' ? 'ok' : 'warn';
@@ -35,9 +37,34 @@ export function TopBar({ onSwitch }: { onSwitch: () => void }): JSX.Element {
   return (
     <header className="flex h-14 items-center gap-6 border-b border-line bg-surface px-8">
       <div className="text-[13px] text-muted">
-        RM <span className="font-medium text-ink">{meta.data?.rm.name ?? '—'}</span>
+        <span className="font-medium text-ink">
+          {user?.displayName ?? meta.data?.rm.name ?? '—'}
+        </span>
         <span className="mx-2 text-line-2">·</span>
-        <span className="font-mono text-[12px]">{meta.data?.rm.id ?? ''}</span>
+        <span className="font-mono text-[12px]">{user?.rmId ?? meta.data?.rm.id ?? ''}</span>
+        {user && (
+          <>
+            <span className="mx-2 text-line-2">·</span>
+            <span className="text-[11.5px]">
+              sees{' '}
+              {user.scope === 'own'
+                ? 'own book'
+                : user.scope === 'team'
+                  ? 'the team'
+                  : 'everything'}
+              {meta.data ? ` (${meta.data.clientCount} clients)` : ''}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                useAuth.getState().clear();
+              }}
+              className="ml-3 text-[11.5px] text-accent hover:underline"
+            >
+              Sign out
+            </button>
+          </>
+        )}
       </div>
       <div className="ml-auto flex items-center gap-5 text-[12.5px] text-muted">
         <button

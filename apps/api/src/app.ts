@@ -4,8 +4,10 @@ import sensible from '@fastify/sensible';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { Config } from './config.js';
 import { ClaudeGateway } from './llm/gateway.js';
+import authPlugin from './plugins/auth.js';
 import dbPlugin from './plugins/db.js';
 import { AssistantTools } from './assistant/tools.js';
+import { AccessRepository } from './repositories/accessRepository.js';
 import { CallPlanRepository } from './repositories/callPlanRepository.js';
 import { PromiseRepository } from './repositories/promiseRepository.js';
 import { ClientDetailRepository } from './repositories/clientDetailRepository.js';
@@ -23,6 +25,7 @@ import { dataQualityRoutes } from './routes/dataQuality.js';
 import { healthRoutes } from './routes/health.js';
 import { metaRoutes } from './routes/meta.js';
 import { assistantRoutes } from './routes/assistant.js';
+import { authRoutes } from './routes/auth.js';
 import { bookRoutes } from './routes/book.js';
 import { companionRoutes } from './routes/companion.js';
 import { promiseRoutes } from './routes/promises.js';
@@ -67,7 +70,19 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   await app.register(cors, { origin: config.CORS_ORIGIN });
   // Global ceiling; LLM-backed and heavy routes set a stricter per-route limit via config.rateLimit.
   await app.register(rateLimit, { max: 600, timeWindow: '1 minute' });
-  await app.register(dbPlugin, { connectionString: config.DATABASE_URL });
+  await app.register(dbPlugin, {
+    connectionString: config.API_DATABASE_URL ?? config.DATABASE_URL,
+  });
+  const access = new AccessRepository(app.db);
+  await app.register(authPlugin, {
+    mode: config.AUTH_MODE,
+    secret: config.AUTH_SECRET,
+    issuer: config.AUTH_ISSUER,
+    audience: config.AUTH_AUDIENCE,
+    jwksUrl: config.AUTH_JWKS_URL,
+    access,
+    publicPrefixes: ['/health', '/api/v1/auth/mode', '/api/v1/auth/dev'],
+  });
 
   const ctx = new DatasetContext(app.db, config.DATASET_TODAY, config.DATASET_NAME);
   const loadRuns = new LoadRunRepository(app.db);
@@ -130,7 +145,7 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
     signalService,
     gateway,
     ctx,
-    config.RM_LEVEL,
+    access,
     config.CHECKER_ID,
   );
 
@@ -172,6 +187,13 @@ export async function buildApp(config: Config): Promise<FastifyInstance> {
   await app.register(healthRoutes(health));
   await app.register(
     async (v1) => {
+      await v1.register(
+        authRoutes(access, {
+          mode: config.AUTH_MODE,
+          secret: config.AUTH_SECRET,
+          ttlSeconds: config.AUTH_TOKEN_TTL_SECONDS,
+        }),
+      );
       await v1.register(dataQualityRoutes(dataQuality));
       await v1.register(clientRoutes(clientService));
       await v1.register(vectorRoutes(vectorService));

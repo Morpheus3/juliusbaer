@@ -18,11 +18,17 @@ import { PortfolioPage } from '@/features/portfolio/PortfolioPage';
 import { TransactionsTab } from '@/features/portfolio/TransactionsTab';
 import { VectorPage } from '@/features/vector/VectorPage';
 import { WorkflowPage } from '@/features/workflow/WorkflowPage';
+import { useAuth } from '@/lib/auth';
 import { AppShell } from './shell/AppShell';
+import { LoginPage } from './shell/LoginPage';
 import { DefaultClientRedirect } from './shell/DefaultClientRedirect';
 import { PlaceholderPage } from './shell/PlaceholderPage';
 
 export function App(): JSX.Element {
+  const token = useAuth((s) => s.token);
+  if (!token) {
+    return <LoginPage />;
+  }
   return (
     <Routes>
       <Route element={<AppShell />}>

@@ -11,11 +11,12 @@ import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
+import { apiFetch } from '@/lib/auth';
 import { fmtDateTime } from '@/lib/format';
 import { useClockDate } from '@/state/clock';
 
 async function postJson<T>(url: string, body: unknown, parse: (v: unknown) => T): Promise<T> {
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body ?? {}),

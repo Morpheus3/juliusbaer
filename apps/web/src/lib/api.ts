@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+import { apiFetch } from './auth';
 
 export class ApiError extends Error {
   constructor(
@@ -12,7 +13,7 @@ export class ApiError extends Error {
 
 /** Fetches JSON and validates it against the shared contract before it reaches the UI. */
 export async function getJson<T extends z.ZodType>(url: string, schema: T): Promise<z.output<T>> {
-  const res = await fetch(url, { headers: { accept: 'application/json' } });
+  const res = await apiFetch(url, { headers: { accept: 'application/json' } });
   const body: unknown = await res.json().catch(() => null);
   if (!res.ok) {
     const message =
@@ -33,7 +34,7 @@ export async function postJson<T extends z.ZodType>(
   body: unknown,
   schema: T,
 ): Promise<z.output<T>> {
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json', accept: 'application/json' },
     body: JSON.stringify(body),

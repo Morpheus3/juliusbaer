@@ -19,6 +19,8 @@ import type { DecisionRepository } from '../repositories/decisionRepository.js';
 import type { RubricRepository } from '../repositories/rubricRepository.js';
 import type { SignalRepository } from '../repositories/signalRepository.js';
 import type { OutreachRow, WorkflowRepository } from '../repositories/workflowRepository.js';
+import type { AccessRepository } from '../repositories/accessRepository.js';
+import { currentActor } from './actor.js';
 import type { DatasetContext } from './datasetContext.js';
 import type { RiskService } from './riskService.js';
 import type { SignalService } from './signalService.js';
@@ -54,8 +56,8 @@ export class WorkflowService {
     private readonly signalService: SignalService,
     private readonly gateway: ClaudeGateway,
     private readonly ctx: DatasetContext,
-    private readonly rmLevel: number,
-    private readonly checkerId: string,
+    private readonly access: AccessRepository,
+    private readonly fallbackCheckerId: string,
   ) {}
 
   async state(clientId: string, clock: string | undefined): Promise<WorkflowResponse> {
@@ -104,7 +106,7 @@ export class WorkflowService {
           pep: bundle.client.pepStatus,
           rubric: rubricScores,
           rubricLocked: rubricRow?.status === 'locked',
-          rmLevel: this.rmLevel,
+          rmLevel: currentActor()?.level ?? 1,
           checker: check
             ? {
                 decision: check.decision as 'approved' | 'rejected',
@@ -163,7 +165,7 @@ export class WorkflowService {
       clientName: bundle.client.clientName,
       reportingLanguage: bundle.client.reportingLanguage,
       clock: at,
-      rm: { id: meta.rm.id, level: this.rmLevel, checkerId: this.checkerId },
+      rm: { id: meta.rm.id, level: currentActor()?.level ?? 1, checkerId: await this.checkerId() },
       steps,
       alerts,
       stale: {
@@ -212,6 +214,16 @@ export class WorkflowService {
     };
   }
 
+  /** The second pair of eyes: a checker in the caller's team, else the team head, else the configured fallback. */
+  private async checkerId(): Promise<string> {
+    const actor = currentActor();
+    if (actor?.roles.includes('checker') || actor?.roles.includes('team_head')) {
+      return actor.rmId ?? actor.subject;
+    }
+    const found = actor ? await this.access.checkerFor(actor.teamId, actor.rmId) : null;
+    return found ?? this.fallbackCheckerId;
+  }
+
   async triage(clientId: string, alertId: string, req: TriageRequest): Promise<void> {
     const actor = await this.ctx.rmId();
     await this.repo.triage(
@@ -233,6 +245,7 @@ export class WorkflowService {
     actionId: string,
     req: { decision: 'approved' | 'rejected'; note?: string | undefined },
   ): Promise<void> {
+    const checker = await this.checkerId();
     await this.decisions.record(
       {
         actionId: `check:${actionId}`,
@@ -240,12 +253,12 @@ export class WorkflowService {
         entityType: 'action_check',
         decision: req.decision,
         note: req.note ?? null,
-        actor: this.checkerId,
+        actor: checker,
         snapshot: { at: new Date().toISOString() },
       },
       {
         kind: req.decision === 'approved' ? 'CHECKER_APPROVED' : 'CHECKER_REJECTED',
-        actor: this.checkerId,
+        actor: checker,
         clientId,
         entityType: 'action',
         entityId: actionId,

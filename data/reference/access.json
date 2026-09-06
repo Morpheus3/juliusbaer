@@ -1,0 +1,9 @@
+{
+  "$comment": "Development identities beyond the RMs found in the dataset. Every RM in raw.clients gets a user with role rm automatically (subject = rm id). Entries here add heads, checkers and admins. ILLUSTRATIVE: production identities come from the bank's identity provider.",
+  "version": 1,
+  "users": [
+    { "subject": "head", "displayName": "Team Head (demo)", "roles": ["team_head"], "team": "first" },
+    { "subject": "checker", "displayName": "Checker (demo)", "roles": ["checker"], "team": "first" },
+    { "subject": "admin", "displayName": "Platform Admin (demo)", "roles": ["admin"] }
+  ]
+}

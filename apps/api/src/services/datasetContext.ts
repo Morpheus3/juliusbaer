@@ -1,5 +1,6 @@
 import { asc, desc, eq, sql } from 'drizzle-orm';
 import type { DatasetMeta } from '@jb/contracts';
+import { currentActor } from './actor.js';
 import {
   clients,
   loadRuns,
@@ -23,7 +24,8 @@ export interface SnapshotInfo {
  * environment overrides the data-derived default (the latest snapshot).
  */
 export class DatasetContext {
-  private cache: { at: number; meta: DatasetMeta } | null = null;
+  /** Keyed by the caller's scope: a head and an RM see different books. */
+  private cache = new Map<string, { at: number; meta: DatasetMeta }>();
 
   constructor(
     private readonly db: Db,
@@ -33,12 +35,15 @@ export class DatasetContext {
   ) {}
 
   invalidate(): void {
-    this.cache = null;
+    this.cache.clear();
   }
 
   async meta(): Promise<DatasetMeta> {
-    if (this.cache && Date.now() - this.cache.at < this.ttlMs) {
-      return this.cache.meta;
+    const actor = currentActor();
+    const key = actor ? `${actor.scope}|${actor.rmId ?? ''}|${actor.teamId ?? ''}` : 'service';
+    const hit = this.cache.get(key);
+    if (hit && Date.now() - hit.at < this.ttlMs) {
+      return hit.meta;
     }
     const [snaps, rmRows, clientRows, lt, sr, sc, cp, run] = await Promise.all([
       this.db.select().from(snapshots).orderBy(asc(snapshots.ordinal)),
@@ -82,7 +87,11 @@ export class DatasetContext {
     const today =
       this.todayOverride ??
       (loadedToday && /^\d{4}-\d{2}-\d{2}$/.test(loadedToday) ? loadedToday : last.date);
-    const rm = rmRows[0] ?? { id: 'RM', name: 'Relationship Manager', desk: '' };
+    const majority = rmRows[0] ?? { id: 'RM', name: 'Relationship Manager', desk: '' };
+    // The caller is the RM when she has one; a head or admin is shown as themselves over the book they see.
+    const rm = actor
+      ? { id: actor.rmId ?? actor.subject, name: actor.displayName, desk: majority.desk }
+      : majority;
     const meta: DatasetMeta = {
       datasetName: this.datasetName,
       today,
@@ -101,7 +110,7 @@ export class DatasetContext {
         callPolicy: (cp[0]?.n ?? 0) > 0,
       },
     };
-    this.cache = { at: Date.now(), meta };
+    this.cache.set(key, { at: Date.now(), meta });
     return meta;
   }
 
@@ -125,7 +134,12 @@ export class DatasetContext {
     return chosen;
   }
 
+  /** The acting identity for audit rows: the caller's RM id, else their subject, else the dataset's RM. */
   async rmId(): Promise<string> {
+    const actor = currentActor();
+    if (actor) {
+      return actor.rmId ?? actor.subject;
+    }
     return (await this.meta()).rm.id;
   }
 }

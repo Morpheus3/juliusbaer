@@ -3,7 +3,7 @@ import { loadEnv, requireEnv } from '../env.js';
 import { seed } from '../seed/index.js';
 
 loadEnv();
-const db = createDb(requireEnv('DATABASE_URL'));
+const db = createDb(requireEnv('DATABASE_URL'), { scope: 'all' });
 try {
   const result = await seed(db, { today: process.env.DATASET_TODAY });
   console.log(`load run ${result.loadRunId}`);

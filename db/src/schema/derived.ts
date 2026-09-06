@@ -23,6 +23,8 @@ export const loadRuns = derived.table('load_runs', {
   startedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   finishedAt: timestamp({ withTimezone: true }),
   status: text().notNull().default('running'),
+  /** full (truncate and reload) | incremental (message apply) */
+  mode: text().notNull().default('full'),
   datasetToday: text().notNull(),
   sourceDir: text().notNull(),
   rowCounts: jsonb().$type<Record<string, number>>().notNull().default({}),

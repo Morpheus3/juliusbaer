@@ -15,12 +15,13 @@ import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
+import { apiFetch } from '@/lib/auth';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
 import { useClockDate } from '@/state/clock';
 import { SEVERITY_SHORT, SEVERITY_TONE } from '../signals/signalFormat';
 
 async function postJson<T>(url: string, body: unknown, parse: (v: unknown) => T): Promise<T> {
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),

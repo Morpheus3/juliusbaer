@@ -4,7 +4,7 @@ import { closeDb, createDb } from '../client.js';
 import { loadEnv, repoRoot, requireEnv } from '../env.js';
 
 loadEnv();
-const db = createDb(requireEnv('DATABASE_URL'));
+const db = createDb(requireEnv('DATABASE_URL'), { scope: 'all' });
 try {
   await migrate(db, {
     migrationsFolder: path.join(repoRoot(), 'db', 'migrations'),

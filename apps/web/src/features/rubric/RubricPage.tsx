@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Panel } from '@/components/Panel';
 import { Pill } from '@/components/Pill';
 import { ApiError, getJson } from '@/lib/api';
+import { apiFetch } from '@/lib/auth';
 import { fmtDateTime } from '@/lib/format';
 import { useClockDate } from '@/state/clock';
 
@@ -24,7 +25,7 @@ async function post<T>(url: string, body: unknown, parse: (v: unknown) => T): Pr
     headers['content-type'] = 'application/json';
     init.body = JSON.stringify(body);
   }
-  const res = await fetch(url, init);
+  const res = await apiFetch(url, init);
   const json: unknown = await res.json().catch(() => null);
   if (!res.ok) {
     const message =

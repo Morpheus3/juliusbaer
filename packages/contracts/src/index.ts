@@ -17,3 +17,4 @@ export * from './api/assistant.js';
 export * from './api/promises.js';
 export * from './api/companion.js';
 export * from './api/ideas.js';
+export * from './messages.js';

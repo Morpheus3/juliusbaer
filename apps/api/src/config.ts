@@ -13,7 +13,19 @@ const ConfigSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
   DATASET_NAME: z.string().default('Loaded dataset'),
-  RM_LEVEL: z.coerce.number().int().min(1).max(3).default(2),
+  /** The API connects as a non-superuser role so row-level security applies; falls back to DATABASE_URL. */
+  API_DATABASE_URL: z.string().min(1).optional(),
+  AUTH_MODE: z.enum(['dev', 'oidc']).default('dev'),
+  AUTH_SECRET: z.string().min(16).default('dev-only-secret-change-me-please'),
+  AUTH_TOKEN_TTL_SECONDS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(8 * 3600),
+  AUTH_ISSUER: z.string().optional(),
+  AUTH_AUDIENCE: z.string().optional(),
+  AUTH_JWKS_URL: z.url().optional(),
+  /** Fallback checker when no checker or head exists in the caller's team. */
   CHECKER_ID: z.string().default('RM-CHECKER'),
   ANTHROPIC_API_KEY: z.string().optional(),
   CLAUDE_ANALYSIS_MODEL: z.string().default('claude-sonnet-5'),

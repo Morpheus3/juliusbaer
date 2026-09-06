@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClaudeSettings } from '@jb/contracts';
 import { useState, type JSX } from 'react';
 import { ApiError, getJson } from '@/lib/api';
+import { apiFetch } from '@/lib/auth';
 
 async function send<T>(
   url: string,
@@ -15,7 +16,7 @@ async function send<T>(
     headers['content-type'] = 'application/json';
     init.body = JSON.stringify(body);
   }
-  const res = await fetch(url, init);
+  const res = await apiFetch(url, init);
   const json: unknown = await res.json().catch(() => null);
   if (!res.ok) {
     const message =

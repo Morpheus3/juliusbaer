@@ -13,7 +13,9 @@ import {
   pgSchema,
   primaryKey,
   text,
+  timestamp,
   uniqueIndex,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 export const raw = pgSchema('raw');
@@ -294,6 +296,51 @@ export const eventLog = raw.table('event_log', {
   severity: text().notNull(),
   ordinal: integer().notNull(),
 });
+
+/**
+ * Relationship managers, their teams, and dated client assignments. The rm_* columns on clients
+ * remain as the denormalised current primary for the engines; assignments are the source of truth
+ * for who may see a client and who saw it when.
+ */
+export const teams = raw.table('teams', {
+  teamId: text().primaryKey(),
+  name: text().notNull(),
+  desk: text().notNull().default(''),
+  headRmId: text(),
+});
+
+export const rms = raw.table('rms', {
+  rmId: text().primaryKey(),
+  name: text().notNull(),
+  desk: text().notNull().default(''),
+  teamId: text().references(() => teams.teamId),
+  email: text(),
+  status: text().notNull().default('active'),
+});
+
+export const rmAssignments = raw.table(
+  'rm_assignments',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    clientId: text()
+      .notNull()
+      .references(() => clients.clientId),
+    rmId: text()
+      .notNull()
+      .references(() => rms.rmId),
+    /** primary | secondary | checker | cover */
+    role: text().notNull().default('primary'),
+    validFrom: date().notNull(),
+    validTo: date(),
+    source: text().notNull().default('dataset'),
+    reason: text(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('rm_assignments_client_idx').on(t.clientId, t.validTo),
+    index('rm_assignments_rm_idx').on(t.rmId, t.validTo),
+  ],
+);
 
 export const rmNotes = raw.table(
   'rm_notes',
