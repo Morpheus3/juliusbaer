@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { CheckRequest, DraftRequest, SendRequest, TriageRequest } from '@jb/contracts';
 import { AnalyticsUnavailableError } from '../services/analyticsClient.js';
 import { ClientNotFoundError } from '../services/vectorService.js';
-import { AlreadySentError, type WorkflowService } from '../services/workflowService.js';
+import {
+  AlreadySentError,
+  GateBlockedError,
+  type WorkflowService,
+} from '../services/workflowService.js';
 
 const Params = z.object({ clientId: z.string().min(1).max(64) });
 const ClockQuery = z.object({
@@ -42,7 +46,7 @@ export const workflowRoutes =
         if (err instanceof AnalyticsUnavailableError) {
           return reply.badGateway(err.message);
         }
-        if (err instanceof AlreadySentError) {
+        if (err instanceof AlreadySentError || err instanceof GateBlockedError) {
           return reply.conflict(err.message);
         }
         throw err;
@@ -100,6 +104,17 @@ export const workflowRoutes =
             ? service.draft(id, b, q.success ? q.data.clock : undefined)
             : Promise.resolve(undefined);
         }),
+    );
+    app.post('/clients/:clientId/outreach/:outreachId/gate', (req, reply) =>
+      guard(req.params, reply, (id) => {
+        const p = z.object({ outreachId: z.string().min(1) }).safeParse(req.params);
+        const b = z.object({ body: z.string().min(1).max(6000) }).safeParse(req.body);
+        if (!p.success || !b.success) {
+          reply.badRequest('outreachId and body are required');
+          return Promise.resolve(undefined);
+        }
+        return service.gatePreview(id, p.data.outreachId, b.data.body);
+      }),
     );
     app.post('/clients/:clientId/outreach/:outreachId/send', (req, reply) =>
       guard(req.params, reply, (id) => {

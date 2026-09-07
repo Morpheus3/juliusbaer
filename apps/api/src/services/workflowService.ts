@@ -6,6 +6,7 @@ import type {
   WorkflowResponse,
   WorkflowStep,
   WorkflowStepKey,
+  GateResult,
 } from '@jb/contracts';
 import { z } from 'zod';
 import { daysBetween } from '../domain/dates.js';
@@ -20,6 +21,7 @@ import type { RubricRepository } from '../repositories/rubricRepository.js';
 import type { SignalRepository } from '../repositories/signalRepository.js';
 import type { OutreachRow, WorkflowRepository } from '../repositories/workflowRepository.js';
 import type { AccessRepository } from '../repositories/accessRepository.js';
+import type { CommunicationGateway } from './communicationGateway.js';
 import { currentActor } from './actor.js';
 import type { DatasetContext } from './datasetContext.js';
 import type { RiskService } from './riskService.js';
@@ -58,6 +60,7 @@ export class WorkflowService {
     private readonly ctx: DatasetContext,
     private readonly access: AccessRepository,
     private readonly fallbackCheckerId: string,
+    private readonly gate: CommunicationGateway,
   ) {}
 
   async state(clientId: string, clock: string | undefined): Promise<WorkflowResponse> {
@@ -224,6 +227,15 @@ export class WorkflowService {
     return found ?? this.fallbackCheckerId;
   }
 
+  /** The gate's verdict without sending, so the RM sees what would block before pressing send. */
+  async gatePreview(clientId: string, outreachId: string, body: string): Promise<GateResult> {
+    const existing = await this.repo.outreachById(outreachId);
+    if (existing?.clientId !== clientId) {
+      throw new ClientNotFoundError(clientId);
+    }
+    return this.gate.gate(existing, body, 'rm');
+  }
+
   async triage(clientId: string, alertId: string, req: TriageRequest): Promise<void> {
     const actor = await this.ctx.rmId();
     await this.repo.triage(
@@ -386,14 +398,27 @@ export class WorkflowService {
     if (existing?.clientId !== clientId) {
       throw new ClientNotFoundError(clientId);
     }
-    const row = await this.repo.markSent(outreachId, req.subject, req.body, {
+    // Every message passes the communication gateway, whoever wrote it.
+    const verdict = await this.gate.gate(existing, req.body, 'rm');
+    if (!verdict.allowed) {
+      throw new GateBlockedError(
+        verdict.checks
+          .filter((c) => c.status === 'block')
+          .map((c) => `${c.name}: ${c.detail}`)
+          .join(' '),
+      );
+    }
+    const row = await this.repo.markSent(outreachId, req.subject, verdict.body, {
       kind: 'OUTREACH_SENT',
       actor,
       clientId,
       entityType: 'outreach',
       entityId: outreachId,
       summary: `Outreach logged as sent (${existing.channel}): "${req.subject}". No message left the system; the RM sends through the bank's channel.`,
-      payload: { edited: req.body !== existing.body || req.subject !== existing.subject },
+      payload: {
+        edited: req.body !== existing.body || req.subject !== existing.subject,
+        gate: verdict.checks,
+      },
     });
     if (!row) {
       throw new AlreadySentError();
@@ -483,6 +508,13 @@ function stepLink(key: WorkflowStepKey, clientId: string): string {
       return `${base}/workflow`;
     default:
       return base;
+  }
+}
+
+export class GateBlockedError extends Error {
+  constructor(message: string) {
+    super(`The communication gateway blocked this message. ${message}`);
+    this.name = 'GateBlockedError';
   }
 }
 

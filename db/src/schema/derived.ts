@@ -210,6 +210,28 @@ export const promises = derived.table(
   ],
 );
 
+/**
+ * Shadow mode: what an agent would have said at a playbook step, and the RM's one-tap grade. Agreement
+ * per playbook is the number that earns the next rung of the autonomy ladder.
+ */
+export const shadowGrades = derived.table(
+  'shadow_grades',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    clientId: text().notNull(),
+    playbookId: text().notNull(),
+    stepId: text().notNull(),
+    draft: text().notNull(),
+    source: text().notNull().default('template'),
+    /** agree | disagree | edited */
+    grade: text().notNull(),
+    rmText: text(),
+    actor: text().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('shadow_grades_playbook_idx').on(t.playbookId, t.createdAt)],
+);
+
 /** Saved impact runs: the request that produced them and the full result, for audit and replay. */
 export const impactRuns = derived.table(
   'impact_runs',

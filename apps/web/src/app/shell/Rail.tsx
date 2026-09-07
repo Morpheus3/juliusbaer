@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useAuth } from '@/lib/auth';
 import { useMeta } from '@/lib/meta';
 import { clientIdFromPath, useClientContext } from '@/state/clientContext';
 import { ClaudeKeyPanel } from './ClaudeKeyPanel';
@@ -67,6 +68,8 @@ export function Rail(): JSX.Element {
   const meta = useMeta();
   const { pathname } = useLocation();
   const last = useClientContext((s) => s.lastClientId);
+  const user = useAuth((s) => s.user);
+  const isHead = user?.roles.some((r) => r === 'team_head' || r === 'admin') ?? false;
   const clientId = clientIdFromPath(pathname) ?? last ?? meta.data?.defaultClientId ?? null;
   const clientBase = clientId ? `/clients/${encodeURIComponent(clientId)}` : null;
   const inRoom =
@@ -97,6 +100,15 @@ export function Rail(): JSX.Element {
       <ul className="m-0 mt-2 list-none p-0">
         <Item e={{ to: '/book', label: 'Today', hint: 'Brief · call sheet · lanes' }} />
         <Item e={{ to: '/ideas', label: 'Ideas', hint: 'Which clients fit · opportunities' }} />
+        {isHead && (
+          <Item
+            e={{
+              to: '/team',
+              label: 'Team',
+              hint: 'Risk · conduct · coverage · signatures · the machine',
+            }}
+          />
+        )}
         <Item
           e={{
             to: clientBase ?? '/client',

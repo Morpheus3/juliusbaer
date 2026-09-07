@@ -1,0 +1,80 @@
+{
+  "$comment": "Structured conversations as data. The companion runs them with the RM today; an agent runs the same file later, one rung of the autonomy ladder at a time. Templates use {{placeholders}} filled from the client record; nothing else is invented. ILLUSTRATIVE.",
+  "version": 1,
+  "autonomy": {
+    "level": "L1",
+    "$levels": "L0 drafts only · L1 approve to send · L2 informational messages sent, RM notified · L3 converses within a playbook · L4 voice",
+    "agreementThresholdForL2": 0.85,
+    "minimumGradesForL2": 20
+  },
+  "escalationTriggers": [
+    "complain",
+    "unhappy",
+    "lawyer",
+    "regulator",
+    "sell everything",
+    "buy now",
+    "guarantee",
+    "advice",
+    "recommend",
+    "passed away",
+    "divorce",
+    "urgent"
+  ],
+  "playbooks": [
+    {
+      "id": "kyc-refresh",
+      "name": "KYC refresh",
+      "goal": "Confirm the client's identity, residence, source of wealth and objectives before the review date.",
+      "allowedTopics": ["identity details", "residence and tax domicile", "source of wealth", "objectives", "documents needed"],
+      "requiredDisclosures": ["Explain why the bank asks and how the information is used."],
+      "doneCondition": "All four confirmations recorded and documents requested.",
+      "steps": [
+        { "id": "open", "prompt": "Explain the review and what it covers.", "template": "{{name}}, your periodic review is due on {{kycReviewDue}}. I need to confirm a few details the regulator asks us to keep current; it takes about ten minutes." },
+        { "id": "residence", "prompt": "Confirm residence and tax domicile.", "template": "Our records show you resident in {{residence}} with tax domicile {{taxDomicile}}. Is that still right?" },
+        { "id": "wealth", "prompt": "Confirm source of wealth.", "template": "We have your source of wealth recorded as: {{sourceOfWealth}}. Has anything changed?" },
+        { "id": "objectives", "prompt": "Confirm objectives and horizon.", "template": "Your stated objectives are: {{objectives}}, with a {{horizonYears}}-year horizon and a {{riskProfile}} profile. Does that still describe what you want from us?" },
+        { "id": "close", "prompt": "List documents and close.", "template": "Thank you. I will send a short list of the documents we need and confirm once the review is complete." }
+      ]
+    },
+    {
+      "id": "cash-need-check-in",
+      "name": "Cash-need check-in",
+      "goal": "Confirm timing and amount of an upcoming cash need and agree how it will be funded.",
+      "allowedTopics": ["the dated need", "timing", "amount and currency", "liquidity available", "funding options already approved"],
+      "requiredDisclosures": ["No new product is offered in this conversation."],
+      "doneCondition": "Timing and amount confirmed; funding route noted for the RM.",
+      "steps": [
+        { "id": "open", "prompt": "Name the need and its date.", "template": "{{name}}, I am calling about the {{nextNeedDescription}} you mentioned, which we have from {{nextNeedDate}} for {{nextNeedAmount}}." },
+        { "id": "confirm", "prompt": "Confirm timing and amount.", "template": "Is the timing still {{nextNeedDate}}, and is {{nextNeedAmount}} still the figure?" },
+        { "id": "funding", "prompt": "State liquid coverage without advising.", "template": "Today your daily-liquid assets cover {{coverageRatio}} times the needs of the next twelve months. {{rmName}} will walk you through the funding options." },
+        { "id": "close", "prompt": "Agree next step.", "template": "I will note this for {{rmName}} and confirm the plan with you before anything moves." }
+      ]
+    },
+    {
+      "id": "market-update",
+      "name": "Market update",
+      "goal": "Tell the client what a recent event did to their household, in plain words, without advice.",
+      "allowedTopics": ["the named event", "exposure of the household", "what the RM is reviewing"],
+      "requiredDisclosures": ["This is information, not a recommendation."],
+      "doneCondition": "Event and exposure stated; RM follow-up offered.",
+      "steps": [
+        { "id": "event", "prompt": "Name the event and the date.", "template": "{{name}}, on {{topSignalDate}} {{topSignalTitle}}." },
+        { "id": "exposure", "prompt": "State the household exposure.", "template": "About {{topSignalExposedPct}} percent of your household is exposed to it, mainly through {{topSignalVia}}." },
+        { "id": "close", "prompt": "Offer the RM follow-up.", "template": "This is information rather than a recommendation. {{rmName}} is reviewing it and will call if there is something to discuss." }
+      ]
+    },
+    {
+      "id": "meeting-scheduling",
+      "name": "Meeting scheduling",
+      "goal": "Agree a time for the annual review or a follow-up meeting.",
+      "allowedTopics": ["dates and times", "location or call", "who attends"],
+      "requiredDisclosures": [],
+      "doneCondition": "A date proposed and the client's preference recorded.",
+      "steps": [
+        { "id": "propose", "prompt": "Propose the meeting and two slots.", "template": "{{name}}, {{rmName}} would like to schedule your review. Would {{slotA}} or {{slotB}} suit you, in {{bookingCentre}} or by call?" },
+        { "id": "confirm", "prompt": "Confirm and close.", "template": "Thank you. I will confirm {{chosen}} in writing and send the agenda beforehand." }
+      ]
+    }
+  ]
+}

@@ -173,7 +173,10 @@ const ReferenceDocFile = z.looseObject({ version: z.number().int().positive() })
 
 /** Loads one-document reference files (cross-border policy, playbooks) into derived.reference_docs. */
 export async function loadReferenceDocs(db: Db, referenceDir: string): Promise<number> {
-  const files: [string, string][] = [['cross_border_policy.json', 'cross-border-policy']];
+  const files: [string, string][] = [
+    ['cross_border_policy.json', 'cross-border-policy'],
+    ['playbooks.json', 'playbooks'],
+  ];
   let n = 0;
   await db.transaction(async (tx) => {
     await tx.delete(referenceDocs);

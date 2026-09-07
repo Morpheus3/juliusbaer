@@ -18,3 +18,6 @@ export * from './api/promises.js';
 export * from './api/companion.js';
 export * from './api/ideas.js';
 export * from './messages.js';
+export * from './api/team.js';
+export * from './api/playbooks.js';
+export * from './api/gate.js';

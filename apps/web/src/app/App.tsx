@@ -5,6 +5,7 @@ import { BookPage } from '@/features/book/BookPage';
 import { DataQualityPage } from '@/features/dataQuality/DataQualityPage';
 import { IdeasPage } from '@/features/ideas/IdeasPage';
 import { JourneyPage } from '@/features/journey/JourneyPage';
+import { TeamPage } from '@/features/team/TeamPage';
 import { ImpactPage } from '@/features/impact/ImpactPage';
 import { RiskActionsPage } from '@/features/risk/RiskActionsPage';
 import { TradeIdeasPage } from '@/features/risk/TradeIdeasPage';
@@ -36,6 +37,7 @@ export function App(): JSX.Element {
         <Route path="/book" element={<BookPage />} />
         <Route path="/board" element={<BoardPage />} />
         <Route path="/ideas" element={<IdeasPage />} />
+        <Route path="/team" element={<TeamPage />} />
         <Route path="/signals" element={<SignalsPage />} />
         <Route
           path="/impact"

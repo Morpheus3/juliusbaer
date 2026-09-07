@@ -2,7 +2,7 @@
 -- Apply on an empty database that already has the pgvector and pgcrypto extensions
 -- (see db/init/01-extensions.sql) with: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/sql/schema.sql
 -- Do not edit by hand; edit the Drizzle schema, generate a migration, then re-export.
--- Generated 2026-09-07 from 14 migrations.
+-- Generated 2026-09-07 from 16 migrations.
 
 BEGIN;
 
@@ -662,5 +662,30 @@ CREATE OR REPLACE VIEW ingest.dead_letters AS
 ALTER TABLE raw.rm_assignments DISABLE ROW LEVEL SECURITY;
 ALTER TABLE raw.rm_assignments NO FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS rls_client ON raw.rm_assignments;
+
+-- ============================================================================
+-- 0014 · 0014_complete_glorian · 2026-09-07
+-- ============================================================================
+CREATE TABLE "derived"."shadow_grades" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"client_id" text NOT NULL,
+	"playbook_id" text NOT NULL,
+	"step_id" text NOT NULL,
+	"draft" text NOT NULL,
+	"source" text DEFAULT 'template' NOT NULL,
+	"grade" text NOT NULL,
+	"rm_text" text,
+	"actor" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+CREATE INDEX "shadow_grades_playbook_idx" ON "derived"."shadow_grades" USING btree ("playbook_id","created_at");
+
+-- ============================================================================
+-- 0015 · 0015_rls_shadow_grades · 2026-09-07
+-- ============================================================================
+-- Shadow grades name a client, so they follow the same row-level security as every client-owned table.
+ALTER TABLE derived.shadow_grades ENABLE ROW LEVEL SECURITY;
+ALTER TABLE derived.shadow_grades FORCE ROW LEVEL SECURITY;
+CREATE POLICY rls_client ON derived.shadow_grades FOR ALL USING (access.can_see(client_id)) WITH CHECK (access.can_see(client_id));
 
 COMMIT;

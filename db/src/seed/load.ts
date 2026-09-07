@@ -1,6 +1,7 @@
 /**
  * Writes a validated dataset into the raw schema inside one transaction. The load is
- * idempotent: raw tables are truncated and repopulated, and a load_runs row records
+ * idempotent: raw tables are truncated and repopulated, the incremental landing zone and change log
+ * are cleared (messages applied before a full load no longer describe the data), and a load_runs row records
  * what happened. Snapshot-wide columns are unpivoted here.
  */
 import { sql } from 'drizzle-orm';
@@ -43,7 +44,8 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
         raw.rm_notes, raw.event_log, raw.market_context, raw.planned_cash_needs,
         raw.commitments, raw.credit_facility_snapshots, raw.credit_facilities,
         raw.transactions, raw.holdings, raw.instrument_prices, raw.instruments,
-        raw.portfolio_aum, raw.portfolios, raw.mandates, raw.clients, raw.snapshots
+        raw.portfolio_aum, raw.portfolios, raw.mandates, raw.clients, raw.snapshots,
+        ingest.staging_messages, ingest.change_log
       RESTART IDENTITY CASCADE
     `);
 

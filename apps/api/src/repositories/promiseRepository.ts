@@ -69,6 +69,14 @@ export class PromiseRepository {
     return r ?? null;
   }
 
+  async setReferenceDoc(id: string, doc: Record<string, unknown>): Promise<void> {
+    const version = typeof doc.version === 'number' ? doc.version : 1;
+    await this.db
+      .insert(referenceDocs)
+      .values({ id, version, doc })
+      .onConflictDoUpdate({ target: referenceDocs.id, set: { version, doc } });
+  }
+
   async referenceDoc(id: string): Promise<Record<string, unknown> | null> {
     const [r] = await this.db.select().from(referenceDocs).where(eq(referenceDocs.id, id));
     return r?.doc ?? null;

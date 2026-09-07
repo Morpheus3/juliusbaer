@@ -35,3 +35,5 @@ snapshots arrive as changes, from Kafka in production and as files in developmen
   the thirteen checks to changed clients is the next step.
 - The vector rebuild is book-wide per batch (fast at this size); a per-client build is the scale step.
 - Partitioning by client id keeps a client's changes ordered; ordering across clients is not needed.
+- A full load (the CSV seed) clears the landing zone and the change log: messages applied before it no
+  longer describe the data, so they must be re-applied after a reseed (`npm run ingest:batch`).

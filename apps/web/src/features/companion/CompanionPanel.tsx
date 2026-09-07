@@ -12,6 +12,7 @@ import { Pill } from '@/components/Pill';
 import { ask } from '@/features/assistant/assistantApi';
 import { usePromises } from '@/features/promises/promisesApi';
 import { useCombinedRisk } from '@/features/risk/riskApi';
+import { PlaybookPanel } from './PlaybookPanel';
 import { getJson, postJson } from '@/lib/api';
 import { fmtDate, fmtUsdCompact } from '@/lib/format';
 import { useClockDate } from '@/state/clock';
@@ -325,6 +326,14 @@ export function CompanionPanel({
             </>
           )}
         </section>
+
+        {/* Playbook and shadow drafts */}
+        <PlaybookPanel
+          clientId={clientId}
+          onStep={(text) => {
+            setNote((n) => `${n}${n ? '\n' : ''}${text}`);
+          }}
+        />
 
         {/* Ready cards */}
         <section className="grid grid-cols-2 gap-2 text-[12px]">

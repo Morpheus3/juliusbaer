@@ -4,6 +4,7 @@ import {
   WorkflowResponse,
   type ActionReview,
   type TriagedAlert,
+  GateResult,
 } from '@jb/contracts';
 import { useState, type JSX } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -352,6 +353,12 @@ function OutreachPanel({
       void qc.invalidateQueries({ queryKey: ['workflow', clientId] });
     },
   });
+  const gate = useMutation({
+    mutationFn: (e: { id: string; body: string }) =>
+      postJson(`/api/v1/clients/${clientId}/outreach/${e.id}/gate`, { body: e.body }, (v) =>
+        GateResult.parse(v),
+      ),
+  });
   const send = useMutation({
     mutationFn: (e: { id: string; subject: string; body: string }) =>
       postJson(
@@ -451,7 +458,44 @@ function OutreachPanel({
           {meta && meta.factsUsed.length > 0 && (
             <div className="text-[11px] text-muted">Facts used: {meta.factsUsed.join(' · ')}</div>
           )}
+          {gate.data && (
+            <ul className="m-0 list-none space-y-0.5 rounded border border-line bg-surface-2 px-3 py-2 p-0 text-[11.5px]">
+              <li className={`font-semibold ${gate.data.allowed ? 'text-ok' : 'text-crit'}`}>
+                Communication gateway: {gate.data.allowed ? 'may be sent' : 'blocked'}
+                {gate.data.body !== current.body ? ' · required disclosures will be appended' : ''}
+              </li>
+              {gate.data.checks.map((c) => (
+                <li key={c.name} className="flex gap-1.5">
+                  <span
+                    className={
+                      c.status === 'pass'
+                        ? 'text-ok'
+                        : c.status === 'warn'
+                          ? 'text-warn'
+                          : 'text-crit'
+                    }
+                  >
+                    {c.status === 'pass' ? '✓' : c.status === 'warn' ? '!' : '✗'}
+                  </span>
+                  <span>
+                    <span className="font-medium text-ink">{c.name}:</span>{' '}
+                    <span className="text-ink-2">{c.detail}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={gate.isPending}
+              onClick={() => {
+                gate.mutate({ id: current.id, body: current.body });
+              }}
+              className="rounded border border-brass bg-brass-soft px-3 py-1 text-[12px] font-medium text-brass"
+            >
+              Check with the gateway
+            </button>
             <button
               type="button"
               disabled={send.isPending}
@@ -459,6 +503,7 @@ function OutreachPanel({
                 send.mutate(current);
               }}
               className="rounded bg-ink px-3 py-1 text-[12px] font-medium text-white"
+              title="Every send passes the communication gateway; a block returns the reasons here"
             >
               Send and log
             </button>
