@@ -7,6 +7,20 @@ import { sql } from 'drizzle-orm';
 import type { Db } from '../client.js';
 import * as s from '../schema/index.js';
 import { wideSeries, type Dataset } from './dataset.js';
+import {
+  mapCashNeed,
+  mapClient,
+  mapCommitment,
+  mapEvent,
+  mapFacility,
+  mapHolding,
+  mapInstrument,
+  mapMandate,
+  mapMarketContext,
+  mapNote,
+  mapPortfolio,
+  mapTransaction,
+} from './mappers.js';
 
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 
@@ -39,69 +53,11 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
       data.snapshots.map((x) => ({ snapshotDate: x.date, ordinal: x.ordinal, label: x.label })),
     );
 
-    await insertChunked(
-      tx,
-      s.clients,
-      data.clients.map((c) => ({
-        clientId: c.client_id,
-        clientName: c.client_name,
-        age: c.age,
-        gender: c.gender,
-        nationality: c.nationality,
-        countryOfResidence: c.country_of_residence,
-        taxDomicile: c.tax_domicile,
-        bookingCentre: c.booking_centre,
-        rmId: c.rm_id,
-        rmName: c.rm_name,
-        rmDesk: c.rm_desk,
-        baseCurrency: c.base_currency,
-        wealthBand: c.wealth_band,
-        totalAumUsd: c.total_aum_usd,
-        lifeStage: c.life_stage,
-        sourceOfWealth: c.source_of_wealth,
-        riskProfile: c.risk_profile,
-        riskToleranceScore: c.risk_tolerance_score,
-        investmentHorizonYears: c.investment_horizon_years,
-        liquidityNeeds: c.liquidity_needs,
-        objectives: c.objectives,
-        clientSince: c.client_since,
-        kycReviewDue: c.kyc_review_due,
-        pepStatus: c.pep_status,
-        reportingLanguage: c.reporting_language,
-      })),
-    );
+    await insertChunked(tx, s.clients, data.clients.map(mapClient));
 
-    await insertChunked(
-      tx,
-      s.mandates,
-      data.mandates.map((m) => ({
-        mandateCode: m.mandate_code,
-        mandateName: m.mandate_name,
-        assetClass: m.asset_class,
-        minPct: m.min_pct,
-        targetPct: m.target_pct,
-        maxPct: m.max_pct,
-        maxSinglePositionPct: m.max_single_position_pct,
-        mandateNotes: m.mandate_notes,
-      })),
-    );
+    await insertChunked(tx, s.mandates, data.mandates.map(mapMandate));
 
-    await insertChunked(
-      tx,
-      s.portfolios,
-      data.portfolios.map((p) => ({
-        portfolioId: p.portfolio_id,
-        clientId: p.client_id,
-        portfolioName: p.portfolio_name,
-        mandateCode: p.mandate_code,
-        mandateName: p.mandate_name,
-        serviceModel: p.service_model,
-        baseCurrency: p.base_currency,
-        inceptionDate: p.inception_date,
-        benchmark: p.benchmark,
-        aumUsdCurrent: p.aum_usd_current,
-      })),
-    );
+    await insertChunked(tx, s.portfolios, data.portfolios.map(mapPortfolio));
     await insertChunked(
       tx,
       s.portfolioAum,
@@ -114,23 +70,7 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
       ),
     );
 
-    await insertChunked(
-      tx,
-      s.instruments,
-      data.instruments.map((i) => ({
-        instrumentId: i.instrument_id,
-        instrumentName: i.instrument_name,
-        assetClass: i.asset_class,
-        subAssetClass: i.sub_asset_class,
-        sector: i.sector,
-        region: i.region,
-        currency: i.currency,
-        liquidityTier: i.liquidity_tier,
-        underlyingReference: i.underlying_reference,
-        sustainabilityExcluded: i.sustainability_excluded,
-        concentrationLimitApplies: i.concentration_limit_applies,
-      })),
-    );
+    await insertChunked(tx, s.instruments, data.instruments.map(mapInstrument));
     await insertChunked(
       tx,
       s.instrumentPrices,
@@ -143,74 +83,11 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
       ),
     );
 
-    await insertChunked(
-      tx,
-      s.holdings,
-      data.holdings.map((h) => ({
-        snapshotDate: h.snapshot_date,
-        portfolioId: h.portfolio_id,
-        clientId: h.client_id,
-        instrumentId: h.instrument_id,
-        instrumentName: h.instrument_name,
-        assetClass: h.asset_class,
-        subAssetClass: h.sub_asset_class,
-        sector: h.sector,
-        region: h.region,
-        instrumentCcy: h.instrument_ccy,
-        quantity: h.quantity,
-        priceLocal: h.price_local,
-        marketValueLocal: h.market_value_local,
-        portfolioCcy: h.portfolio_ccy,
-        marketValueBase: h.market_value_base,
-        marketValueUsd: h.market_value_usd,
-        weightPct: h.weight_pct,
-        avgCostLocal: h.avg_cost_local,
-        costBasisBase: h.cost_basis_base,
-        unrealisedPnlBase: h.unrealised_pnl_base,
-        unrealisedPnlPct: h.unrealised_pnl_pct,
-        lendingValueBase: h.lending_value_base,
-        advanceRatePct: h.advance_rate_pct,
-        liquidityTier: h.liquidity_tier,
-        valuationDate: h.valuation_date,
-        acquiredDate: h.acquired_date,
-      })),
-    );
+    await insertChunked(tx, s.holdings, data.holdings.map(mapHolding));
 
-    await insertChunked(
-      tx,
-      s.transactions,
-      data.transactions.map((t) => ({
-        transactionId: t.transaction_id,
-        tradeDate: t.trade_date,
-        settlementDate: t.settlement_date,
-        portfolioId: t.portfolio_id,
-        clientId: t.client_id,
-        transactionType: t.transaction_type,
-        instrumentId: t.instrument_id,
-        instrumentName: t.instrument_name,
-        quantity: t.quantity,
-        priceLocal: t.price_local,
-        currency: t.currency,
-        amount: t.amount,
-        narrative: t.narrative,
-      })),
-    );
+    await insertChunked(tx, s.transactions, data.transactions.map(mapTransaction));
 
-    await insertChunked(
-      tx,
-      s.creditFacilities,
-      data.creditFacilities.map((f) => ({
-        facilityId: f.facility_id,
-        clientId: f.client_id,
-        collateralPortfolioId: f.collateral_portfolio_id,
-        facilityType: f.facility_type,
-        facilityCcy: f.facility_ccy,
-        creditLimit: f.credit_limit,
-        interestRatePct: f.interest_rate_pct,
-        marginCallLtvPct: f.margin_call_ltv_pct,
-        utilisationPctCurrent: f.utilisation_pct_current,
-      })),
-    );
+    await insertChunked(tx, s.creditFacilities, data.creditFacilities.map(mapFacility));
     await insertChunked(
       tx,
       s.creditFacilitySnapshots,
@@ -233,80 +110,19 @@ export async function loadRaw(db: Db, data: Dataset): Promise<Record<string, num
       }),
     );
 
-    await insertChunked(
-      tx,
-      s.commitments,
-      data.commitments.map((c) => ({
-        commitmentId: c.commitment_id,
-        clientId: c.client_id,
-        portfolioId: c.portfolio_id,
-        fundName: c.fund_name,
-        currency: c.currency,
-        committed: c.committed,
-        calledToDate: c.called_to_date,
-        uncalled: c.uncalled,
-        expectedCallWindow: c.expected_call_window,
-      })),
-    );
+    await insertChunked(tx, s.commitments, data.commitments.map(mapCommitment));
 
-    await insertChunked(
-      tx,
-      s.plannedCashNeeds,
-      data.plannedCashNeeds.map((n) => ({
-        needId: n.need_id,
-        clientId: n.client_id,
-        description: n.description,
-        currency: n.currency,
-        amount: n.amount,
-        dueFrom: n.due_from,
-        dueTo: n.due_to,
-        recurrence: n.recurrence,
-        certainty: n.certainty,
-      })),
-    );
+    await insertChunked(tx, s.plannedCashNeeds, data.plannedCashNeeds.map(mapCashNeed));
 
-    await insertChunked(
-      tx,
-      s.marketContext,
-      data.marketContext.map((m) => ({
-        snapshotDate: m.snapshot_date,
-        seriesId: m.series_id,
-        seriesName: m.series_name,
-        category: m.category,
-        unit: m.unit,
-        value: m.value,
-        snapshotLabel: m.snapshot_label ?? '',
-      })),
-    );
+    await insertChunked(tx, s.marketContext, data.marketContext.map(mapMarketContext));
 
     await insertChunked(
       tx,
       s.eventLog,
-      data.eventLog.map((e, i) => ({
-        eventId: `EV-${String(i + 1).padStart(3, '0')}`,
-        eventDate: e.event_date,
-        eventType: e.event_type,
-        region: e.region,
-        description: e.description,
-        primaryTransmission: e.primary_transmission,
-        severity: e.severity,
-        ordinal: i,
-      })),
+      data.eventLog.map((e, i) => mapEvent(e, i)),
     );
 
-    await insertChunked(
-      tx,
-      s.rmNotes,
-      data.rmNotes.map((n) => ({
-        noteId: n.note_id,
-        clientId: n.client_id,
-        noteDate: n.note_date,
-        rmId: n.rm_id,
-        rmName: n.rm_name,
-        channel: n.channel,
-        note: n.note,
-      })),
-    );
+    await insertChunked(tx, s.rmNotes, data.rmNotes.map(mapNote));
 
     return {
       clients: data.clients.length,

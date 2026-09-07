@@ -57,26 +57,46 @@ docs/                Blueprint, ADRs, dataset dictionary
 - Every prompt lives in a registry with a version; numbers in narratives are injected, never generated.
 - No automated trading. Every action requires RM approval and is written to an audit log.
 
+## Data platform
+
+Postgres is the system of record; every engine reads it. The database ships as code twice: Drizzle
+migrations in `db/migrations` (the application's source of truth) and plain SQL in `db/sql`
+(`schema.sql` generated from the migrations, plus roles, grants and the row-level-security check).
+See `db/sql/README.md`.
+
+- **Schemas**: `raw` (bank data, incl. RMs, teams and dated client assignments), `derived` (engine
+  outputs and RM decisions), `access` (users and roles), `ingest` (landing zone and change log).
+- **Isolation**: row-level security on every client-owned table, enforced in Postgres; the API
+  connects as `rmw_app` and scopes each request to the caller (own book, team, or everything).
+  `npm run db:roles` creates the roles locally, `npm run db:rls-check` proves the policies.
+- **Identity**: `AUTH_MODE=dev` lists identities from the data and `data/reference/access.json`;
+  `AUTH_MODE=oidc` verifies the bank's tokens.
+- **Ingestion**: message contracts in `packages/contracts/src/messages.ts`; `npm run ingest:batch --
+data/messages/sample` applies files; `npm run kafka:up` then `npm run ingest:dev` and
+  `npm run ingest:produce` run the Kafka path locally (Redpanda). Rejected messages appear in
+  `ingest.dead_letters`; every batch is a `derived.load_runs` row. ADR-014 and ADR-015.
+
 ## Build iterations
 
-| #   | Scope                                                                            | Status |
-| --- | -------------------------------------------------------------------------------- | ------ |
-| 0   | Foundation: monorepo, Postgres, schema, loader, data-quality register, app shell | done   |
-| 1   | Customer factual data and behavioural vector                                     | done   |
-| 2   | Client 360 and portfolio deep dive                                               | done   |
-| 3   | Market signals and impact analysis                                               | done   |
-| 4   | Risk rubric (Capacity · Appetite · Horizon) and confidence scoring               | done   |
-| 4.5 | Dataset agnosticism refactor                                                     | done   |
-| 5   | Combined risk, ranked actions, trade ideas                                       | done   |
-| 6   | Book cockpit with Now / 7-day / 30-day lanes                                     | done   |
-| 7   | Workflow, approvals, outreach, audit                                             | done   |
-| 7.6 | Hardening pass from the 2026-09-05 review                                        | done   |
-| 8a  | Client context: strip, ⌘K switcher, corridor rail                                | done   |
-| 8b  | Client journey: five chapters as the client's front door                         | done   |
-| 8c  | Call plan: whom to call and when, policy in reference data                       | done   |
-| 8d  | Today: morning brief, call sheet, lanes opening the journey                      | done   |
-| 9a  | The conversation: assistant drawer on every screen, grammar + Claude planners    | done   |
-| 9b  | Companion (in-call cues, guardrails), promise ledger, idea desk                  | done   |
-| 10  | The manager and the foundation: team page, gateway and playbooks, shadow mode    | next   |
+| #     | Scope                                                                                  | Status |
+| ----- | -------------------------------------------------------------------------------------- | ------ |
+| 0     | Foundation: monorepo, Postgres, schema, loader, data-quality register, app shell       | done   |
+| 1     | Customer factual data and behavioural vector                                           | done   |
+| 2     | Client 360 and portfolio deep dive                                                     | done   |
+| 3     | Market signals and impact analysis                                                     | done   |
+| 4     | Risk rubric (Capacity · Appetite · Horizon) and confidence scoring                     | done   |
+| 4.5   | Dataset agnosticism refactor                                                           | done   |
+| 5     | Combined risk, ranked actions, trade ideas                                             | done   |
+| 6     | Book cockpit with Now / 7-day / 30-day lanes                                           | done   |
+| 7     | Workflow, approvals, outreach, audit                                                   | done   |
+| 7.6   | Hardening pass from the 2026-09-05 review                                              | done   |
+| 8a    | Client context: strip, ⌘K switcher, corridor rail                                      | done   |
+| 8b    | Client journey: five chapters as the client's front door                               | done   |
+| 8c    | Call plan: whom to call and when, policy in reference data                             | done   |
+| 8d    | Today: morning brief, call sheet, lanes opening the journey                            | done   |
+| 9a    | The conversation: assistant drawer on every screen, grammar + Claude planners          | done   |
+| 9b    | Companion (in-call cues, guardrails), promise ledger, idea desk                        | done   |
+| D1–D4 | Data platform: RM model, identity, row-level security, incremental and Kafka ingestion | done   |
+| 10    | The manager and the foundation: team page, gateway and playbooks, shadow mode          | next   |
 
 The experience design behind iterations 8 to 10 is `docs/rm-experience-design.html` (the RM Spine).

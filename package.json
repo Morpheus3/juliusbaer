@@ -32,7 +32,11 @@
     "vectors:build": "curl -sS -X POST http://localhost:8000/vectors/build",
     "db:ddl": "npm run ddl -w @jb/db",
     "db:rls-check": "docker exec -i -e PGPASSWORD=rmw_app_dev rmw-postgres psql -U rmw_app -d ${POSTGRES_DB:-rm_workbench} -f - < db/sql/02_rls_check.sql",
-    "db:roles": "docker exec -i rmw-postgres psql -U ${POSTGRES_USER:-rmw} -d ${POSTGRES_DB:-rm_workbench} -v ON_ERROR_STOP=1 -v owner_password=rmw_owner_dev -v app_password=rmw_app_dev -v ingest_password=rmw_ingest_dev -v analytics_password=rmw_analytics_dev -f - < db/sql/00_roles.sql && docker exec -i rmw-postgres psql -U ${POSTGRES_USER:-rmw} -d ${POSTGRES_DB:-rm_workbench} -v ON_ERROR_STOP=1 -f - < db/sql/01_grants.sql"
+    "db:roles": "docker exec -i rmw-postgres psql -U ${POSTGRES_USER:-rmw} -d ${POSTGRES_DB:-rm_workbench} -v ON_ERROR_STOP=1 -v owner_password=rmw_owner_dev -v app_password=rmw_app_dev -v ingest_password=rmw_ingest_dev -v analytics_password=rmw_analytics_dev -f - < db/sql/00_roles.sql && docker exec -i rmw-postgres psql -U ${POSTGRES_USER:-rmw} -d ${POSTGRES_DB:-rm_workbench} -v ON_ERROR_STOP=1 -f - < db/sql/01_grants.sql",
+    "ingest:batch": "npm run ingest:batch -w @jb/db --",
+    "kafka:up": "docker compose --profile kafka up -d redpanda",
+    "ingest:dev": "npm run dev -w @jb/ingest",
+    "ingest:produce": "npm run produce -w @jb/ingest --"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

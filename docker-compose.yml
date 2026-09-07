@@ -32,5 +32,27 @@ services:
         condition: service_healthy
     profiles: ['analytics']
 
+  redpanda:
+    image: redpandadata/redpanda:v24.3.5
+    container_name: rmw-redpanda
+    command:
+      - redpanda start
+      - --overprovisioned
+      - --smp 1
+      - --memory 512M
+      - --reserve-memory 0M
+      - --node-id 0
+      - --check=false
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://127.0.0.1:9092
+    ports:
+      - '127.0.0.1:9092:9092'
+    healthcheck:
+      test: ['CMD-SHELL', 'rpk cluster health | grep -q "Healthy:.*true"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    profiles: ['kafka']
+
 volumes:
   pgdata:

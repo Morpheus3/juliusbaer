@@ -16,7 +16,8 @@
     "seed": "tsx src/cli/seed.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "ddl": "tsx src/cli/exportDdl.ts"
+    "ddl": "tsx src/cli/exportDdl.ts",
+    "ingest:batch": "tsx src/cli/ingestBatch.ts"
   },
   "dependencies": {
     "@jb/contracts": "*",

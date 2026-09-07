@@ -63,3 +63,25 @@ the evidence drawer, the assumptions panel or the leg table.
 | `DATASET_TODAY`     | latest snapshot  | Overrides the dataset's "today"                         |
 | `DATASET_NAME`      | `Loaded dataset` | Shown in the shell                                      |
 | `ANTHROPIC_API_KEY` | unset            | Enables the live LLM assessor; unset runs recorded mode |
+
+## Messages (incremental ingestion)
+
+Changes arrive as messages, from Kafka or from `*.jsonl` files, with one envelope:
+
+```json
+{
+  "type": "rm.assignment.v1",
+  "key": "core:assign:1001",
+  "eventTime": "2026-09-01T02:00:00Z",
+  "source": "core-banking",
+  "payload": { "clientId": "…", "rmId": "…", "role": "primary", "validFrom": "2026-09-01" }
+}
+```
+
+`type` selects the payload schema (`packages/contracts/src/messages.ts`); row-shaped payloads
+(`client.upsert.v1`, `transaction.v1`, `note.v1`, …) are the CSV row contracts and accept JSON
+numbers and booleans. `key` is the source system's identity for the change and makes the apply
+idempotent. Snapshot messages (`holdings.snapshot.v1`, `prices.snapshot.v1`, `facility_snapshot.v1`,
+`market_context.snapshot.v1`) create the snapshot date when it is new. `rm.assignment.v1` with role
+`primary` closes the previous primary and updates the client's RM columns. Sample messages:
+`data/messages/sample`.

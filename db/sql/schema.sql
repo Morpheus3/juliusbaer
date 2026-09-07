@@ -2,7 +2,7 @@
 -- Apply on an empty database that already has the pgvector and pgcrypto extensions
 -- (see db/init/01-extensions.sql) with: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/sql/schema.sql
 -- Do not edit by hand; edit the Drizzle schema, generate a migration, then re-export.
--- Generated 2026-09-06 from 14 migrations.
+-- Generated 2026-09-07 from 14 migrations.
 
 BEGIN;
 

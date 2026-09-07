@@ -1,0 +1,1 @@
+{"type":"rm.upsert.v1","key":"hr:rm:20260901-021","eventTime":"2026-09-01T01:00:00Z","source":"hr","payload":{"rmId":"RM-SG-021","name":"Daniel Koh","desk":"Asia desk - Singapore and Hong Kong booking centres","teamId":"TEAM-asia-desk-singapore-and-hong-kong-bookin","email":"daniel.koh@example.bank","status":"active"}}

@@ -6,8 +6,14 @@ export const SnapshotDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'expec
 
 export const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'expected YYYY-MM-DD');
 
-/** CSV cells arrive as strings; these coerce while rejecting garbage. */
-export const NumCell = z.string().transform((v, ctx) => {
+/**
+ * Cells arrive as strings from CSV and as JSON scalars from messages; these accept both, coerce, and
+ * reject garbage.
+ */
+export const NumCell = z.union([z.number(), z.string()]).transform((v, ctx) => {
+  if (typeof v === 'number') {
+    return v;
+  }
   const n = Number(v);
   if (v.trim() === '' || Number.isNaN(n)) {
     ctx.addIssue({ code: 'custom', message: `not a number: "${v}"` });
@@ -15,9 +21,17 @@ export const NumCell = z.string().transform((v, ctx) => {
   }
   return n;
 });
-export const OptionalNumCell = z.string().transform((v) => (v.trim() === '' ? null : Number(v)));
-export const OptionalStrCell = z.string().transform((v) => (v.trim() === '' ? null : v));
-export const YesNoCell = z.enum(['Y', 'N']).transform((v) => v === 'Y');
+export const OptionalNumCell = z
+  .union([z.number(), z.string(), z.null()])
+  .transform((v) =>
+    v === null ? null : typeof v === 'number' ? v : v.trim() === '' ? null : Number(v),
+  );
+export const OptionalStrCell = z
+  .union([z.string(), z.null()])
+  .transform((v) => (v === null || v.trim() === '' ? null : v));
+export const YesNoCell = z
+  .union([z.enum(['Y', 'N']), z.boolean()])
+  .transform((v) => (typeof v === 'boolean' ? v : v === 'Y'));
 
 export const AssetClassSchema = z.enum([
   'Cash and Equivalents',

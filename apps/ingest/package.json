@@ -1,0 +1,22 @@
+{
+  "name": "@jb/ingest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Kafka consumer and batch poller that apply ingest messages to Postgres",
+  "scripts": {
+    "dev": "tsx watch src/consumer.ts",
+    "start": "tsx src/consumer.ts",
+    "produce": "tsx src/produce.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@jb/contracts": "*",
+    "@jb/db": "*",
+    "kafkajs": "^2.2.4",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0"
+  }
+}
