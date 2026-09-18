@@ -32,16 +32,17 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
   <div class="sub">What to ask the bank so the RM's day is ready at 6 a.m. · 18 Sep 2026</div>
   <ol>
     <li><a href="#problem">1 · The problem: 9 a.m. data, 6 a.m. need</a></li>
-    <li><a href="#journey">2 · What the RM does</a></li>
-    <li><a href="#entitlements">3 · Entitlements for the RM</a></li>
-    <li><a href="#assets">4 · Asset classes supported</a></li>
-    <li><a href="#insights">5 · Data, information and insights required</a></li>
-    <li><a href="#sources">6 · Source systems</a></li>
-    <li><a href="#recency">7 · Recency, quality and coverage per system</a></li>
-    <li><a href="#events">8 · Event or micro-batch support</a></li>
-    <li><a href="#agents">9 · Agent build: content, ideas and communication</a></li>
-    <li><a href="#tasks">10 · Calls to action and tasks</a></li>
-    <li><a href="#first">11 · The fifteen to ask first</a></li>
+    <li><a href="#catalogue">2 · What we built: information, insights, tasks</a></li>
+    <li><a href="#journey">3 · What the RM does</a></li>
+    <li><a href="#entitlements">4 · Entitlements for the RM</a></li>
+    <li><a href="#assets">5 · Asset classes supported</a></li>
+    <li><a href="#insights">6 · Data, information and insights required</a></li>
+    <li><a href="#sources">7 · Source systems</a></li>
+    <li><a href="#recency">8 · Recency, quality and coverage per system</a></li>
+    <li><a href="#events">9 · Event or micro-batch support</a></li>
+    <li><a href="#agents">10 · Agent build: content, ideas and communication</a></li>
+    <li><a href="#tasks">11 · Calls to action and tasks</a></li>
+    <li><a href="#first">12 · The fifteen to ask first</a></li>
   </ol>
 </nav>
 
@@ -64,7 +65,38 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 </div>
 
 <!-- 2 -->
-<h2 id="journey"><span class="num">02</span>What the RM does</h2>
+<h2 id="catalogue"><span class="num">02</span>What we built: information, insights and tasks to confirm</h2>
+<p class="intro">Everything the workbench produces today, grouped into the categories an RM thinks in. This is the list to put in front of the client first. For each row they mark keep, change, not needed or missing; the remaining sections then connect to the rows that survive, because every data, source, recency and event question below exists to feed one of these.</p>
+<div class="thesis">
+  <p>Information is a fact about the client or the market, read from the systems. Insight is a conclusion the machine draws and can explain, with a level 2 "why" and level 3 rows behind it. A task is a call to action with an owner, a due date and a defined proof of completion, proposed by the machine and confirmed by the RM.</p>
+</div>
+<div class="tablewrap"><table>
+<thead><tr><th>Category</th><th>Information</th><th>Insights</th><th>Tasks and calls to action</th><th>Where it lives</th><th>Confirm</th></tr></thead>
+<tbody>
+<tr><td class="k">1 · Client and household</td><td>Profile, segment, residence and tax domicile, booking centre, reporting language, KYC status and review date, PEP; portfolios and service models; last contact date and channel</td><td>Where the client stands in one paragraph, with every figure sourced; moments ahead (dated needs, KYC, maturities); sensitivities quoted from notes with dates</td><td>Schedule the KYC refresh; update the profile after a review; correct a stale record</td><td>Journey chapter 1; client strip; companion guardrails</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">2 · Portfolio and performance</td><td>Household value and allocation by asset class at each snapshot; holdings with cost, weight, valuation date, liquidity tier; transactions and income</td><td>Change since baseline split into price, FX and flows; top movers; income yield; stale valuations flagged</td><td>Prepare the performance story for the call; produce the "since we last spoke" pack in the client's language</td><td>Journey chapter 2; portfolio rooms</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">3 · Mandate and concentration</td><td>Mandate bands, targets, single-position limits, exclusion lists; direct and look-through exposure by name, sector, region, currency</td><td>Band breaches with drift versus client-directed distinction; concentration and look-through breaches with the saleable part; exclusion holdings in exclusion-bound mandates</td><td>Trim to the limit or record the client's instruction to hold; rebalance toward the bands; replace an excluded holding</td><td>Alerts; mandate and collateral board; trade ideas</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">4 · Liquidity and lending</td><td>Cash needs with dates and certainty; commitments and uncalled capital; facilities with drawn, limit, lending value, LTV per snapshot and trigger levels</td><td>Twelve-month coverage of needs by daily-liquid assets; LTV headroom trend and projected breach date; margin-call proximity; scenario effect on LTV and coverage</td><td>Agree the funding route before the need; discuss collateral top-up, reduced drawing or de-risking, with a second RM check; raise cash ahead of a dated liability</td><td>Cash-flow room; board; actions; call plan clock term</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">5 · Risk and suitability</td><td>Stated risk profile, score and horizon; behavioural features from transactions (32 in the customer vector); peer group</td><td>Rubric: capacity, appetite, horizon scored by rules, a statistical model and a language model with a combined confidence; stated-versus-observed mismatches; combined risk cell and composite score</td><td>Re-assess after a review; override a dimension with a reason; lock the rubric as the suitability record</td><td>Rubric room; risk and actions; journey chapter 3</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">6 · Market signals and impact</td><td>Market event log with date, severity, transmission; market series; named stress scenarios</td><td>Which signals reach the household and through which holdings, with exposure and confidence; base and severe stress on value, LTV and coverage; the one scenario most relevant to this client</td><td>Call the most exposed clients first; discuss the impact; send a market update</td><td>Signals feed; impact room; journey chapter 3; morning brief</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">7 · Relationship and follow-through</td><td>Notes, calls and meetings with channel and date; client messages awaiting reply; promises made by RM or client with the quoted sentence</td><td>Contact cadence against the segment policy and relationship debt; open promises and those past due; decision debt (agreed but not executed); sensitivities to avoid raising</td><td>Reply to the waiting message today; fulfil each promise with its draft attached; bring the unexecuted decision back; call the client who is overdue for contact</td><td>Promise ledger; call plan relationship term; companion</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">8 · Ideas and opportunities</td><td>Approved product universe; house view and research; idea rules</td><td>Trade ideas per client with rationale, suitability gate and confidence, blocked ones shown with the failed rule; which clients an idea or a signal fits across the book; opportunities: lending, discretionary mandate, succession, next generation, deployment, each with its rule or quoted note</td><td>Approve or reject an idea; draft one message per client in their language; open the lending or mandate conversation</td><td>Trade ideas room; idea desk</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">9 · Priorities and the day</td><td>Open items per client; deadlines; RM capacity and hours; client time zones and channels</td><td>Items in Now, week and month lanes with momentum against the previous snapshot; client urgency; whom to call, by when, in which slot and channel, with five explained priority terms; the four-sentence morning brief</td><td>Make the calls in order; defer with a reason; mark done; schedule reviews separately from calls</td><td>Today; call sheet; lanes</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">10 · Actions, approvals and record</td><td>Ranked actions with evidence, benefit and trade-off; alerts awaiting triage; approvals awaiting a checker; the nine workflow steps</td><td>Suitability, compliance, explainability and maker-checker checks per action; what is still open for this client</td><td>Triage an alert; approve or reject an action; give or obtain the second-RM check; log the call with note, cues and promises; every decision as an audit event</td><td>Workflow room; journey chapters 4 and 5; assistant proposals</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">11 · Client communication</td><td>Reporting language and preferred channel; approved templates and disclosures; cross-border rules by residence</td><td>Draft outreach from approved actions and signals with facts used and caveats; the gateway's verdict on every message (cross-border, language, promises, suitability basis, disclosures)</td><td>Edit and send through the gateway; log the send; a "since we last spoke" summary; personalised content from the house view</td><td>Workflow outreach; communication gateway; idea desk drafts</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">12 · Conversation and assistance</td><td>The client in context on every screen; the question the RM asks in her words</td><td>Answers from the engines about a client, a group of clients or the market, with the tool trace; cue answers during a call with guardrails; playbook steps with what an agent would have said</td><td>Tasks proposed from language and confirmed with one click; navigate; add a cue to the note</td><td>Assistant drawer; companion; playbooks</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">13 · Team and oversight</td><td>RM assignments and teams; overrides with reasons; approvals waiting; coverage against cadence; call load and deferrals; fee proxy</td><td>Risk, conduct, coverage and capacity by RM; ten worst households; ideas landing (reached, drafted, sent); explainability sample</td><td>Sign what waits for a checker; coach on conduct patterns; reassign or cover; pause all agents</td><td>Team page</td><td>keep · change · not needed · missing</td></tr>
+<tr><td class="k">14 · Data and machine trust</td><td>Load runs, data-quality issues, dead letters; model calls and errors; shadow grades per playbook</td><td>Data coverage and freshness per source; agreement between agent drafts and RM words, against the threshold that earns the next autonomy level</td><td>Fix or own a data issue; grade a shadow draft; raise or lower the autonomy level</td><td>Audit and data-quality room; machine panel</td><td>keep · change · not needed · missing</td></tr>
+</tbody></table></div>
+<ol class="qs">
+<li data-id="C-1">For each category: is this what your RMs need, is anything here noise, and what is missing that they ask for today?<span class="why"><b>Why we ask</b>The rows that survive define the scope; every question in the later sections traces back to one of them.</span></li>
+<li data-id="C-2">Which insights must be ready at six, which may arrive with the nine o'clock batch and refresh, and which are only needed on demand?<span class="why"><b>Why we ask</b>Sets the overnight run and tells us which sources in section 8 must deliver early.</span></li>
+<li data-id="C-3">Which tasks are the RM's alone, which may a machine complete, and which belong to someone else (assistant, operations, compliance)?<span class="why"><b>Why we ask</b>Draws the autonomy line per category before any agent is built.</span></li>
+<li data-id="C-4">Which categories may be shown to the client, in what form, and which stay internal?<span class="why"><b>Why we ask</b>Separates RM-facing insight from client-facing content and decides where the communication gateway must sit.</span></li>
+</ol>
+
+<!-- 3 -->
+<h2 id="journey"><span class="num">03</span>What the RM does</h2>
 <p class="intro">The workbench is organised around six moments of the RM's day: wake, prepare, converse, follow through, grow, reflect, with the team head's Monday above them. These questions confirm the bank's RM day matches, and what she does that we have not seen.</p>
 <ol class="qs">
 <li data-id="J-1">Walk us through an RM's day from arrival to leaving: what she reads first, how she decides whom to call, what she prepares before a call, what she does during and after it, and what she hands to others.<span class="why"><b>Why we ask</b>The six moments we built are a hypothesis; the bank's real sequence decides what must be ready at six and in what order.</span></li>
@@ -78,8 +110,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="J-9">Which parts of the day would the RM most like to stop doing, and which would she never hand to a machine?<span class="why"><b>Why we ask</b>Sets the autonomy ladder honestly: drafts only, approve to send, or informational messages sent by an agent.</span></li>
 </ol>
 
-<!-- 3 -->
-<h2 id="entitlements"><span class="num">03</span>Entitlements for the RM</h2>
+<!-- 4 -->
+<h2 id="entitlements"><span class="num">04</span>Entitlements for the RM</h2>
 <p class="intro">One RM must not see another's clients. The workbench enforces this in the database with row-level security driven by dated RM-to-client assignments. These questions establish where that truth lives in the bank.</p>
 <ol class="qs">
 <li data-id="E-1">Where is the RM-to-client assignment held (CRM, core banking, HR), and is history kept with valid-from and valid-to dates?<span class="why"><b>Why we ask</b>Entitlement is computed from assignments valid today; the audit trail needs history to answer who could see a client in a given month.</span></li>
@@ -91,8 +123,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="E-7">What may an RM see about a client after offboarding or reassignment: nothing, read-only history, or her own notes only?<span class="why"><b>Why we ask</b>Closed assignments hide the client today; the bank may want read-only access to the RM's own notes for a period.</span></li>
 </ol>
 
-<!-- 4 -->
-<h2 id="assets"><span class="num">04</span>Asset classes supported</h2>
+<!-- 5 -->
+<h2 id="assets"><span class="num">05</span>Asset classes supported</h2>
 <p class="intro">Per asset class: the products, the client-relevant lifecycle events, and the controls in front of a transaction. The workbench classifies holdings as cash and equivalents, fixed income, equity, alternatives, commodities and structured products, with credit facilities alongside.</p>
 
 <h3>Cash, deposits and FX</h3>
@@ -141,8 +173,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="A-X2">How are complaints, vulnerable-client flags, deceased or dormant statuses represented, and must they stop outreach?<span class="why"><b>Why we ask</b>Escalation triggers and the gateway need structured flags; free text in notes is not a control.</span></li>
 </ol>
 
-<!-- 5 -->
-<h2 id="insights"><span class="num">05</span>Data, information and insights required</h2>
+<!-- 6 -->
+<h2 id="insights"><span class="num">06</span>Data, information and insights required</h2>
 <p class="intro">Three layers. Data is what the sources hold. Information is what the RM reads. Insight is what the machine concludes and must be able to explain. The workbench keeps all three visible: level 1 the conclusion, level 2 the why, level 3 the rows.</p>
 <div class="tablewrap"><table>
 <thead><tr><th>Layer</th><th>What the RM needs by 6 a.m.</th><th>Built from</th><th>Question for the bank</th></tr></thead>
@@ -160,8 +192,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="I-6">Which insights would the bank want computed across the whole book for the team head, and at what granularity may they be shown?<span class="why"><b>Why we ask</b>The team page aggregates by RM under the head's scope; conduct indicators such as override rate need thresholds the bank sets.</span></li>
 </ol>
 
-<!-- 6 -->
-<h2 id="sources"><span class="num">06</span>Source systems</h2>
+<!-- 7 -->
+<h2 id="sources"><span class="num">07</span>Source systems</h2>
 <p class="intro">One system of record per domain, one identifier that joins to the client, and a named owner. Fill the table with the bank, then ask the questions beneath for every row.</p>
 <div class="tablewrap"><table>
 <thead><tr><th>Domain</th><th>Typical system</th><th>Key</th><th>Workbench use</th><th>Ask</th></tr></thead>
@@ -190,8 +222,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="S-4">Who owns each system, who can grant read access, and who would own a new event feed from it?<span class="why"><b>Why we ask</b>Every integration in section 8 needs a producer-side owner; without one, files are the realistic path.</span></li>
 </ol>
 
-<!-- 7 -->
-<h2 id="recency"><span class="num">07</span>Recency, quality and coverage per system</h2>
+<!-- 8 -->
+<h2 id="recency"><span class="num">08</span>Recency, quality and coverage per system</h2>
 <p class="intro">This is where the six o'clock question is answered. For every source: when is it final, when can we read it, how often is it wrong, and what share of the book does it cover.</p>
 <div class="tablewrap"><table>
 <thead><tr><th>Source</th><th>Recency: ask</th><th>Quality: ask</th><th>Coverage: ask</th><th>Effect on the 6 a.m. brief</th></tr></thead>
@@ -218,8 +250,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="R-7">Is the client's reporting-currency conversion done at source or expected downstream, with which rate and time?<span class="why"><b>Why we ask</b>Household totals and FX effects are only comparable under one convention.</span></li>
 </ol>
 
-<!-- 8 -->
-<h2 id="events"><span class="num">08</span>Event or micro-batch support</h2>
+<!-- 9 -->
+<h2 id="events"><span class="num">09</span>Event or micro-batch support</h2>
 <p class="intro">The workbench applies typed messages idempotently from Kafka or from files. Whether a source can emit events, deliver micro-batches, or only a daily file decides how early the brief can be ready and how current it stays through the day.</p>
 <ol class="qs">
 <li data-id="V-1">Does each source publish business events today (message bus, webhooks, outbox), expose change data capture, deliver micro-batches at intervals, or only a daily file?<span class="why"><b>Why we ask</b>Decides whether the Kafka front door or the batch adapter is the first integration per source, and what "current" can mean.</span></li>
@@ -245,8 +277,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <tr><td class="k">Market</td><td>Event published; house view changed; threshold move</td><td>Daily research digest</td><td>Signals, impact, the brief's market sentence</td></tr>
 </tbody></table></div>
 
-<!-- 9 -->
-<h2 id="agents"><span class="num">09</span>Agent build: content, ideas and communication</h2>
+<!-- 10 -->
+<h2 id="agents"><span class="num">10</span>Agent build: content, ideas and communication</h2>
 <p class="intro">Imagine the RM at six. The brief is written, the calls are ranked, each client's story is ready. What else would she want the machine to have done overnight? Written the house view into words for each client. Turned this week's idea into the six clients it fits, each with a draft in their language. Prepared the messages she will send at nine, through the channel each client prefers, already passed through compliance. These questions establish whether the bank has the platforms and permissions for that, and what the RM would actually do with it.</p>
 
 <h3>Content authoring and publishing</h3>
@@ -279,8 +311,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="G-18">What would the team head want to see before allowing an agent to talk to a client at all, and what single switch would she want in her hand?<span class="why"><b>Why we ask</b>The machine panel shows agreement per playbook and a pause-all switch; the head's answer sets the threshold and the evidence.</span></li>
 </ol>
 
-<!-- 10 -->
-<h2 id="tasks"><span class="num">10</span>Calls to action and tasks</h2>
+<!-- 11 -->
+<h2 id="tasks"><span class="num">11</span>Calls to action and tasks</h2>
 <p class="intro">Information tells the RM what is true; insight tells her what it means; a call to action tells her what to do; a task is that action with an owner, a due date and evidence of completion. The workbench turns every insight into a proposed task the RM confirms, and every confirmation into an audit event. These questions establish what the bank's RMs actually do with what they learn, where tasks live today, and which ones a machine may prepare, propose or complete.</p>
 
 <h3>From insight to action: what the workbench proposes today</h3>
@@ -316,8 +348,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="T-12">What would the RM want the six o'clock task list to look like: how many items, in what order, with what attached, and what should never be on it?<span class="why"><b>Why we ask</b>Defines the shape of Today: the brief, the call sheet and the tasks are one page, and it must be readable in ninety seconds.</span></li>
 </ol>
 
-<!-- 11 -->
-<h2 id="first"><span class="num">11</span>The fifteen to ask first</h2>
+<!-- 12 -->
+<h2 id="first"><span class="num">12</span>The fifteen to ask first</h2>
 <p class="intro">If the first workshop has ninety minutes, these decide whether the six o'clock brief is possible and what it may contain.</p>
 <ol class="qs">
 <li data-id="1">For custody positions and prices: at what time is yesterday final, at what time can we read it, and why the gap? (R-1)</li>
@@ -337,6 +369,6 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="15">Where do RM tasks live today, what proves a task done, and which tasks may a machine complete rather than propose? (T-2, T-5, T-7)</li>
 </ol>
 
-<footer>Discovery questionnaire for the agentic RM workbench in Private Banking and Retail Wealth. Question ids: J what the RM does, E entitlements, A asset classes, I data and insights, S source systems, R recency and quality, V events and micro-batches, G agent build, T calls to action and tasks. The workbench modules referenced are those built in iterations 0 to 10 and the data platform (ADR-001 to ADR-016). Prepared 18 Sep 2026.</footer>
+<footer>Discovery questionnaire for the agentic RM workbench in Private Banking and Retail Wealth. Question ids: C catalogue to confirm, J what the RM does, E entitlements, A asset classes, I data and insights, S source systems, R recency and quality, V events and micro-batches, G agent build, T calls to action and tasks. The workbench modules referenced are those built in iterations 0 to 10 and the data platform (ADR-001 to ADR-016). Prepared 18 Sep 2026.</footer>
 </main>
 </div>
