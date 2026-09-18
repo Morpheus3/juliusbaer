@@ -1,1455 +1,304 @@
 <title>Private Banking Discovery Questions</title>
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
-/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-  :root {
-    --bg: #f5f7fa;
-    --surface: #ffffff;
-    --surface-2: #edf1f6;
-    --ink: #16202e;
-    --ink-2: #3c4858;
-    --muted: #66728a;
-    --line: #d9dfe8;
-    --line-2: #c3ccd9;
-    --accent: #1f4e79;
-    --accent-soft: #e3ecf5;
-    --brass: #8f6f3a;
-    --brass-soft: #f3ebdd;
-    --crit: #b3261e;
-    --crit-soft: #f9e5e3;
-    --warn: #9a6a00;
-    --warn-soft: #fbf0d2;
-    --ok: #1f7a4d;
-    --ok-soft: #dff2e6;
-    --serif: 'Source Serif 4', Georgia, serif;
-    --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) {
-      --bg: #0f141c;
-      --surface: #161d28;
-      --surface-2: #1d2634;
-      --ink: #e7ebf1;
-      --ink-2: #c4ccd8;
-      --muted: #95a1b4;
-      --line: #273241;
-      --line-2: #344256;
-      --accent: #7fb0e0;
-      --accent-soft: #1b2c40;
-      --brass: #d2b27c;
-      --brass-soft: #2a2418;
-      --crit: #f28b82;
-      --crit-soft: #3a1f1d;
-      --warn: #e6be5a;
-      --warn-soft: #332a14;
-      --ok: #7ccb9a;
-      --ok-soft: #173224;
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme='dark'] {
-    --bg: #0f141c;
-    --surface: #161d28;
-    --surface-2: #1d2634;
-    --ink: #e7ebf1;
-    --ink-2: #c4ccd8;
-    --muted: #95a1b4;
-    --line: #273241;
-    --line-2: #344256;
-    --accent: #7fb0e0;
-    --accent-soft: #1b2c40;
-    --brass: #d2b27c;
-    --brass-soft: #2a2418;
-    --crit: #f28b82;
-    --crit-soft: #3a1f1d;
-    --warn: #e6be5a;
-    --warn-soft: #332a14;
-    --ok: #7ccb9a;
-    --ok-soft: #173224;
-    color-scheme: dark;
-  }
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font: 15px/1.6 var(--sans);
-    -webkit-font-smoothing: antialiased;
-  }
-  a {
-    color: var(--accent);
-  }
-  .page {
-    display: grid;
-    grid-template-columns: 230px minmax(0, 1fr);
-    gap: 48px;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 40px 32px 96px;
-  }
-  @media (max-width: 960px) {
-    .page {
-      grid-template-columns: 1fr;
-      gap: 24px;
-      padding: 24px 18px 64px;
-    }
-    .toc {
-      position: static !important;
-    }
-  }
-  .toc {
-    position: sticky;
-    top: 24px;
-    align-self: start;
-    font-size: 13px;
-  }
-  .toc .brand {
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: 17px;
-    margin-bottom: 4px;
-  }
-  .toc .sub {
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 18px;
-  }
-  .toc ol {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border-left: 1px solid var(--line);
-  }
-  .toc li a {
-    display: block;
-    padding: 4px 0 4px 14px;
-    color: var(--ink-2);
-    text-decoration: none;
-    border-left: 2px solid transparent;
-    margin-left: -1px;
-  }
-  .toc li a:hover {
-    color: var(--accent);
-    border-left-color: var(--accent);
-  }
-  main {
-    min-width: 0;
-  }
-  .eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--brass);
-    font-weight: 600;
-  }
-  h1 {
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: clamp(30px, 4vw, 40px);
-    line-height: 1.1;
-    letter-spacing: -0.015em;
-    margin: 8px 0 14px;
-    text-wrap: balance;
-    max-width: 24ch;
-  }
-  .lede {
-    font-size: 17px;
-    line-height: 1.55;
-    color: var(--ink-2);
-    max-width: 66ch;
-    margin: 0 0 20px;
-  }
-  h2 {
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: 26px;
-    letter-spacing: -0.01em;
-    margin: 64px 0 6px;
-    text-wrap: balance;
-  }
-  h2 + p.intro {
-    color: var(--ink-2);
-    margin: 0 0 22px;
-    max-width: 70ch;
-  }
-  h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 28px 0 8px;
-  }
-  p {
-    max-width: 70ch;
-  }
-  .num {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    display: block;
-    margin-bottom: -2px;
-  }
-  .thesis {
-    border-left: 3px solid var(--brass);
-    background: var(--brass-soft);
-    padding: 16px 20px;
-    border-radius: 0 6px 6px 0;
-    margin: 20px 0;
-    max-width: 76ch;
-  }
-  .thesis p {
-    margin: 0 0 8px;
-    font-family: var(--serif);
-    font-size: 17px;
-    line-height: 1.45;
-    color: var(--ink);
-  }
-  .thesis p:last-child {
-    margin: 0;
-  }
-  .grid3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  @media (max-width: 720px) {
-    .grid3 {
-      grid-template-columns: 1fr;
-    }
-  }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 14px 16px;
-  }
-  .card b {
-    display: block;
-    font-family: var(--serif);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  .card p {
-    font-size: 13.5px;
-    color: var(--ink-2);
-    margin: 0;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 13px;
-  }
-  .tablewrap {
-    overflow-x: auto;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--surface);
-    margin: 14px 0 6px;
-  }
-  th {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: left;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--line);
-    background: var(--surface-2);
-    white-space: nowrap;
-    vertical-align: bottom;
-  }
-  td {
-    padding: 9px 12px;
-    border-bottom: 1px solid var(--line);
-    vertical-align: top;
-  }
-  tr:last-child td {
-    border-bottom: 0;
-  }
-  td.k {
-    font-weight: 600;
-    color: var(--ink);
-    white-space: nowrap;
-  }
-  td.q {
-    color: var(--ink-2);
-  }
-  ol.qs {
-    margin: 8px 0 0;
-    padding-left: 0;
-    list-style: none;
-  }
-  ol.qs li {
-    position: relative;
-    padding: 8px 12px 8px 58px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--surface);
-    margin-bottom: 6px;
-    font-size: 13.5px;
-    color: var(--ink);
-  }
-  ol.qs li::before {
-    content: attr(data-id);
-    position: absolute;
-    left: 12px;
-    top: 9px;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--brass);
-  }
-  ol.qs li small {
-    display: block;
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 2px;
-  }
-  footer {
-    margin-top: 64px;
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
-    font-size: 12.5px;
-    max-width: 74ch;
-  }
+:root{--bg:#FFFFFF;--surface:#FFFFFF;--surface-2:#F4F6F9;--ink:#16202E;--ink-2:#3C4858;--muted:#66728A;--line:#DDE3EC;--line-2:#C3CCD9;--accent:#1F4E79;--accent-soft:#E3ECF5;--brass:#8F6F3A;--brass-soft:#F6F0E4;--crit:#B3261E;--crit-soft:#F9E5E3;--warn:#9A6A00;--warn-soft:#FBF0D2;--ok:#1F7A4D;--ok-soft:#DFF2E6;--serif:"Source Serif 4",Georgia,serif;--sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;color-scheme:light only}
+*{box-sizing:border-box}body{margin:0;background:#FFFFFF;color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}a{color:var(--accent)}
+.page{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1300px;margin:0 auto;padding:40px 32px 96px}
+@media (max-width:960px){.page{grid-template-columns:1fr;gap:24px;padding:24px 18px 64px}.toc{position:static!important}}
+.toc{position:sticky;top:24px;align-self:start;font-size:13px}.toc .brand{font-family:var(--serif);font-weight:600;font-size:17px;margin-bottom:4px}.toc .sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+.toc ol{list-style:none;padding:0;margin:0;border-left:1px solid var(--line)}.toc li a{display:block;padding:4px 0 4px 14px;color:var(--ink-2);text-decoration:none;border-left:2px solid transparent;margin-left:-1px}.toc li a:hover{color:var(--accent);border-left-color:var(--accent)}
+main{min-width:0}.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass);font-weight:600}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,40px);line-height:1.1;letter-spacing:-.015em;margin:8px 0 14px;text-wrap:balance;max-width:24ch}
+.lede{font-size:17px;line-height:1.55;color:var(--ink-2);max-width:68ch;margin:0 0 20px}
+h2{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em;margin:64px 0 6px;text-wrap:balance}h2+p.intro{color:var(--ink-2);margin:0 0 22px;max-width:72ch}h3{font-size:15px;font-weight:600;margin:28px 0 8px}p{max-width:72ch}
+.num{font-family:var(--mono);font-size:12px;color:var(--muted);display:block;margin-bottom:-2px}
+.thesis{border-left:3px solid var(--brass);background:var(--brass-soft);padding:16px 20px;border-radius:0 6px 6px 0;margin:20px 0;max-width:78ch}.thesis p{margin:0 0 8px;font-family:var(--serif);font-size:17px;line-height:1.45;color:var(--ink)}.thesis p:last-child{margin:0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}@media (max-width:720px){.grid3,.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px}.card b{display:block;font-family:var(--serif);font-size:16px;font-weight:600;margin-bottom:4px}.card p{font-size:13.5px;color:var(--ink-2);margin:0}
+table{border-collapse:collapse;width:100%;font-size:13px}.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface);margin:14px 0 6px}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap;vertical-align:bottom}td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}
+td.k{font-weight:600;color:var(--ink);white-space:nowrap}
+.pill{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;padding:2px 8px;border-radius:999px;line-height:1.5;white-space:nowrap}.pill.crit{background:var(--crit-soft);color:var(--crit)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.info{background:var(--accent-soft);color:var(--accent)}.pill.brass{background:var(--brass-soft);color:var(--brass)}
+ol.qs{margin:8px 0 0;padding-left:0;list-style:none}ol.qs li{position:relative;padding:9px 14px 9px 62px;border:1px solid var(--line);border-radius:6px;background:var(--surface);margin-bottom:6px;font-size:13.5px;color:var(--ink)}ol.qs li::before{content:attr(data-id);position:absolute;left:12px;top:10px;font-family:var(--mono);font-size:11.5px;color:var(--brass)}
+ol.qs li .why{display:block;margin-top:4px;padding-top:4px;border-top:1px dashed var(--line);color:var(--ink-2);font-size:12.5px}ol.qs li .why b{color:var(--brass);font-weight:600;margin-right:4px}
+.clock{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}.clock>div{border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12.5px;color:var(--ink-2);background:var(--surface)}.clock>div b{display:block;font-family:var(--mono);font-size:12px;color:var(--brass);margin-bottom:2px}.clock>div strong{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}.clock>div.bad{border-color:var(--crit);background:var(--crit-soft)}.clock>div.good{border-color:var(--ok);background:var(--ok-soft)}
+@media (max-width:900px){.clock{grid-template-columns:1fr 1fr}}
+footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;max-width:76ch}
 </style>
 
 <div class="page">
-  <nav class="toc" aria-label="Contents">
-    <div class="brand">Private Banking Discovery Questions</div>
-    <div class="sub">
-      Reframing the Global Markets opportunity map for Retail Wealth and Private Banking · 18 Sep
-      2026
-    </div>
-    <ol>
-      <li><a href="#analysis">1 · What the map says, and what changes</a></li>
-      <li><a href="#reframe">2 · Global Markets to Private Banking</a></li>
-      <li><a href="#functional">3 · Functional questions by asset class</a></li>
-      <li><a href="#data">4 · Data source questions</a></li>
-      <li><a href="#timing">5 · Update timing matrix</a></li>
-      <li><a href="#events">6 · Event enablement of source systems</a></li>
-      <li><a href="#journey">7 · RM journey questions</a></li>
-      <li><a href="#first">8 · The fifteen to ask first</a></li>
-    </ol>
-  </nav>
+<nav class="toc" aria-label="Contents">
+  <div class="brand">Private Banking Discovery Questions</div>
+  <div class="sub">What to ask the bank so the RM's day is ready at 6 a.m. · 18 Sep 2026</div>
+  <ol>
+    <li><a href="#problem">1 · The problem: 9 a.m. data, 6 a.m. need</a></li>
+    <li><a href="#journey">2 · What the RM does</a></li>
+    <li><a href="#entitlements">3 · Entitlements for the RM</a></li>
+    <li><a href="#assets">4 · Asset classes supported</a></li>
+    <li><a href="#insights">5 · Data, information and insights required</a></li>
+    <li><a href="#sources">6 · Source systems</a></li>
+    <li><a href="#recency">7 · Recency, quality and coverage per system</a></li>
+    <li><a href="#events">8 · Event or micro-batch support</a></li>
+    <li><a href="#agents">9 · Agent build: content, ideas and communication</a></li>
+    <li><a href="#first">10 · The fifteen to ask first</a></li>
+  </ol>
+</nav>
 
-  <main>
-    <div class="eyebrow">Agentic RM Workbench · discovery</div>
-    <h1>Private Banking Discovery Questions</h1>
-    <p class="lede">
-      The Global Markets Agentic AI Opportunity Map is organised by desk and product: FX and
-      Treasury, Equities, Funds, Bonds and Structured Products, each with front, middle and back
-      office and an agentic rating per function. Private Banking has the same instruments but a
-      different centre of gravity. The client is the unit of work, every transaction is a
-      suitability question, and the person who has to act is a relationship manager with a book.
-      These are the questions to ask a bank so that the RM workbench we have built can be fed from
-      its systems, asset class by asset class.
-    </p>
+<main>
+<div class="eyebrow">Agentic RM Workbench · discovery for Private Banking and Retail Wealth</div>
+<h1>Private Banking Discovery Questions</h1>
+<p class="lede">The bank's problem is a clock. Data lands at nine; the relationship manager needs her day ready at six: the brief, the calls, the client stories, the ideas and the tasks. These are the questions to ask so the workbench we built can be fed early enough, from the right systems, with the right entitlements, and so the agents that write content and reach clients do so within the bank's rules. Every question says why we ask it.</p>
 
-    <h2 id="analysis"><span class="num">01</span>What the map says, and what changes</h2>
-    <div class="thesis">
-      <p>
-        The Global Markets map answers "which desk functions can an agent run". Private Banking
-        needs to answer "what does this client's household look like right now, what changed, who
-        may see it, and what should the RM do next". Same instruments, different axis.
-      </p>
-      <p>
-        So the questions below are not about automating operations. They are about the four things
-        the RM workbench needs from a bank's data estate: a client-centred golden record, positions
-        and transactions per asset class with known timing, the events that say something changed,
-        and the entitlement that says which RM may see it.
-      </p>
-    </div>
-    <div class="grid3">
-      <div class="card">
-        <b>Keep from the map</b>
-        <p>
-          The asset-class decomposition, the product and transaction lists per class, the
-          corporate-action catalogue, the reference-data layer (party, account, instrument master,
-          pricing, collateral, limits), the risk and compliance layer, and the front, middle, back
-          office split as a way to find the system of record for each step.
-        </p>
-      </div>
-      <div class="card">
-        <b>Change for Private Banking</b>
-        <p>
-          Channel is the RM and the client portal, not the dealing desk. Suitability,
-          appropriateness and cross-border rules sit in front of every order. Advisory versus
-          discretionary versus execution-only decides who initiates. Lombard lending, mandates, cash
-          needs and the RM's notes become first-class data. Retail regulation adds cooling-off,
-          product risk ratings, vulnerable-client flags and complaints.
-        </p>
-      </div>
-      <div class="card">
-        <b>Missing from the map</b>
-        <p>
-          Nothing about the client: no household view, no relationship history, no RM-to-client
-          assignment, no source-system timing. No event model: the map lists functions, not the
-          changes that flow between them. No isolation: who may see which client. The workbench is
-          built on exactly those three things, so the questions concentrate there.
-        </p>
-      </div>
-    </div>
+<!-- 1 -->
+<h2 id="problem"><span class="num">01</span>The problem: 9 a.m. data, 6 a.m. need</h2>
+<div class="thesis">
+  <p>Today the RM starts working when the data arrives. The goal is the reverse: when she opens the workbench at six, the machine has already read everything, ranked the book, written each client's story, run the signals against every household, found which clients an idea fits, drafted the messages, and lined up the tasks. The RM's morning is spent deciding, not assembling.</p>
+  <p>Three hours have to come from somewhere. Either the sources can deliver earlier or incrementally, or the workbench works from the previous close plus overnight events and refreshes when the day's batch lands. Which of those is possible is a question about each source system, and most of section 7 exists to answer it.</p>
+</div>
+<div class="clock">
+  <div class="bad"><b>Today</b><strong>09:00 batch lands</strong>Positions, prices and balances arrive together; the RM reads, reconciles and plans until mid-morning.</div>
+  <div class="good"><b>Target</b><strong>04:00 to 05:30 machine runs</strong>Overnight events applied, vectors and alerts rebuilt, briefs and drafts written, call sheet packed, tasks proposed.</div>
+  <div class="good"><b>Target</b><strong>06:00 RM opens Today</strong>Brief, call sheet, client journeys, ideas and drafts are ready. Anything that changes after the day's batch is marked as refreshed.</div>
+  <div><b>Rule</b><strong>Nothing invented to fill the gap</strong>Where a source cannot deliver by six, the screen shows the last known value with its timestamp, never a guess.</div>
+</div>
 
-    <h2 id="reframe"><span class="num">02</span>Global Markets to Private Banking</h2>
-    <p class="intro">
-      How each part of the map lands in Private Banking, and which part of the RM workbench consumes
-      it.
-    </p>
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Global Markets map</th>
-            <th>Private Banking equivalent</th>
-            <th>Workbench consumer</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              FX and Treasury: spots, forwards, placements, enhanced-yield accounts, options,
-              accumulators
-            </td>
-            <td>
-              Cash and deposits (CASA, term deposits, dual-currency), FX for funding and remittance,
-              FX accumulators and decumulators sold to clients, structured deposits
-            </td>
-            <td>
-              Cash and Equivalents class; FX effect in attribution; accumulator settlement in
-              transactions; liquidity tiers
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Equities, Warrants, IPO: orders, broker connections, RSP, IPO financing, corporate
-              actions
-            </td>
-            <td>
-              Cash equities and ETFs, IPO subscriptions, regular savings plans, single-stock
-              concentration, custody positions, corporate actions affecting the household
-            </td>
-            <td>
-              Equity class; concentration and look-through limits; single-line breaches; trade ideas
-            </td>
-          </tr>
-          <tr>
-            <td>
-              Funds: subscription, redemption, switching, fund corporate actions, NAV monitoring
-            </td>
-            <td>
-              Unit trusts, money-market funds, private equity and hedge funds with capital calls,
-              gated liquidity, NAV lag
-            </td>
-            <td>
-              Alternatives and Fixed Income classes; commitments and uncalled capital; liquidity
-              tiers; stale valuation alerts
-            </td>
-          </tr>
-          <tr>
-            <td>Bonds and Structured Products: buy/sell, pledging, coupons, calls, maturities</td>
-            <td>
-              Bonds and perpetuals, structured notes, equity-linked notes, fixed-coupon notes;
-              pledged as collateral; look-through to underlyings
-            </td>
-            <td>
-              Fixed Income and Structured Products classes; look-through legs; coupon income;
-              maturity as a cash event
-            </td>
-          </tr>
-          <tr>
-            <td>Collateral data, limits, pretrade credit check</td>
-            <td>
-              Lombard and property-backed facilities, lending values, advance rates, LTV and
-              margin-call triggers
-            </td>
-            <td>
-              Credit facilities and facility snapshots; LTV headroom; margin-call proximity alerts;
-              collateral actions
-            </td>
-          </tr>
-          <tr>
-            <td>Customer and party, KYC/FATCA, onboarding</td>
-            <td>
-              Client golden record, household and beneficial ownership, risk profile and horizon,
-              KYC review dates, PEP, residence and tax domicile, reporting language
-            </td>
-            <td>
-              Client record; rubric stated inputs; KYC alerts; cross-border guardrails; outreach
-              language
-            </td>
-          </tr>
-          <tr>
-            <td>Product catalog and structured products, fund risk versus customer risk</td>
-            <td>
-              Product risk ratings, target market, suitability and appropriateness rules, mandate
-              bands and exclusions
-            </td>
-            <td>Mandates and bands; suitability gate on actions and ideas; exclusion alerts</td>
-          </tr>
-          <tr>
-            <td>Relationship Manager / Sales Desk, dealing phone and voice recording</td>
-            <td>
-              The RM's notes, calls and meetings; client messages awaiting reply; recorded lines
-              where they exist
-            </td>
-            <td>Notes; promise ledger; companion; call plan; unanswered-contact alerts</td>
-          </tr>
-          <tr>
-            <td>Market research and analysis</td>
-            <td>House view, market events, signals mapped to holdings</td>
-            <td>Event log and signal rules; impact engine; idea desk</td>
-          </tr>
-          <tr>
-            <td>Maker-checker, workflow and entitlements</td>
-            <td>
-              RM approval, second-RM check on money-moving actions, team head oversight,
-              RM-to-client assignment
-            </td>
-            <td>Workflow; roles and assignments; row-level security; team page</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<!-- 2 -->
+<h2 id="journey"><span class="num">02</span>What the RM does</h2>
+<p class="intro">The workbench is organised around six moments of the RM's day: wake, prepare, converse, follow through, grow, reflect, with the team head's Monday above them. These questions confirm the bank's RM day matches, and what she does that we have not seen.</p>
+<ol class="qs">
+<li data-id="J-1">Walk us through an RM's day from arrival to leaving: what she reads first, how she decides whom to call, what she prepares before a call, what she does during and after it, and what she hands to others.<span class="why"><b>Why we ask</b>The six moments we built are a hypothesis; the bank's real sequence decides what must be ready at six and in what order.</span></li>
+<li data-id="J-2">How many clients does an RM cover, how many conversations a day is normal, and what share of the day goes to preparation, documentation and chasing versus talking to clients?<span class="why"><b>Why we ask</b>The call plan's capacity and the efficiency case both rest on these numbers; the workbench should remove the preparation and documentation share.</span></li>
+<li data-id="J-3">What does the RM assemble by hand today before a client call, and from how many screens or systems?<span class="why"><b>Why we ask</b>That assembly is the client journey's five chapters; whatever she gathers manually is what the machine must pre-build.</span></li>
+<li data-id="J-4">How does the RM decide whom to call first today, and whom she can leave until next week? Is it gut, a report, or a manager's list?<span class="why"><b>Why we ask</b>The call plan ranks by harm, deadline, bundling and relationship debt; the bank's actual heuristics should become its policy file, not be replaced by ours.</span></li>
+<li data-id="J-5">What must the RM record after every interaction (call note, suitability confirmation, disclosures given, promises made), where, and how long does it take?<span class="why"><b>Why we ask</b>The companion drafts the note, extracts promises and pre-fills the suitability record; the bank's evidence requirements define what "complete" means.</span></li>
+<li data-id="J-6">Which decisions need a second person (checker, team head, compliance), and how long do those approvals take today?<span class="why"><b>Why we ask</b>Maker-checker is configurable in the workflow; approval latency is a task the machine can queue and chase before six.</span></li>
+<li data-id="J-7">What does the RM do when a market event happens intraday: who tells her, how does she find which clients are affected, and what is she expected to do by when?<span class="why"><b>Why we ask</b>Signals mapped to holdings and the impact engine automate exactly this; the expected response time decides whether intraday events must flow, not just the overnight batch.</span></li>
+<li data-id="J-8">What does the team head look at on Monday morning, and what does she ask RMs for by email today?<span class="why"><b>Why we ask</b>The team page has five panels built on a guess of those questions; the real ones replace them.</span></li>
+<li data-id="J-9">Which parts of the day would the RM most like to stop doing, and which would she never hand to a machine?<span class="why"><b>Why we ask</b>Sets the autonomy ladder honestly: drafts only, approve to send, or informational messages sent by an agent.</span></li>
+</ol>
 
-    <h2 id="functional"><span class="num">03</span>Functional questions by asset class</h2>
-    <p class="intro">
-      Asked of the business owners of each asset class. Each block covers the products in scope, the
-      lifecycle events that matter to a client, the controls in front of a transaction, and what the
-      RM is expected to do about them.
-    </p>
+<!-- 3 -->
+<h2 id="entitlements"><span class="num">03</span>Entitlements for the RM</h2>
+<p class="intro">One RM must not see another's clients. The workbench enforces this in the database with row-level security driven by dated RM-to-client assignments. These questions establish where that truth lives in the bank.</p>
+<ol class="qs">
+<li data-id="E-1">Where is the RM-to-client assignment held (CRM, core banking, HR), and is history kept with valid-from and valid-to dates?<span class="why"><b>Why we ask</b>Entitlement is computed from assignments valid today; the audit trail needs history to answer who could see a client in a given month.</span></li>
+<li data-id="E-2">Besides the primary RM, who else legitimately sees a client: secondary RM, assistant, checker, team head, holiday cover, product specialist, compliance? Is each a role with a duration?<span class="why"><b>Why we ask</b>Our assignment model has primary, secondary, checker and cover roles with dates; the bank's list decides which roles exist and whether cover is time-boxed.</span></li>
+<li data-id="E-3">How is a team or desk defined, who heads it, and may a head see every client in the team or only aggregates?<span class="why"><b>Why we ask</b>Team scope in row-level security is the head's whole team; if the bank wants aggregates only, the team page must change.</span></li>
+<li data-id="E-4">Which identity provider issues RM and manager identities, and which claims carry role, team and RM id?<span class="why"><b>Why we ask</b>The API verifies a token and maps its claims to scope; production needs the bank's issuer, audience and claim names.</span></li>
+<li data-id="E-5">When a client is reassigned, how quickly must the old RM lose access and the new RM gain it, and who approves the reassignment?<span class="why"><b>Why we ask</b>An assignment message updates access the moment it is applied; the bank's expectation decides whether that must be an event or can wait for a nightly file.</span></li>
+<li data-id="E-6">May any book-wide computation happen (percentiles, peer groups, which clients fit an idea) as long as an RM only ever sees her own clients in the result?<span class="why"><b>Why we ask</b>The analytics service computes peers and percentiles across the bank under a service role; the idea desk searches the whole book then filters to the caller's scope.</span></li>
+<li data-id="E-7">What may an RM see about a client after offboarding or reassignment: nothing, read-only history, or her own notes only?<span class="why"><b>Why we ask</b>Closed assignments hide the client today; the bank may want read-only access to the RM's own notes for a period.</span></li>
+</ol>
 
-    <h3>Cash, deposits and FX</h3>
-    <ol class="qs">
-      <li data-id="F-C1">
-        Which cash products does a client hold: current accounts, term deposits, structured
-        deposits, dual-currency investments, FX accumulators or decumulators? Which are booked as
-        cash and which as structured products in the bank's own classification?<small
-          >Decides how the Cash and Equivalents and Structured Products classes are populated and
-          how liquidity tiers are assigned.</small
-        >
-      </li>
-      <li data-id="F-C2">
-        How is "available liquidity" defined for a client: cleared balances, uncleared, pledged,
-        under notice, held for settlement? Which of these may the RM quote as sellable or
-        drawable?<small
-          >Feeds the daily-liquid coverage of cash needs and the liquidity shortfall alert.</small
-        >
-      </li>
-      <li data-id="F-C3">
-        Which FX transactions are client-initiated and which are funding conversions the bank
-        performs for settlement? Are conversion rates and spreads visible per transaction?<small
-          >Separates the FX effect in attribution from client decisions.</small
-        >
-      </li>
-      <li data-id="F-C4">
-        For term deposits and structured deposits: where are maturity, rollover instruction,
-        early-withdrawal penalty and knock-in or knock-out levels recorded, and when does the client
-        get told?<small
-          >Maturities are cash events the call plan should see before they happen.</small
-        >
-      </li>
-      <li data-id="F-C5">
-        What happens at an FX accumulator fixing against the client: who is notified, when, and is
-        the settlement visible as a transaction or only as a position change?<small
-          >The dataset showed accumulator settlements running against a client for months; the RM
-          needs the event, not the aftermath.</small
-        >
-      </li>
-    </ol>
+<!-- 4 -->
+<h2 id="assets"><span class="num">04</span>Asset classes supported</h2>
+<p class="intro">Per asset class: the products, the client-relevant lifecycle events, and the controls in front of a transaction. The workbench classifies holdings as cash and equivalents, fixed income, equity, alternatives, commodities and structured products, with credit facilities alongside.</p>
 
-    <h3>Equities, ETFs and IPO</h3>
-    <ol class="qs">
-      <li data-id="F-E1">
-        Which service model applies to each portfolio: discretionary, advisory, execution-only, or
-        custody-only? Who initiates orders in each, and which are in scope for the RM's suitability
-        duty?<small
-          >The workbench measures mandate bands only on managed portfolios and shows custody
-          separately.</small
-        >
-      </li>
-      <li data-id="F-E2">
-        What single-position and issuer concentration limits apply, at portfolio and household
-        level, and do they look through ETFs, funds and structured notes to the underlying
-        issuer?<small
-          >Look-through concentration is the workbench's most visible alert; the bank's limit
-          definition must match.</small
-        >
-      </li>
-      <li data-id="F-E3">
-        How are IPO subscriptions, IPO financing and allotment represented before listing: as a
-        pending order, a receivable, a loan, or nothing until settlement?<small
-          >Pre-listing exposure otherwise disappears from the household view.</small
-        >
-      </li>
-      <li data-id="F-E4">
-        For regular savings plans: where is the standing instruction, the next execution date and
-        the funding account recorded? Are missed executions surfaced anywhere?<small
-          >Both a cash-flow item and a decision-debt signal.</small
-        >
-      </li>
-      <li data-id="F-E5">
-        Which corporate actions reach the RM as something to discuss (rights, takeovers, scrip
-        dividends, voluntary conversions) versus processed silently (cash dividends, splits)? Who
-        decides the client's election and by when?<small
-          >Voluntary events with deadlines belong in the call plan's clock term.</small
-        >
-      </li>
-      <li data-id="F-E6">
-        Is realised and unrealised profit and loss computed by the custody system, the performance
-        system, or both? Which cost basis method, and in which currency?<small
-          >The journey's "what happened" chapter must agree with the client statement.</small
-        >
-      </li>
-    </ol>
+<h3>Cash, deposits and FX</h3>
+<ol class="qs">
+<li data-id="A-C1">Which cash products do clients hold: current accounts, term deposits, structured deposits, dual-currency investments, FX accumulators? Which does the bank classify as cash and which as structured products?<span class="why"><b>Why we ask</b>Classification drives liquidity tiers and the coverage of cash needs; a structured deposit counted as cash overstates what is sellable.</span></li>
+<li data-id="A-C2">How is available liquidity defined: cleared, uncleared, pledged, under notice, reserved for settlement? Which may the RM quote as drawable?<span class="why"><b>Why we ask</b>The liquidity shortfall alert compares daily-liquid assets with twelve-month needs; the definition must match what the bank would actually release.</span></li>
+<li data-id="A-C3">Which FX transactions are client-initiated and which are funding conversions the bank makes? Are rate and spread visible per transaction?<span class="why"><b>Why we ask</b>Attribution separates price, FX and flows; a bank conversion booked as a client trade misstates client behaviour in the vector.</span></li>
+<li data-id="A-C4">For deposits and accumulators: where are maturity, rollover instruction, fixings, knock-in and knock-out recorded, and when is the client told?<span class="why"><b>Why we ask</b>Maturities and fixings are dated events the call plan should surface before they happen, not after.</span></li>
+</ol>
 
-    <h3>Funds and alternatives</h3>
-    <ol class="qs">
-      <li data-id="F-F1">
-        Which fund types are held: daily-dealing unit trusts, money-market funds, funds with gates
-        or lock-ups, private equity and private credit with capital calls, hedge funds with monthly
-        or quarterly liquidity?<small
-          >Each maps to a liquidity tier the coverage ratio depends on.</small
-        >
-      </li>
-      <li data-id="F-F2">
-        For committed capital: where are total commitment, called to date, uncalled and expected
-        call window recorded, and how does a capital call notice arrive?<small
-          >Uncalled commitments are dated cash needs the RM must fund.</small
-        >
-      </li>
-      <li data-id="F-F3">
-        How stale can a fund valuation be before it is flagged, and is the valuation date carried
-        with the position? Who owns the NAV feed for private funds?<small
-          >Stale-valuation alerts and the confidence band on impact depend on this.</small
-        >
-      </li>
-      <li data-id="F-F4">
-        Fund switches: are same-house and cross-house switches one transaction or a redemption plus
-        subscription with cash in between? How long is the client out of the market?<small
-          >Affects attribution flows and the RM's explanation of performance gaps.</small
-        >
-      </li>
-      <li data-id="F-F5">
-        Which fund corporate actions (mergers, liquidations, closures, series roll-ups) require a
-        client decision, and how is the client's election captured?<small
-          >Dated decisions go to the call plan.</small
-        >
-      </li>
-    </ol>
+<h3>Equities, ETFs and IPO</h3>
+<ol class="qs">
+<li data-id="A-E1">Which service model applies per portfolio: discretionary, advisory, execution-only, custody? Who initiates orders in each and which fall under the RM's suitability duty?<span class="why"><b>Why we ask</b>Mandate bands are measured only on managed portfolios; the flag decides which breaches are the RM's problem.</span></li>
+<li data-id="A-E2">What single-position and issuer concentration limits apply at portfolio and household level, and do they look through ETFs, funds and notes to the issuer?<span class="why"><b>Why we ask</b>Look-through concentration is the most visible alert in the workbench; the bank's limit definition must match or the alert is noise.</span></li>
+<li data-id="A-E3">How are IPO subscriptions and financing represented before listing?<span class="why"><b>Why we ask</b>Pre-listing exposure and the loan behind it otherwise vanish from the household view and from LTV.</span></li>
+<li data-id="A-E4">Which corporate actions reach the RM as decisions (rights, takeovers, scrip elections) versus processed silently, and by what deadline must the client elect?<span class="why"><b>Why we ask</b>Dated elections belong in the call plan's clock term; the RM should see them on the sheet before the deadline.</span></li>
+<li data-id="A-E5">Who computes realised and unrealised profit and loss, with which cost basis and currency, and does the client statement use the same figures?<span class="why"><b>Why we ask</b>The journey's performance story must agree with what the client holds in hand.</span></li>
+</ol>
 
-    <h3>Bonds and structured products</h3>
-    <ol class="qs">
-      <li data-id="F-B1">
-        For structured notes and equity-linked notes: is the payoff decomposed anywhere
-        (underlyings, barriers, coupons, autocall dates), or is the note a single line with a
-        price?<small
-          >The workbench's look-through uses a reference file today; the bank may have a structuring
-          system that holds the legs.</small
-        >
-      </li>
-      <li data-id="F-B2">
-        Which bond lifecycle events reach the client and the RM: coupon, partial or full call,
-        maturity, rating change, default or restructuring? Where is the call schedule held?<small
-          >Calls and maturities are cash events; downgrades are signals.</small
-        >
-      </li>
-      <li data-id="F-B3">
-        Are bonds and notes pledged as collateral marked as such on the position, with the lending
-        value and advance rate per line?<small
-          >Lending value per holding drives the LTV recomputation under stress.</small
-        >
-      </li>
-      <li data-id="F-B4">
-        Which product risk rating scheme applies (bank internal, regulatory), and how does it map to
-        the client's risk profile for suitability? Where is the appropriateness assessment for
-        complex products recorded?<small
-          >The suitability gate on actions and ideas needs the bank's own rule set, not ours.</small
-        >
-      </li>
-      <li data-id="F-B5">
-        For perpetuals and subordinated debt sold for income: is the income expectation (coupon
-        reset, call probability) captured anywhere the RM can quote?<small
-          >Income yield is a KPI on the client's front door.</small
-        >
-      </li>
-    </ol>
+<h3>Funds and alternatives</h3>
+<ol class="qs">
+<li data-id="A-F1">Which fund types are held: daily unit trusts, money-market funds, gated or locked funds, private equity and credit with capital calls, hedge funds with monthly or quarterly dealing?<span class="why"><b>Why we ask</b>Each maps to a liquidity tier; the coverage ratio and the stress confidence band depend on it.</span></li>
+<li data-id="A-F2">For committed capital: where are commitment, called to date, uncalled and the expected call window, and how does a call notice arrive?<span class="why"><b>Why we ask</b>Uncalled commitments are dated cash needs the RM has to fund; a call notice is a Now item.</span></li>
+<li data-id="A-F3">How stale may a fund valuation be before it is flagged, and is the valuation date carried on the position?<span class="why"><b>Why we ask</b>The stale-valuation alert and the honesty of household totals depend on the date travelling with the number.</span></li>
+</ol>
 
-    <h3>Lending, collateral and mandates</h3>
-    <ol class="qs">
-      <li data-id="F-L1">
-        Which facilities exist against a household: Lombard lines, property-backed loans,
-        overdrafts, IPO financing? Is each linked to the specific collateral portfolio?<small
-          >The facility-to-portfolio link is what makes LTV explainable line by line.</small
-        >
-      </li>
-      <li data-id="F-L2">
-        How often is LTV recomputed (intraday, end of day), what are the trigger, top-up and
-        close-out levels, and how much notice does the client get?<small
-          >Headroom trend and the projected breach date in the call plan need the recomputation
-          cadence.</small
-        >
-      </li>
-      <li data-id="F-L3">
-        Who may waive or extend a margin call, and is the waiver recorded as structured data or in a
-        note?<small>The board reads "waived" from notes today; a structured flag is better.</small>
-      </li>
-      <li data-id="F-L4">
-        For discretionary and advisory mandates: where are the strategic bands, target weights,
-        single-position limits and exclusion lists held, and how are client-directed deviations
-        recorded?<small
-          >Mandate bands and client-directed breaches are core to the risk matrix and the conduct
-          panel.</small
-        >
-      </li>
-      <li data-id="F-L5">
-        What is the bank's stated risk-profile scale, investment-horizon question set and review
-        frequency, and where are stated versus observed differences expected to be reconciled?<small
-          >The rubric compares stated profile with observed behaviour; the bank's scale must be
-          mapped, not assumed.</small
-        >
-      </li>
-    </ol>
+<h3>Bonds and structured products</h3>
+<ol class="qs">
+<li data-id="A-B1">Are structured notes and equity-linked notes decomposed anywhere into underlyings, barriers, coupons and autocall dates, or held as a single line with a price?<span class="why"><b>Why we ask</b>Look-through and the impact engine need the legs; today they come from a reference file the bank should replace with its structuring system.</span></li>
+<li data-id="A-B2">Which bond events reach the RM: coupon, call, maturity, rating change, restructuring? Where is the call schedule held?<span class="why"><b>Why we ask</b>Calls and maturities are cash events; downgrades are signals against the household.</span></li>
+<li data-id="A-B3">Are pledged positions marked with lending value and advance rate per line?<span class="why"><b>Why we ask</b>Line-level lending values let the impact engine recompute LTV under a scenario and explain a margin call.</span></li>
+<li data-id="A-B4">Which product risk rating scheme applies and how does it map to the client's profile? Where is the appropriateness assessment for complex products recorded?<span class="why"><b>Why we ask</b>The suitability gate on every idea and action must run the bank's rules, not ours.</span></li>
+</ol>
 
-    <h3>Cross-asset controls the RM lives under</h3>
-    <ol class="qs">
-      <li data-id="F-X1">
-        Which cross-border rules apply by client residence and booking centre: what may be
-        discussed, offered, sent, and what needs documented reverse enquiry?<small
-          >The companion's guardrails and the communication gateway use a reference file today; the
-          bank's compliance owns the real one.</small
-        >
-      </li>
-      <li data-id="F-X2">
-        What must be recorded for each advised transaction: suitability confirmation, product
-        disclosure acknowledgement, call note, recorded line? Where does each live?<small
-          >The workflow's suitability record and the gate's disclosures must match the bank's
-          evidence requirements.</small
-        >
-      </li>
-      <li data-id="F-X3">
-        Which actions need a second pair of eyes (collateral changes, rebalancing, liquidity
-        raising) and who qualifies as checker?<small
-          >Maker-checker levels in the workflow are configurable; the bank's matrix decides
-          them.</small
-        >
-      </li>
-      <li data-id="F-X4">
-        How are complaints, vulnerable-client flags and dormant or deceased-client statuses
-        represented, and must they stop outreach?<small
-          >Escalation triggers and the gateway need structured flags rather than free text.</small
-        >
-      </li>
-    </ol>
+<h3>Lending, collateral and mandates</h3>
+<ol class="qs">
+<li data-id="A-L1">Which facilities exist against a household and is each linked to its collateral portfolio?<span class="why"><b>Why we ask</b>The facility-to-portfolio link is what makes LTV explainable line by line and lets the RM say which sale relieves it.</span></li>
+<li data-id="A-L2">How often is LTV recomputed, what are trigger, top-up and close-out levels, how much notice does the client get, and who may waive?<span class="why"><b>Why we ask</b>Headroom trend, the projected breach date and the waiver flag on the collateral board come from these.</span></li>
+<li data-id="A-L3">Where are mandate bands, target weights, single-position limits and exclusion lists held, and how are client-directed deviations recorded?<span class="why"><b>Why we ask</b>Mandate breaches feed the risk matrix; client-directed ones are a conduct item, not an RM failure, and must be distinguishable.</span></li>
+<li data-id="A-L4">What is the bank's risk-profile scale, horizon questionnaire and review cycle, and is comparing stated with observed behaviour acceptable to compliance?<span class="why"><b>Why we ask</b>The rubric scores capacity, appetite and horizon and flags stated-versus-observed mismatches; the bank must want that comparison.</span></li>
+</ol>
 
-    <h2 id="data"><span class="num">04</span>Data source questions</h2>
-    <p class="intro">
-      Asked of the data owners. For every domain the same things: system of record, identifier,
-      update timing, history and restatement, quality ownership, and the join to the client. The
-      grid gives the asset-class specifics; the list below gives the questions that apply to every
-      cell.
-    </p>
+<h3>Cross-asset controls</h3>
+<ol class="qs">
+<li data-id="A-X1">Which cross-border rules apply by client residence and booking centre: what may be discussed, offered and sent, and what needs documented reverse enquiry?<span class="why"><b>Why we ask</b>The companion's guardrails and the communication gateway enforce a reference file; compliance owns the real matrix.</span></li>
+<li data-id="A-X2">How are complaints, vulnerable-client flags, deceased or dormant statuses represented, and must they stop outreach?<span class="why"><b>Why we ask</b>Escalation triggers and the gateway need structured flags; free text in notes is not a control.</span></li>
+</ol>
 
-    <h3>The grid: asset class by data domain</h3>
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Asset class</th>
-            <th>Positions and valuations</th>
-            <th>Transactions</th>
-            <th>Reference and prices</th>
-            <th>Lifecycle and corporate actions</th>
-            <th>Client-specific</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="k">Cash, deposits, FX</td>
-            <td class="q">
-              Core banking balances: cleared versus ledger, per currency, per account; deposit
-              contracts with maturity; accumulator open positions with fixings to date
-            </td>
-            <td class="q">
-              Payments, transfers, conversions with rate and spread, deposit placements and
-              rollovers, accumulator settlements
-            </td>
-            <td class="q">
-              FX rates and their cut-off time per currency pair; deposit rate boards
-            </td>
-            <td class="q">Maturity, rollover, knock-in and knock-out, fixing</td>
-            <td class="q">
-              Base currency and reporting currency per client; funding account links
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Equities, ETFs, IPO</td>
-            <td class="q">
-              Custody positions per portfolio with quantity, cost basis, lending value, pledge
-              status; pending IPO allotments
-            </td>
-            <td class="q">
-              Orders (placed, amended, cancelled), executions with venue and fees, settlements, RSP
-              executions, transfers in and out
-            </td>
-            <td class="q">
-              Security master with issuer, sector, region, liquidity tier; close prices with source
-              and time; corporate-action calendar
-            </td>
-            <td class="q">
-              Dividends, rights, splits, takeovers, warrant expiry, elections and deadlines
-            </td>
-            <td class="q">
-              Per-portfolio service model; concentration limits applicable to the client
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Funds and alternatives</td>
-            <td class="q">
-              Units and NAV with NAV date; commitments with called and uncalled; gates and lock-up
-              end dates
-            </td>
-            <td class="q">
-              Subscriptions, redemptions, switches, distributions, capital calls and returns of
-              capital
-            </td>
-            <td class="q">
-              Fund master with liquidity terms, dealing calendar, risk rating; NAV feed with
-              publication lag
-            </td>
-            <td class="q">
-              Mergers, closures, roll-ups, distribution elections, capital call notices
-            </td>
-            <td class="q">
-              Client eligibility for private markets (accredited or professional status)
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Bonds and structured products</td>
-            <td class="q">
-              Nominal, clean and dirty price, accrued, lending value; note legs if decomposed
-            </td>
-            <td class="q">Buys and sells, coupons, calls, maturities, pledges</td>
-            <td class="q">
-              Bond master with issuer group, rating, call schedule; note term sheets with
-              underlyings and barriers; prices with source and staleness
-            </td>
-            <td class="q">Coupon, call, maturity, rating change, autocall or barrier event</td>
-            <td class="q">
-              Product risk rating versus client profile; appropriateness assessment outcome
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Lending and collateral</td>
-            <td class="q">
-              Facility limit, drawn, collateral market value, lending value, LTV, headroom per
-              snapshot
-            </td>
-            <td class="q">Drawdowns, repayments, interest charges, top-ups, margin-call notices</td>
-            <td class="q">Advance rates per instrument type; trigger levels per facility</td>
-            <td class="q">Margin call issued, cured by action or market, waived, extended</td>
-            <td class="q">Facility-to-collateral-portfolio link; guarantors and co-borrowers</td>
-          </tr>
-          <tr>
-            <td class="k">Client and relationship</td>
-            <td class="q">Household composition, portfolios, mandates and bands</td>
-            <td class="q">Not applicable</td>
-            <td class="q">
-              Risk profile scale, horizon, objectives, liquidity needs, source of wealth, KYC status
-              and review date, PEP, residence, tax domicile, reporting language
-            </td>
-            <td class="q">
-              KYC review due, profile change, onboarding, offboarding, RM reassignment
-            </td>
-            <td class="q">
-              RM notes, meetings and calls with channel and date; planned cash needs; client
-              messages awaiting reply
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<!-- 5 -->
+<h2 id="insights"><span class="num">05</span>Data, information and insights required</h2>
+<p class="intro">Three layers. Data is what the sources hold. Information is what the RM reads. Insight is what the machine concludes and must be able to explain. The workbench keeps all three visible: level 1 the conclusion, level 2 the why, level 3 the rows.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Layer</th><th>What the RM needs by 6 a.m.</th><th>Built from</th><th>Question for the bank</th></tr></thead>
+<tbody>
+<tr><td class="k">Data</td><td>Positions and balances per household at the last close, prices with their dates, transactions since the previous day, facility LTVs, client profile and KYC dates, notes and messages, RM assignments</td><td>Sources in section 6</td><td>Which of these can be complete before 6 a.m., which arrive at 9 a.m., and which are only available T+1? (Answered per system in section 7.)</td></tr>
+<tr><td class="k">Information</td><td>Household total and change since baseline, allocation against bands, concentration, liquidity coverage, LTV headroom, upcoming dated events, last contact and open promises</td><td>Attribution, mandate, exposure, cash-flow and facility engines</td><td>Which of these does the bank already produce (statements, reports), so the workbench should read rather than recompute? Where they disagree, which is authoritative for the client?</td></tr>
+<tr><td class="k">Insight</td><td>Ranked alerts in Now, week and month lanes; risk cell and score; which signals reached the household and by how much; rubric mismatches; ranked actions and ideas with suitability; whom to call first and why; the client's story in prose</td><td>Horizon, combined risk, signal and impact, rubric, actions, call plan, journey prose</td><td>Which insights may be shown to the RM without a human check, which need one, and which may be shown to the client? What confidence or evidence must accompany each?</td></tr>
+</tbody></table></div>
+<ol class="qs">
+<li data-id="I-1">Which reports does the RM receive today at nine, from which system, and what does she do with each?<span class="why"><b>Why we ask</b>Each report is either replaced by a screen, read as an input, or retired; knowing the list stops us rebuilding what exists.</span></li>
+<li data-id="I-2">What is the baseline for "what changed": year start, last statement, last meeting, previous day?<span class="why"><b>Why we ask</b>Attribution and momentum are computed against a baseline snapshot; the RM's expectation sets the default.</span></li>
+<li data-id="I-3">Which market events, research and house views does the bank publish, in what form, and who is allowed to turn them into client-level signals?<span class="why"><b>Why we ask</b>The signal engine maps events to holdings through transmission rules; the bank's research desk should own the event list and the rules.</span></li>
+<li data-id="I-4">Which named stress scenarios does risk management publish, and may they be shown to clients?<span class="why"><b>Why we ask</b>The journey shows one scenario per client chosen by relevance; it must be a scenario the bank stands behind.</span></li>
+<li data-id="I-5">What evidence must accompany a recommendation before an RM may act on it or repeat it to a client?<span class="why"><b>Why we ask</b>Every action carries evidence, sources, suitability and confidence; the bank's standard defines the minimum.</span></li>
+<li data-id="I-6">Which insights would the bank want computed across the whole book for the team head, and at what granularity may they be shown?<span class="why"><b>Why we ask</b>The team page aggregates by RM under the head's scope; conduct indicators such as override rate need thresholds the bank sets.</span></li>
+</ol>
 
-    <h3>Questions that apply to every cell</h3>
-    <ol class="qs">
-      <li data-id="D-1">
-        Which system is the system of record for this cell, and which systems hold copies? When they
-        disagree, which wins?<small
-          >The workbench needs one golden source per domain to keep the L3 evidence honest.</small
-        >
-      </li>
-      <li data-id="D-2">
-        What is the identifier and how does it join to the client: client id, household id,
-        portfolio or account id, instrument id (ISIN, internal, CUSIP)? Is the mapping stable across
-        systems and over time?<small
-          >Every derived table carries the client id; joins are the whole game.</small
-        >
-      </li>
-      <li data-id="D-3">
-        When does the cell update: real-time on the transaction, intraday batch at fixed times, end
-        of day, T+1 morning? In which time zone, and what is the cut-off for "today's"
-        figures?<small
-          >Decides what "clock" means and whether the workbench can show today or only
-          yesterday.</small
-        >
-      </li>
-      <li data-id="D-4">
-        Can a published value be restated later (late prices, corrected trades, NAV restatements,
-        back-dated notes)? How is the restatement signalled?<small
-          >The attribution and the audit trail must not silently change.</small
-        >
-      </li>
-      <li data-id="D-5">
-        How much history is available online and how much in archive, per cell? Are point-in-time
-        snapshots kept or only current state?<small
-          >The replay clock, momentum against the previous snapshot and stress windows need history
-          with dates.</small
-        >
-      </li>
-      <li data-id="D-6">
-        Who owns data quality for the cell, which checks already run, and where are failures
-        visible?<small
-          >The workbench's quality register should extend the bank's checks, not duplicate
-          them.</small
-        >
-      </li>
-      <li data-id="D-7">
-        Which fields are personal data, which are restricted, and what may leave the bank's boundary
-        to a model provider? Is pseudonymisation acceptable?<small
-          >Governs the Claude gateway, traces and the plugin design.</small
-        >
-      </li>
-      <li data-id="D-8">
-        Is the client's reporting currency conversion done at source or expected downstream, and
-        with which rate and time?<small
-          >Household totals and FX effects are only comparable with one convention.</small
-        >
-      </li>
-    </ol>
+<!-- 6 -->
+<h2 id="sources"><span class="num">06</span>Source systems</h2>
+<p class="intro">One system of record per domain, one identifier that joins to the client, and a named owner. Fill the table with the bank, then ask the questions beneath for every row.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Domain</th><th>Typical system</th><th>Key</th><th>Workbench use</th><th>Ask</th></tr></thead>
+<tbody>
+<tr><td class="k">Client and household</td><td>CRM, client master</td><td>Client id, household id</td><td>Client record, journey chapter 1, cross-border, language</td><td>Is the household a keyed entity or an aggregation of account holders?</td></tr>
+<tr><td class="k">KYC and profile</td><td>KYC system, onboarding</td><td>Client id</td><td>KYC alerts, rubric stated inputs, PEP</td><td>Is the risk profile stored as a score, a category, or questionnaire answers?</td></tr>
+<tr><td class="k">RM assignment and hierarchy</td><td>CRM, HR</td><td>Client id, RM id, team id</td><td>Row-level security, team page, audit actors</td><td>Is assignment history kept, and are cover and checker roles represented?</td></tr>
+<tr><td class="k">Accounts and balances</td><td>Core banking</td><td>Account id, client id</td><td>Cash class, liquidity coverage</td><td>Cleared versus ledger balance; intraday visibility?</td></tr>
+<tr><td class="k">Custody positions</td><td>Securities or custody system</td><td>Portfolio id, instrument id</td><td>Snapshots, allocation, concentration, look-through, lending values</td><td>Is a point-in-time snapshot kept daily, or only current state?</td></tr>
+<tr><td class="k">Orders and transactions</td><td>Order management, execution, settlement</td><td>Transaction id, portfolio id</td><td>Attribution flows, behavioural features, decision debt</td><td>Are orders (placed, amended, cancelled) available, or only settled trades?</td></tr>
+<tr><td class="k">Instrument master and prices</td><td>Security master, market data</td><td>ISIN or internal id</td><td>Valuation dates, sector and region, liquidity tier, stale marks</td><td>Which vendor, which close, which cut-off per market?</td></tr>
+<tr><td class="k">Structured product terms</td><td>Structuring or product system</td><td>Instrument id</td><td>Look-through legs, barriers, autocall dates</td><td>Are term sheets structured data or documents?</td></tr>
+<tr><td class="k">Funds and NAVs</td><td>Transfer agent, fund houses</td><td>Fund id</td><td>Liquidity tiers, stale valuation, commitments</td><td>What is the NAV publication lag per fund type?</td></tr>
+<tr><td class="k">Lending and collateral</td><td>Lending or collateral system</td><td>Facility id, portfolio id</td><td>LTV headroom, margin-call alerts, collateral actions</td><td>When is LTV recomputed and where are waivers recorded?</td></tr>
+<tr><td class="k">Mandates</td><td>Portfolio management system</td><td>Mandate code, portfolio id</td><td>Bands, exclusions, breach alerts</td><td>Are client-directed deviations flagged in data?</td></tr>
+<tr><td class="k">Corporate actions</td><td>Custodian, CA system</td><td>Event id, instrument id</td><td>Dated decisions in the call plan</td><td>Are election deadlines and client elections captured?</td></tr>
+<tr><td class="k">Notes, calls, messages</td><td>CRM, recorded lines, secure mail, portal</td><td>Client id, timestamp</td><td>Call plan cadence, promises, sensitivities, unanswered-contact alert</td><td>Are notes structured (channel, date) and in which languages?</td></tr>
+<tr><td class="k">Cash needs and life events</td><td>CRM fields, financial planning tool</td><td>Client id</td><td>Liquidity coverage, moments ahead, call plan deadlines</td><td>Are needs dated and amount-bearing, or prose?</td></tr>
+<tr><td class="k">Research and market events</td><td>Research platform, market data</td><td>Event id</td><td>Signals, impact, idea desk, morning brief</td><td>Is there a feed, or is it documents and email?</td></tr>
+<tr><td class="k">Product approvals and lists</td><td>Product catalogue, approved list</td><td>Instrument id</td><td>Idea universe, suitability gate</td><td>Which list may the RM propose from?</td></tr>
+</tbody></table></div>
+<ol class="qs">
+<li data-id="S-1">For each domain, which system is the system of record and which hold copies? When they disagree, which wins?<span class="why"><b>Why we ask</b>Every figure on screen links to its rows; the rows must come from one authoritative place.</span></li>
+<li data-id="S-2">Are identifiers stable across systems and over time, and is there a mapping service for client, account, portfolio and instrument ids?<span class="why"><b>Why we ask</b>Every derived table is keyed by client id; a broken join silently drops a household from the book.</span></li>
+<li data-id="S-3">Which fields are personal or restricted, and what may leave the bank to a model provider? Is pseudonymisation acceptable?<span class="why"><b>Why we ask</b>Governs what the model may see when writing briefs and drafts, and what the traces may store.</span></li>
+<li data-id="S-4">Who owns each system, who can grant read access, and who would own a new event feed from it?<span class="why"><b>Why we ask</b>Every integration in section 8 needs a producer-side owner; without one, files are the realistic path.</span></li>
+</ol>
 
-    <h3>Client and relationship domain, specifically</h3>
-    <ol class="qs">
-      <li data-id="D-C1">
-        Where does the RM-to-client assignment live (CRM, core banking, HR), how are secondary RMs,
-        checkers, team heads and holiday cover represented, and is assignment history kept with
-        dates?<small
-          >Row-level security is built on dated assignments; without history, "who saw what in
-          March" cannot be answered.</small
-        >
-      </li>
-      <li data-id="D-C2">
-        Where are RM notes, call logs and meeting minutes captured, in which languages, and are they
-        structured (channel, date, attendees) or free text? Is there a recorded-line system, and is
-        transcription permitted?<small
-          >Notes feed the call plan, promises, sensitivities and the companion.</small
-        >
-      </li>
-      <li data-id="D-C3">
-        Where do planned client cash needs, life events and objectives live: CRM fields,
-        financial-planning tool, or only in notes?<small
-          >Dated needs drive the liquidity coverage and the call plan's deadlines.</small
-        >
-      </li>
-      <li data-id="D-C4">
-        Where does a client message wait for a reply (secure mail, portal, messaging app), and is
-        its timestamp available?<small
-          >The unanswered-contact alert is a Now item; it needs a source.</small
-        >
-      </li>
-      <li data-id="D-C5">
-        Is the household a first-class entity (linked accounts, joint holders, trusts, beneficial
-        owners), or does the bank report per account holder?<small
-          >The workbench aggregates by client; households need a defined key.</small
-        >
-      </li>
-    </ol>
+<!-- 7 -->
+<h2 id="recency"><span class="num">07</span>Recency, quality and coverage per system</h2>
+<p class="intro">This is where the six o'clock question is answered. For every source: when is it final, when can we read it, how often is it wrong, and what share of the book does it cover.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Source</th><th>Recency: ask</th><th>Quality: ask</th><th>Coverage: ask</th><th>Effect on the 6 a.m. brief</th></tr></thead>
+<tbody>
+<tr><td class="k">Core banking balances</td><td>Real-time posting; when is end-of-day final and readable?</td><td>Reversals and re-postings frequency</td><td>All currencies and booking centres?</td><td>Liquidity coverage can be current if readable overnight</td></tr>
+<tr><td class="k">Custody positions</td><td>Position close time per market; file or query availability time</td><td>Failed settlements, pending trades, corrections</td><td>All custodians and sub-custodians?</td><td>The single largest blocker: if positions are 9 a.m., the brief works from the previous close and refreshes</td></tr>
+<tr><td class="k">Prices and FX</td><td>Close time per market; late prices; FX cut-off</td><td>Stale, missing and vendor-flagged prices</td><td>All instrument types incl. private and structured?</td><td>Valuation dates per line decide which figures the brief may quote</td></tr>
+<tr><td class="k">Fund NAVs</td><td>Publication lag per fund type</td><td>Restatements</td><td>All fund houses?</td><td>Alternatives stay at last NAV with date shown</td></tr>
+<tr><td class="k">Orders and transactions</td><td>Real-time, intraday feed or end-of-day extract?</td><td>Amend and cancel handling</td><td>All channels: RM, portal, mobile?</td><td>Yesterday's activity is in the brief only if the feed is intraday or early</td></tr>
+<tr><td class="k">Lending and LTV</td><td>Recomputation time; dependency on prices</td><td>Manual overrides, waivers</td><td>All facility types?</td><td>Margin-call proximity is only as current as LTV</td></tr>
+<tr><td class="k">Client profile and KYC</td><td>On change; nightly extract?</td><td>Missing fields, expired reviews</td><td>All segments?</td><td>KYC alerts and cross-border rules need residence and dates to be current</td></tr>
+<tr><td class="k">RM assignments</td><td>On change; how fast must access follow?</td><td>Orphan clients, duplicate primaries</td><td>Every client assigned?</td><td>Isolation is only as good as this feed</td></tr>
+<tr><td class="k">Notes and messages</td><td>As written; timestamps reliable?</td><td>Empty or back-dated notes</td><td>Which channels are captured?</td><td>Call plan cadence, promises and unanswered messages</td></tr>
+<tr><td class="k">Corporate actions</td><td>Announcement to availability lag</td><td>Amended events</td><td>All markets?</td><td>Election deadlines on the call sheet</td></tr>
+<tr><td class="k">Research and events</td><td>Publication time; overnight events before 6 a.m.?</td><td>Corrections</td><td>Which asset classes and regions?</td><td>Signals in the brief need events published before the run</td></tr>
+</tbody></table></div>
+<ol class="qs">
+<li data-id="R-1">For each source, at what time is yesterday's data final, at what time can a consumer read it, and in which time zone? Where is the gap between the two, and why?<span class="why"><b>Why we ask</b>The difference between "final at 02:00" and "readable at 09:00" is usually a scheduling choice, not a system limit; it is the three hours we need.</span></li>
+<li data-id="R-2">Can any source deliver incrementally (changes only) instead of a full file, and earlier than the consolidated batch?<span class="why"><b>Why we ask</b>Incremental deliveries let the workbench apply overnight changes and be ready at six, then reconcile when the full batch lands.</span></li>
+<li data-id="R-3">Which values can be restated after publication (late prices, corrected trades, NAV restatements) and how is a restatement signalled?<span class="why"><b>Why we ask</b>A brief written at six from figures restated at nine must show that it was refreshed, and the audit trail must keep both.</span></li>
+<li data-id="R-4">What data-quality checks already run per source, where are failures visible, and who fixes them?<span class="why"><b>Why we ask</b>The workbench's thirteen checks and dead-letter view should extend the bank's controls, and someone must own the failures.</span></li>
+<li data-id="R-5">What share of clients, portfolios and instruments does each source cover? Which clients or products are outside it (external custody, held-away assets, insurance)?<span class="why"><b>Why we ask</b>A household total that omits held-away assets misleads the RM; gaps should be shown as gaps.</span></li>
+<li data-id="R-6">How much history is online per source and are daily point-in-time snapshots kept?<span class="why"><b>Why we ask</b>Momentum, stress windows, behavioural features and the replay clock need dated history, not just current state.</span></li>
+<li data-id="R-7">Is the client's reporting-currency conversion done at source or expected downstream, with which rate and time?<span class="why"><b>Why we ask</b>Household totals and FX effects are only comparable under one convention.</span></li>
+</ol>
 
-    <h2 id="timing"><span class="num">05</span>Update timing matrix</h2>
-    <p class="intro">
-      Fill this in with the bank. Every row is a question until it has an answer. The right-hand
-      column is what the workbench does with the timing once known.
-    </p>
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Likely source</th>
-            <th>Ask: updated when?</th>
-            <th>Ask: available to consumers when?</th>
-            <th>Ask: restated?</th>
-            <th>Workbench use</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="k">Cash balances</td>
-            <td>Core banking</td>
-            <td>Real-time posting</td>
-            <td>Intraday query or end-of-day file?</td>
-            <td>Rarely</td>
-            <td>Liquidity coverage; funding of needs</td>
-          </tr>
-          <tr>
-            <td class="k">Custody positions</td>
-            <td>Custody or securities system</td>
-            <td>On settlement; intraday for trades?</td>
-            <td>End of day, T+1 morning?</td>
-            <td>Corrections</td>
-            <td>Snapshots; concentration; look-through</td>
-          </tr>
-          <tr>
-            <td class="k">Prices and FX</td>
-            <td>Market data vendor via pricing system</td>
-            <td>Close by market; FX cut-off time</td>
-            <td>Same evening or next morning?</td>
-            <td>Late prices</td>
-            <td>Valuation date per line; stale-mark alerts</td>
-          </tr>
-          <tr>
-            <td class="k">Fund NAVs</td>
-            <td>Fund houses via transfer agent</td>
-            <td>Daily to quarterly; private funds monthly or later</td>
-            <td>Publication lag in days?</td>
-            <td>Yes, restatements happen</td>
-            <td>Liquidity tiers; confidence bands</td>
-          </tr>
-          <tr>
-            <td class="k">Orders and executions</td>
-            <td>Order management, broker links</td>
-            <td>Real-time</td>
-            <td>Event stream or end-of-day extract?</td>
-            <td>Amend and cancel</td>
-            <td>Behavioural features; decision debt</td>
-          </tr>
-          <tr>
-            <td class="k">Corporate actions</td>
-            <td>Custodian or CA system</td>
-            <td>On announcement; elections by deadline</td>
-            <td>Daily feed?</td>
-            <td>Event amendments</td>
-            <td>Dated decisions in the call plan</td>
-          </tr>
-          <tr>
-            <td class="k">Facility LTV</td>
-            <td>Lending or collateral system</td>
-            <td>Intraday or end of day recomputation</td>
-            <td>Same time as positions?</td>
-            <td>On price corrections</td>
-            <td>Headroom trend; projected breach; margin-call alert</td>
-          </tr>
-          <tr>
-            <td class="k">Client profile and KYC</td>
-            <td>CRM and KYC system</td>
-            <td>On review or change</td>
-            <td>Real-time via event, or nightly?</td>
-            <td>Yes</td>
-            <td>Rubric stated inputs; KYC alerts; cross-border</td>
-          </tr>
-          <tr>
-            <td class="k">RM assignments</td>
-            <td>CRM or HR</td>
-            <td>On reassignment</td>
-            <td>Immediately, please</td>
-            <td>Back-dated?</td>
-            <td>Row-level security; team page</td>
-          </tr>
-          <tr>
-            <td class="k">RM notes and calls</td>
-            <td>CRM, recorded lines</td>
-            <td>When the RM writes them</td>
-            <td>Immediately</td>
-            <td>Edits</td>
-            <td>Call plan cadence; promises; sensitivities</td>
-          </tr>
-          <tr>
-            <td class="k">Market events and house view</td>
-            <td>Research, market data</td>
-            <td>As published</td>
-            <td>Feed or manual?</td>
-            <td>Updates</td>
-            <td>Signals; impact; idea desk</td>
-          </tr>
-          <tr>
-            <td class="k">Mandates and bands</td>
-            <td>Portfolio management system</td>
-            <td>On mandate change</td>
-            <td>Nightly?</td>
-            <td>Rare</td>
-            <td>Breach alerts; risk matrix</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<!-- 8 -->
+<h2 id="events"><span class="num">08</span>Event or micro-batch support</h2>
+<p class="intro">The workbench applies typed messages idempotently from Kafka or from files. Whether a source can emit events, deliver micro-batches, or only a daily file decides how early the brief can be ready and how current it stays through the day.</p>
+<ol class="qs">
+<li data-id="V-1">Does each source publish business events today (message bus, webhooks, outbox), expose change data capture, deliver micro-batches at intervals, or only a daily file?<span class="why"><b>Why we ask</b>Decides whether the Kafka front door or the batch adapter is the first integration per source, and what "current" can mean.</span></li>
+<li data-id="V-2">For sources that emit events: is there a stable idempotency key and a business event time separate from publish time?<span class="why"><b>Why we ask</b>The landing zone dedupes on the key; the change log orders on event time; replay must be safe.</span></li>
+<li data-id="V-3">Are events ordered per client or account, and can a consumer partition by client id?<span class="why"><b>Why we ask</b>The consumer partitions by client so a household's changes apply in order.</span></li>
+<li data-id="V-4">How are late, out-of-order and corrected events represented?<span class="why"><b>Why we ask</b>Restatements must be applied, not appended; the brief must say it was refreshed.</span></li>
+<li data-id="V-5">Can topics be replayed from an offset or date, how long is retention, and is there a bootstrap path (snapshot topic or initial file)?<span class="why"><b>Why we ask</b>A new consumer, a new RM book or a rebuilt vector store needs a cold start.</span></li>
+<li data-id="V-6">For micro-batch sources: at what intervals, and can the interval be shortened overnight so the last batch lands before 05:30?<span class="why"><b>Why we ask</b>Micro-batches every hour overnight would let the six o'clock run see nearly everything without any real-time integration.</span></li>
+<li data-id="V-7">Which events carry personal data, and is tokenisation applied on the bus?<span class="why"><b>Why we ask</b>Determines what may sit in the landing zone and what must be masked before a model sees it.</span></li>
+<li data-id="V-8">Who owns topic naming, schema registry and versioning, and who triages dead letters: producer or consumer team?<span class="why"><b>Why we ask</b>Message contracts are versioned; rejected messages appear in a dead-letter view that someone must own.</span></li>
+<li data-id="V-9">What volumes and peaks per source (end of day, month end, corporate-action seasons)?<span class="why"><b>Why we ask</b>Sizes consumer batches and decides between book-wide and per-client rebuilds of vectors and alerts.</span></li>
+<li data-id="V-10">Is there a production-like test environment with masked replay or synthetic feeds?<span class="why"><b>Why we ask</b>Ingestion must be proven against real shapes before the first six o'clock run.</span></li>
+</ol>
+<div class="tablewrap"><table>
+<thead><tr><th>Asset class</th><th>Events to ask for</th><th>If only files exist, detect by</th><th>What the RM sees at 6 a.m.</th></tr></thead>
+<tbody>
+<tr><td class="k">Cash and FX</td><td>Balance posted; deposit maturing; accumulator fixing; large payment</td><td>Nightly balance diff; maturity calendar</td><td>Liquidity coverage; cash events as moments ahead</td></tr>
+<tr><td class="k">Equities and IPO</td><td>Order placed, executed, cancelled; settlement; RSP executed or missed; IPO allotted; corporate action announced with deadline</td><td>End-of-day extract; CA calendar</td><td>Concentration alerts; decision debt; dated elections on the call sheet</td></tr>
+<tr><td class="k">Funds and alternatives</td><td>NAV published; capital call; distribution; gate change</td><td>Transfer-agent file; commitment schedule</td><td>Stale-valuation alerts; calls as dated needs</td></tr>
+<tr><td class="k">Bonds and structured products</td><td>Coupon; call announced; maturity; rating change; barrier or autocall event</td><td>Master and term-sheet calendar; price diff</td><td>Income; signals on the household; look-through changes</td></tr>
+<tr><td class="k">Lending</td><td>LTV recomputed; margin call issued, cured, waived; drawdown</td><td>End-of-day facility snapshot</td><td>Margin-call proximity; projected breach date</td></tr>
+<tr><td class="k">Client and relationship</td><td>Onboarded; profile or KYC changed; RM assignment changed; note written; message received; cash need added</td><td>Nightly CRM extract</td><td>Isolation updated; cadence; promises; unanswered messages</td></tr>
+<tr><td class="k">Market</td><td>Event published; house view changed; threshold move</td><td>Daily research digest</td><td>Signals, impact, the brief's market sentence</td></tr>
+</tbody></table></div>
 
-    <h2 id="events"><span class="num">06</span>Event enablement of source systems</h2>
-    <p class="intro">
-      The workbench ingests messages with one envelope and typed payloads, from Kafka or from files,
-      and applies them idempotently. These questions establish whether each source can emit events,
-      and if not, how change can be detected.
-    </p>
+<!-- 9 -->
+<h2 id="agents"><span class="num">09</span>Agent build: content, ideas and communication</h2>
+<p class="intro">Imagine the RM at six. The brief is written, the calls are ranked, each client's story is ready. What else would she want the machine to have done overnight? Written the house view into words for each client. Turned this week's idea into the six clients it fits, each with a draft in their language. Prepared the messages she will send at nine, through the channel each client prefers, already passed through compliance. These questions establish whether the bank has the platforms and permissions for that, and what the RM would actually do with it.</p>
 
-    <h3>Per source system</h3>
-    <ol class="qs">
-      <li data-id="E-1">
-        Does the system publish business events today (a message bus, webhooks, an outbox table),
-        expose change data capture on its database, or only produce files? For each: which events,
-        in which format, with what schema governance?<small
-          >Decides whether the Kafka front door or the batch adapter is the first
-          integration.</small
-        >
-      </li>
-      <li data-id="E-2">
-        For the events it publishes, is there a stable idempotency key (source plus sequence or
-        change id) and a business event time distinct from the publish time?<small
-          >The landing zone dedupes on the key; the change log orders on event time.</small
-        >
-      </li>
-      <li data-id="E-3">
-        Are events ordered per client or per account? Can a consumer partition by client id so one
-        client's changes arrive in order?<small
-          >The consumer partitions by client to keep a household consistent.</small
-        >
-      </li>
-      <li data-id="E-4">
-        How are late, out-of-order and corrected events represented: a new event with a supersedes
-        reference, a delete-and-replace, or a full snapshot?<small
-          >Restatements must be applied, not merely appended.</small
-        >
-      </li>
-      <li data-id="E-5">
-        Can the topic be replayed from an offset or a date, and how long is retention? Is there a
-        bootstrap path for a new consumer, such as a full snapshot topic or an initial file
-        drop?<small>A new RM book or a rebuilt vector store needs a cold start.</small>
-      </li>
-      <li data-id="E-6">
-        Which events carry personal data, and is field-level encryption or tokenisation applied on
-        the bus?<small
-          >Determines what may sit in the landing zone and what must be masked before any model
-          call.</small
-        >
-      </li>
-    </ol>
+<h3>Content authoring and publishing</h3>
+<ol class="qs">
+<li data-id="G-1">Does the bank have a content authoring and publishing platform for research and Chief Investment Office insights? Who writes, who approves, in which formats and languages, and is there a feed the workbench can read?<span class="why"><b>Why we ask</b>House view is the source of signals and ideas; if it exists as documents and email only, the workbench must extract it, and approval status must travel with it.</span></li>
+<li data-id="G-2">Is there a demand for personalised content per client: the house view rewritten for their holdings, their language and their profile, with the parts that do not apply removed?<span class="why"><b>Why we ask</b>The journey already writes prose from a client's facts; extending it to CIO content is a small step if compliance accepts model-rewritten text under approval.</span></li>
+<li data-id="G-3">Which content may an RM adapt and which must be sent verbatim? Who signs off a personalised version, and how is the derivation from the approved original evidenced?<span class="why"><b>Why we ask</b>The gateway appends disclosures and logs edits today; personalised content needs a lineage from the approved source.</span></li>
+<li data-id="G-4">Are trade ideas produced centrally (advisory desk, product specialists) or by RMs? How are they distributed, how is client fit assessed, and how is uptake measured?<span class="why"><b>Why we ask</b>The idea desk inverts ideas to clients with a suitability gate and tracks drafted and sent per idea; central ideas should enter it as data, not as a PDF.</span></li>
+<li data-id="G-5">What does the RM do today with a new idea: read it, pick clients from memory, write the message by hand? How long does that take per idea?<span class="why"><b>Why we ask</b>That is the manual step the idea desk removes; the time saved is the business case.</span></li>
+</ol>
 
-    <h3>Per asset class: the events the RM journey needs</h3>
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Asset class</th>
-            <th>Events to ask for</th>
-            <th>If no event exists, detect by</th>
-            <th>Journey effect</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="k">Cash and FX</td>
-            <td>
-              Balance posted; deposit maturing (with notice period); accumulator fixing and
-              settlement; large inbound or outbound payment
-            </td>
-            <td>Nightly balance snapshot diff; contract maturity calendar</td>
-            <td>
-              Liquidity coverage recomputed; cash event appears as a moment ahead; call plan clock
-              term
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Equities and IPO</td>
-            <td>
-              Order placed, executed, cancelled; settlement; RSP executed or missed; IPO allotted;
-              corporate action announced and election deadline
-            </td>
-            <td>End-of-day position and transaction extract; CA calendar file</td>
-            <td>
-              Concentration and look-through alerts; decision debt; dated elections in the call
-              sheet
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Funds and alternatives</td>
-            <td>
-              NAV published (with NAV date); capital call issued; distribution paid; gate imposed or
-              lifted; fund event announced
-            </td>
-            <td>Transfer-agent file; commitment schedule</td>
-            <td>Stale valuation alert clears or fires; uncalled commitment becomes a dated need</td>
-          </tr>
-          <tr>
-            <td class="k">Bonds and structured products</td>
-            <td>
-              Coupon paid; call announced; maturity; rating change; barrier or autocall event; price
-              restated
-            </td>
-            <td>Bond master and term-sheet calendar; price file diff</td>
-            <td>Income yield; signals on the household; look-through exposure change</td>
-          </tr>
-          <tr>
-            <td class="k">Lending and collateral</td>
-            <td>LTV recomputed; margin call issued; cured; waived; drawdown or repayment</td>
-            <td>End-of-day facility snapshot</td>
-            <td>
-              Margin-call proximity alert; projected breach date; collateral action and checker
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Client and relationship</td>
-            <td>
-              Client onboarded or offboarded; profile or KYC changed; RM assignment changed (with
-              valid-from and role); note written; message received; cash need added
-            </td>
-            <td>Nightly CRM extract; note table diff</td>
-            <td>
-              Row-level security updates the same second; call plan cadence; promises; sensitivities
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Market</td>
-            <td>Market event published; house view changed; price shock beyond a threshold</td>
-            <td>Daily research digest; market-data threshold rules</td>
-            <td>Signals and impact; idea desk; the morning brief</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<h3>Communicating with clients</h3>
+<ol class="qs">
+<li data-id="G-6">Through which channels may the bank contact clients: email, secure portal, mobile app notification, WhatsApp or other messaging, SMS, phone, letter? Which are approved for advice, which for information only, and per which jurisdiction?<span class="why"><b>Why we ask</b>The gateway checks every message; the channel decides which checks and disclosures apply and whether an agent may ever send.</span></li>
+<li data-id="G-7">Where is client channel preference and consent recorded, including opt-outs and quiet hours?<span class="why"><b>Why we ask</b>Drafts should default to the client's preferred channel and language; consent gates any agent-sent message.</span></li>
+<li data-id="G-8">Is WhatsApp or another messaging platform in use with clients today, officially or unofficially, and is it archived and surveilled?<span class="why"><b>Why we ask</b>If it is the real channel, the workbench should draft for it and log it; if it is unofficial, that is a conduct finding for the team page, not a feature.</span></li>
+<li data-id="G-9">Does the mobile app support personalised content or notifications per client, and can a message drafted by the RM be published into the client's app inbox?<span class="why"><b>Why we ask</b>An app inbox is the cleanest channel for agent-sent informational content, with read receipts and no forwarding risk.</span></li>
+<li data-id="G-10">Which templates and disclosures must a client message carry by product, residence and channel, and who approves templates?<span class="why"><b>Why we ask</b>The gateway appends required disclosures; the bank's template library should replace the reference file.</span></li>
+<li data-id="G-11">Is there an appetite for an agent to send low-risk informational messages itself (KYC reminder, meeting scheduling, market update, "since we last spoke" summary) with the RM notified, and what evidence would compliance want first?<span class="why"><b>Why we ask</b>Shadow mode measures agreement between what an agent would say and what the RM said; the bank sets the threshold that earns that step.</span></li>
+<li data-id="G-12">What must be logged when a message is sent: content, channel, time, approver, disclosures, evidence used? Where must it land: the workbench, the CRM, the archive?<span class="why"><b>Why we ask</b>Every send is an audit event today; the bank may need it mirrored into its own archive for surveillance.</span></li>
+</ol>
 
-    <h3>Operational questions for the event platform</h3>
-    <ol class="qs">
-      <li data-id="E-7">
-        Who owns topic naming, the schema registry and the versioning policy, and how are breaking
-        changes announced to consumers?<small
-          >The message contracts are versioned; the bank's policy decides how long old versions are
-          served.</small
-        >
-      </li>
-      <li data-id="E-8">
-        What are the expected volumes and peaks per topic (end-of-day bursts, month-end,
-        corporate-action seasons)?<small
-          >Sizes the consumer batch and the vector rebuild strategy.</small
-        >
-      </li>
-      <li data-id="E-9">
-        Is there a dead-letter convention, and who triages rejected messages: the producer team or
-        the consumer team?<small
-          >The workbench keeps a dead-letter view; someone must own it.</small
-        >
-      </li>
-      <li data-id="E-10">
-        Are there environments with production-like events for testing (masked replay, synthetic
-        feeds)?<small>Needed to prove ingestion before go-live.</small>
-      </li>
-    </ol>
+<h3>What the RM would do with the agents</h3>
+<ol class="qs">
+<li data-id="G-13">If the RM opened the workbench at six and found the brief, the call sheet, six personalised drafts and three proposed tasks, what would she change before acting, and what would she want to be asked first?<span class="why"><b>Why we ask</b>Defines the confirm points: which outputs are ready to use, which need a glance, which need a decision.</span></li>
+<li data-id="G-14">Which questions does the RM ask her assistant or her systems most often, in her words?<span class="why"><b>Why we ask</b>The assistant's grammar is a list of RM questions; the bank's list makes it useful on day one without a model.</span></li>
+<li data-id="G-15">During a client call, what does the RM wish she could look up in seconds but cannot today?<span class="why"><b>Why we ask</b>The companion answers cues in a second from the engines; the wish list tells us which engines matter and which are missing.</span></li>
+<li data-id="G-16">Which promises does the RM make most often, and how does she track them today?<span class="why"><b>Why we ask</b>The promise ledger extracts commitments from notes and drafts their fulfilment; the common ones deserve templates.</span></li>
+<li data-id="G-17">What would make the RM trust a machine-written client story enough to read it aloud on a call?<span class="why"><b>Why we ask</b>Every sentence links to its rows; if trust needs something else (a human check, a house-approved phrase), the design should know.</span></li>
+<li data-id="G-18">What would the team head want to see before allowing an agent to talk to a client at all, and what single switch would she want in her hand?<span class="why"><b>Why we ask</b>The machine panel shows agreement per playbook and a pause-all switch; the head's answer sets the threshold and the evidence.</span></li>
+</ol>
 
-    <h2 id="journey"><span class="num">07</span>RM journey questions</h2>
-    <p class="intro">
-      Each moment of the RM's day that we built has specific inputs. These questions confirm the
-      bank can supply them and that the bank's judgement replaces the reference files we shipped as
-      illustrations.
-    </p>
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Moment and screen</th>
-            <th>What it consumes</th>
-            <th>Questions for the bank</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="k">Wake · Today, morning brief, call sheet</td>
-            <td>Book ranking, lanes, signals, call policy, notes cadence, promises</td>
-            <td class="q">
-              J-1 What contact cadence does the bank expect by segment (UHNW, HNW, affluent), and is
-              it policy or custom? J-2 What is an RM's daily capacity in conversations, and are
-              working hours and holiday calendars available per booking centre? J-3 Which client
-              residences map to which time zones in the bank's data?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Prepare · client journey, five chapters</td>
-            <td>
-              Client record, positions at two snapshots, attribution, cash flows, notes, scenarios
-            </td>
-            <td class="q">
-              J-4 Which two dates is performance normally explained between (year start, last
-              statement, last meeting)? J-5 Is attribution (price, FX, flows) produced by a
-              performance system the client also sees, or must the workbench compute it? J-6 Which
-              named stress scenarios does the bank's risk function publish, and may the RM show them
-              to clients?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Signals and impact</td>
-            <td>
-              Market event log, transmission rules to holdings, shock templates, impact engine
-            </td>
-            <td class="q">
-              J-7 Who curates the market event list the RM may reference, and how quickly after an
-              event? J-8 Are factor sensitivities (duration, beta, FX) available per instrument from
-              the risk system, or should the engine derive them? J-9 Are there house limits on what
-              stress figures may be shown to a client?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Risk rubric · capacity, appetite, horizon</td>
-            <td>Stated profile, behavioural features from transactions, peers</td>
-            <td class="q">
-              J-10 What is the bank's risk-profile scale and questionnaire, and how often is it
-              refreshed? J-11 Is comparing stated profile with observed behaviour acceptable to
-              compliance, and what must happen when they disagree? J-12 May peer comparison across
-              the book be computed, and shown only as the client's own percentile?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Actions, ideas and suitability</td>
-            <td>Mandate bands, exclusions, product risk ratings, alerts, signals</td>
-            <td class="q">
-              J-13 Which suitability and appropriateness rules must every idea pass, and where are
-              they codified? J-14 Which product universe may the RM propose from (approved list,
-              focus list, house view)? J-15 Which actions are recommendations and which are
-              servicing, in the bank's conduct framework?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Converse · companion and guardrails</td>
-            <td>Cross-border rules, sensitivities from notes, playbooks, cues</td>
-            <td class="q">
-              J-16 Who owns the cross-border matrix by residence and booking centre, and in what
-              form can it be supplied? J-17 May the RM dictate cues during a client call, and does
-              that count as recording? J-18 Which structured conversations does the bank already
-              script (KYC refresh, review, market update) that can become playbooks?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Follow through · promises, outreach, gateway</td>
-            <td>Notes, drafts, channels, disclosures, send log</td>
-            <td class="q">
-              J-19 Through which channels may an RM contact a client (email, secure portal,
-              messaging), and where is the send logged? J-20 Which disclosures must accompany a
-              message by product and residence? J-21 Who approves client-facing templates, and how
-              are edits to a drafted message evidenced?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Grow · idea desk and opportunities</td>
-            <td>Idea rules across the book, cash needs, breaches, notes</td>
-            <td class="q">
-              J-22 Is a "which clients fit this idea" search acceptable under the bank's marketing
-              and conduct rules, and does it need a reverse-enquiry record per client? J-23 Which
-              opportunity types does the bank track (lending, mandate, succession, next generation),
-              and where is pipeline recorded?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Reflect · workflow, approvals, audit</td>
-            <td>Decisions, maker-checker, audit events</td>
-            <td class="q">
-              J-24 Which decisions need a second RM or a supervisor, and who qualifies? J-25 Where
-              must the audit trail land: the workbench, the bank's GRC system, or both? J-26 What
-              retention applies to notes, decisions and model traces?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Manager · team page and the machine</td>
-            <td>
-              Assignments by team, overrides, coverage, approvals, model traces, shadow grades
-            </td>
-            <td class="q">
-              J-27 What is the team and desk hierarchy, and where does it live? J-28 Which conduct
-              indicators does the bank already monitor (churn, overrides, unanswered messages), and
-              with what thresholds? J-29 Who may pause automated agents, and what evidence does the
-              bank want before an agent sends anything itself?
-            </td>
-          </tr>
-          <tr>
-            <td class="k">Identity and isolation</td>
-            <td>Users, roles, dated RM assignments, row-level security</td>
-            <td class="q">
-              J-30 Which identity provider issues RM and manager identities, and which claims carry
-              role and team? J-31 May an RM ever see a client not assigned to them (cover, checker,
-              referral), and how is that granted and time-boxed? J-32 Is bank-wide computation of
-              percentiles and peers under a service role acceptable if no cross-client row reaches
-              an RM?
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<!-- 10 -->
+<h2 id="first"><span class="num">10</span>The fifteen to ask first</h2>
+<p class="intro">If the first workshop has ninety minutes, these decide whether the six o'clock brief is possible and what it may contain.</p>
+<ol class="qs">
+<li data-id="1">For custody positions and prices: at what time is yesterday final, at what time can we read it, and why the gap? (R-1)</li>
+<li data-id="2">Which sources can deliver incrementally or in overnight micro-batches rather than one 9 a.m. file? (R-2, V-1, V-6)</li>
+<li data-id="3">Which system is the golden source for the client and household, and for RM-to-client assignment with history? (S-1, E-1)</li>
+<li data-id="4">Which identity provider issues RM identities, and which claims carry role and team? (E-4)</li>
+<li data-id="5">Who else may see a client besides the primary RM, and is a team head's view the whole team or aggregates? (E-2, E-3)</li>
+<li data-id="6">Which portfolios are discretionary, advisory, execution-only or custody, and where is that flag? (A-E1)</li>
+<li data-id="7">Where are mandate bands, limits and exclusions codified, and do concentration limits look through? (A-L3, A-E2)</li>
+<li data-id="8">How often is LTV recomputed, and where are triggers and waivers recorded? (A-L2)</li>
+<li data-id="9">Are structured notes decomposed into legs, and are lending values carried per holding? (A-B1, A-B3)</li>
+<li data-id="10">Where do notes, calls, client messages and dated cash needs live, in which languages? (Section 6, R-5)</li>
+<li data-id="11">What is the bank's risk-profile scale, and may stated be compared with observed? (A-L4)</li>
+<li data-id="12">Which suitability, appropriateness and cross-border rules must sit in front of every idea and message, and in what form can compliance supply them? (A-B4, A-X1)</li>
+<li data-id="13">Is there a research and CIO content platform with a feed and approval status, and is personalised content wanted? (G-1, G-2)</li>
+<li data-id="14">Which client channels are approved, where is consent recorded, and is an agent-sent informational message conceivable? (G-6, G-7, G-11)</li>
+<li data-id="15">What may leave the bank to a model provider, and is pseudonymisation acceptable? (S-3)</li>
+</ol>
 
-    <h2 id="first"><span class="num">08</span>The fifteen to ask first</h2>
-    <p class="intro">
-      If the first workshop has ninety minutes, these decide whether the workbench can be fed at
-      all.
-    </p>
-    <ol class="qs">
-      <li data-id="1">
-        Which system is the golden source for the client record, and which for RM-to-client
-        assignment with history? (D-1, D-C1)
-      </li>
-      <li data-id="2">
-        Is the household a defined entity with a key, or are we aggregating account holders? (D-C5)
-      </li>
-      <li data-id="3">
-        When are custody positions and prices final each day, in which time zone, and can they be
-        restated? (D-3, D-4)
-      </li>
-      <li data-id="4">
-        Which portfolios are discretionary, advisory, execution-only or custody, and where is that
-        flag? (F-E1)
-      </li>
-      <li data-id="5">
-        Where are mandate bands, single-position limits and exclusions codified, and do
-        concentration limits look through? (F-L4, F-E2)
-      </li>
-      <li data-id="6">
-        How often is LTV recomputed and where are trigger levels and waivers recorded? (F-L2, F-L3)
-      </li>
-      <li data-id="7">
-        Are structured notes decomposed into legs anywhere, and are lending values carried per
-        holding? (F-B1, F-B3)
-      </li>
-      <li data-id="8">
-        Where do RM notes, calls and client messages live, and in which languages? (D-C2, D-C4)
-      </li>
-      <li data-id="9">
-        Where do planned cash needs, commitments and capital-call schedules live? (D-C3, F-F2)
-      </li>
-      <li data-id="10">
-        What is the bank's risk-profile scale, and may stated be compared with observed? (J-10,
-        J-11)
-      </li>
-      <li data-id="11">
-        Which suitability, appropriateness and cross-border rules must sit in front of every idea
-        and message, and in what form can compliance supply them? (J-13, J-16)
-      </li>
-      <li data-id="12">
-        Which source systems can emit events today, with idempotency keys and per-client ordering,
-        and which only produce files? (E-1, E-2, E-3)
-      </li>
-      <li data-id="13">
-        Which identity provider issues RM identities, and which claims carry role and team? (J-30)
-      </li>
-      <li data-id="14">
-        What may leave the bank to a model provider, and is pseudonymisation acceptable? (D-7)
-      </li>
-      <li data-id="15">
-        Who owns dead letters and data quality once the workbench consumes the feeds? (E-9, D-6)
-      </li>
-    </ol>
-
-    <footer>
-      Discovery questionnaire for the agentic RM workbench, derived from the Global Markets Agentic
-      AI Opportunity Map and reframed for Retail Wealth and Private Banking. Question ids: F
-      functional, D data source, E event enablement, J RM journey. The workbench modules referenced
-      are those built in iterations 0 to 10 and the data platform (ADR-001 to ADR-016). Prepared 18
-      Sep 2026.
-    </footer>
-  </main>
+<footer>Discovery questionnaire for the agentic RM workbench in Private Banking and Retail Wealth. Question ids: J what the RM does, E entitlements, A asset classes, I data and insights, S source systems, R recency and quality, V events and micro-batches, G agent build. The workbench modules referenced are those built in iterations 0 to 10 and the data platform (ADR-001 to ADR-016). Prepared 18 Sep 2026.</footer>
+</main>
 </div>
