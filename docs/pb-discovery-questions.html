@@ -40,7 +40,8 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
     <li><a href="#recency">7 · Recency, quality and coverage per system</a></li>
     <li><a href="#events">8 · Event or micro-batch support</a></li>
     <li><a href="#agents">9 · Agent build: content, ideas and communication</a></li>
-    <li><a href="#first">10 · The fifteen to ask first</a></li>
+    <li><a href="#tasks">10 · Calls to action and tasks</a></li>
+    <li><a href="#first">11 · The fifteen to ask first</a></li>
   </ol>
 </nav>
 
@@ -279,7 +280,44 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 </ol>
 
 <!-- 10 -->
-<h2 id="first"><span class="num">10</span>The fifteen to ask first</h2>
+<h2 id="tasks"><span class="num">10</span>Calls to action and tasks</h2>
+<p class="intro">Information tells the RM what is true; insight tells her what it means; a call to action tells her what to do; a task is that action with an owner, a due date and evidence of completion. The workbench turns every insight into a proposed task the RM confirms, and every confirmation into an audit event. These questions establish what the bank's RMs actually do with what they learn, where tasks live today, and which ones a machine may prepare, propose or complete.</p>
+
+<h3>From insight to action: what the workbench proposes today</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Insight</th><th>Call to action</th><th>Task the RM confirms</th><th>Evidence of completion</th><th>Ask the bank</th></tr></thead>
+<tbody>
+<tr><td class="k">LTV headroom falling toward the trigger</td><td>Call the client before the breach</td><td>Discuss collateral: top-up, reduce drawing or de-risk; second RM check</td><td>Approval and checker decision logged; call logged; top-up visible in the facility snapshot</td><td>Who must be told when a margin call is projected, in what order, and by when?</td></tr>
+<tr><td class="k">Concentration above limit (direct or look-through)</td><td>Propose a trim or a client-directed acknowledgement</td><td>Trade idea with suitability gate; or record the client's instruction to hold</td><td>Idea approved or rejected with note; client-directed flag recorded</td><td>Is "client chose to hold" an acceptable closure, and where is it recorded?</td></tr>
+<tr><td class="k">Cash need approaching with thin coverage</td><td>Agree the funding route before the date</td><td>Liquidity plan: sell, draw, or reschedule; lending conversation</td><td>Plan noted; funding transaction or facility change observed</td><td>How far ahead must funding be arranged for each need type?</td></tr>
+<tr><td class="k">Severe market signal reaching the household</td><td>Call the exposed clients first</td><td>Discuss the impact; send a market update in the client's language</td><td>Call logged; message sent through the gateway</td><td>What is the expected response time to a severe event, and is silence acceptable for lightly exposed clients?</td></tr>
+<tr><td class="k">Stated versus observed risk mismatch</td><td>Re-profile or document the difference</td><td>Rubric override with reason, or a review meeting</td><td>Override with reason logged; locked rubric attached to the record</td><td>Who may override, and does a mismatch require a formal re-profiling?</td></tr>
+<tr><td class="k">KYC review due or overdue</td><td>Schedule the refresh</td><td>KYC refresh playbook; documents requested</td><td>Meeting scheduled; KYC system updated</td><td>Does the RM own the KYC refresh, or operations, and what does the RM's task look like?</td></tr>
+<tr><td class="k">Client message unanswered</td><td>Reply today</td><td>Draft reply in the client's language; send through the gateway</td><td>Sent and logged</td><td>What is the service standard for a reply, by channel?</td></tr>
+<tr><td class="k">Promise made on a call</td><td>Fulfil it by the date</td><td>Send the material; the draft is attached to the promise</td><td>Promise marked done from the send event</td><td>Which promises are most common, and who tracks them today?</td></tr>
+<tr><td class="k">Decision agreed but never executed</td><td>Bring it back to the client</td><td>Talking point on the next call; staged deployment proposal</td><td>Execution observed, or the client's decision recorded</td><td>Is a client's non-execution something the bank wants tracked, and for how long?</td></tr>
+<tr><td class="k">Contact overdue against cadence</td><td>Call, even with nothing urgent</td><td>Relationship call; review scheduling</td><td>Call logged; note written</td><td>Is cadence a policy the bank enforces or an RM's own habit?</td></tr>
+<tr><td class="k">Idea fits several clients</td><td>Reach them, in order</td><td>One draft per client; reverse-enquiry record where required</td><td>Drafts sent; uptake counted per idea</td><td>May an RM initiate contact about an idea, per residence, or only respond?</td></tr>
+</tbody></table></div>
+
+<h3>Questions about actions and tasks</h3>
+<ol class="qs">
+<li data-id="T-1">For each insight the workbench produces, what does an RM do about it today, and what would the bank want her to do? Are there insights that should produce no action at all?<span class="why"><b>Why we ask</b>The ranked actions and the call plan encode a mapping from insight to action; the bank's own expectation replaces our defaults, and some alerts may be for information only.</span></li>
+<li data-id="T-2">Where do RM tasks live today: a CRM task list, a case-management tool, email, a spreadsheet, the RM's head? Who assigns them, and who else can see them?<span class="why"><b>Why we ask</b>The workbench proposes tasks and logs their completion; if the bank has a task system, tasks must be written there too, or the RM will keep two lists.</span></li>
+<li data-id="T-3">Which tasks come to the RM from elsewhere: compliance (KYC, documentation), operations (failed settlement, missing form), the team head, the client, product desks? In what form and with what deadline?<span class="why"><b>Why we ask</b>The six o'clock task list should include what others need from the RM, not only what the data suggests; these need a feed or an inbox.</span></li>
+<li data-id="T-4">How are tasks prioritised today when there are more than the day allows, and what happens to the ones that slip?<span class="why"><b>Why we ask</b>The call plan packs by deadline and priority and shows overflow explicitly; the bank's rules for what may slip decide the packing order.</span></li>
+<li data-id="T-5">What counts as a task being done, and what evidence must exist: a note, a system update, a sent message, an approval?<span class="why"><b>Why we ask</b>The workbench marks tasks done from the event that proves it (send, decision, log) rather than a tick; each task type needs a defined proof.</span></li>
+<li data-id="T-6">Which tasks have a regulatory or service-level deadline (KYC, margin call notice, complaint response, corporate-action election), and where are those deadlines held?<span class="why"><b>Why we ask</b>Dated deadlines drive the clock term of the call plan and the "returned early" rule on deferred clients.</span></li>
+<li data-id="T-7">Which tasks may a machine complete outright (assemble documents, pre-fill a form, schedule from a calendar, draft a message), which may it propose for one-click confirmation, and which must the RM originate?<span class="why"><b>Why we ask</b>This is the autonomy line per task type: complete, propose, or prepare only. The workbench proposes today and confirms per card.</span></li>
+<li data-id="T-8">May a task be assigned to someone other than the RM (assistant, operations, specialist), and may the machine route it there directly?<span class="why"><b>Why we ask</b>Some calls to action are handoffs; routing needs the team model and the recipient's task system.</span></li>
+<li data-id="T-9">How does the team head see task load and slippage across the team today, and what would she want escalated to her automatically?<span class="why"><b>Why we ask</b>The team page shows calls today, deferrals and approvals waiting; escalation rules decide what reaches her without asking.</span></li>
+<li data-id="T-10">When an RM defers or dismisses a proposed task, must the reason be recorded, and does anyone review the pattern?<span class="why"><b>Why we ask</b>Deferrals with reasons are logged and feed both the call plan and the conduct panel; the bank decides whether the pattern is reviewed.</span></li>
+<li data-id="T-11">Which task outcomes should feed back into client data: a client's stated intention, a waiver, a preference, a promise kept?<span class="why"><b>Why we ask</b>Closing a task often creates a fact (client chose to hold, prefers WhatsApp, will fund by Friday); those facts should land in structured fields, not only in a note.</span></li>
+<li data-id="T-12">What would the RM want the six o'clock task list to look like: how many items, in what order, with what attached, and what should never be on it?<span class="why"><b>Why we ask</b>Defines the shape of Today: the brief, the call sheet and the tasks are one page, and it must be readable in ninety seconds.</span></li>
+</ol>
+
+<!-- 11 -->
+<h2 id="first"><span class="num">11</span>The fifteen to ask first</h2>
 <p class="intro">If the first workshop has ninety minutes, these decide whether the six o'clock brief is possible and what it may contain.</p>
 <ol class="qs">
 <li data-id="1">For custody positions and prices: at what time is yesterday final, at what time can we read it, and why the gap? (R-1)</li>
@@ -296,9 +334,9 @@ footer{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);color:v
 <li data-id="12">Which suitability, appropriateness and cross-border rules must sit in front of every idea and message, and in what form can compliance supply them? (A-B4, A-X1)</li>
 <li data-id="13">Is there a research and CIO content platform with a feed and approval status, and is personalised content wanted? (G-1, G-2)</li>
 <li data-id="14">Which client channels are approved, where is consent recorded, and is an agent-sent informational message conceivable? (G-6, G-7, G-11)</li>
-<li data-id="15">What may leave the bank to a model provider, and is pseudonymisation acceptable? (S-3)</li>
+<li data-id="15">Where do RM tasks live today, what proves a task done, and which tasks may a machine complete rather than propose? (T-2, T-5, T-7)</li>
 </ol>
 
-<footer>Discovery questionnaire for the agentic RM workbench in Private Banking and Retail Wealth. Question ids: J what the RM does, E entitlements, A asset classes, I data and insights, S source systems, R recency and quality, V events and micro-batches, G agent build. The workbench modules referenced are those built in iterations 0 to 10 and the data platform (ADR-001 to ADR-016). Prepared 18 Sep 2026.</footer>
+<footer>Discovery questionnaire for the agentic RM workbench in Private Banking and Retail Wealth. Question ids: J what the RM does, E entitlements, A asset classes, I data and insights, S source systems, R recency and quality, V events and micro-batches, G agent build, T calls to action and tasks. The workbench modules referenced are those built in iterations 0 to 10 and the data platform (ADR-001 to ADR-016). Prepared 18 Sep 2026.</footer>
 </main>
 </div>
